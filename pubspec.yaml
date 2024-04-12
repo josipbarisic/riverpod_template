@@ -31,12 +31,24 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # https://pub.dev/packages/cookie_jar
+  cookie_jar:
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.6
+  cupertino_icons:
+
+  # https://pub.dev/packages/dio
+  dio:
+
+  # https://pub.dev/packages/dio_cookie_manager
+  dio_cookie_manager:
 
   # https://pub.dev/packages/freezed_annotation
   freezed_annotation:
+
+  # https://pub.dev/packages/mocktail
+  mocktail:
 
 dev_dependencies:
   flutter_test:
