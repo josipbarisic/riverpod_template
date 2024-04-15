@@ -2,7 +2,15 @@ import 'package:dio/dio.dart';
 
 const String mockBaseURL = 'https://riverpod_template_test.com';
 
-final RequestOptions requestOptions = RequestOptions(path: '');
+final RequestOptions requestOptions = RequestOptions(
+  path: mockBaseURL,
+  headers: mockHeaders,
+);
+
+final Map<String, dynamic> mockHeaders = {
+  'content-type': 'application/json',
+  'content-length': 2,
+};
 
 /// ======================== Exceptions =========================
 final DioException dio404Exception = DioException(

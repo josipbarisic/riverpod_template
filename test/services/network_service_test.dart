@@ -47,4 +47,94 @@ void main() {
       expect(response, isA<NetworkSuccessResponse>());
     });
   });
+
+  group('NetworkService - POST', () {
+    test('Is NetworkErrorResponse on DioException', () async {
+      dioAdapter.onPost(
+        mockBaseURL,
+        (server) => server.throws(404, dio404Exception),
+        headers: mockHeaders,
+        queryParameters: {},
+        data: {},
+      );
+
+      final response = await sut.postHttp(baseURL: mockBaseURL, endpoint: '');
+
+      expect(response, isA<NetworkErrorResponse>());
+    });
+
+    test('Is NetworkSuccessResponse on Success', () async {
+      dioAdapter.onPost(
+        mockBaseURL,
+        (server) => server.reply(200, successResponse.data),
+        headers: mockHeaders,
+        queryParameters: {},
+        data: {},
+      );
+
+      final response = await sut.postHttp(baseURL: mockBaseURL, endpoint: '');
+
+      expect(response, isA<NetworkSuccessResponse>());
+    });
+  });
+
+  group('NetworkService - PATCH', () {
+    test('Is NetworkErrorResponse on DioException', () async {
+      dioAdapter.onPatch(
+        mockBaseURL,
+        (server) => server.throws(404, dio404Exception),
+        headers: mockHeaders,
+        queryParameters: {},
+        data: {},
+      );
+
+      final response = await sut.patchHttp(baseURL: mockBaseURL, endpoint: '');
+
+      expect(response, isA<NetworkErrorResponse>());
+    });
+
+    test('Is NetworkSuccessResponse on Success', () async {
+      dioAdapter.onPatch(
+        mockBaseURL,
+        (server) => server.reply(200, successResponse.data),
+        headers: mockHeaders,
+        queryParameters: {},
+        data: {},
+      );
+
+      final response = await sut.patchHttp(baseURL: mockBaseURL, endpoint: '');
+
+      expect(response, isA<NetworkSuccessResponse>());
+    });
+  });
+
+  group('NetworkService - DELETE', () {
+    test('Is NetworkErrorResponse on DioException', () async {
+      dioAdapter.onDelete(
+        mockBaseURL,
+        (server) => server.throws(404, dio404Exception),
+        headers: mockHeaders,
+        queryParameters: {},
+        data: {},
+      );
+
+      final response = await sut.deleteHttp(baseURL: mockBaseURL, endpoint: '');
+
+      expect(response, isA<NetworkErrorResponse>());
+    });
+
+    test('Is NetworkSuccessResponse on Success', () async {
+      dioAdapter.onDelete(
+        mockBaseURL,
+        (server) => server.reply(200, successResponse.data),
+        headers: mockHeaders,
+        queryParameters: {},
+        data: {},
+      );
+
+      final response = await sut.deleteHttp(baseURL: mockBaseURL, endpoint: '');
+
+      expect(response, isA<NetworkSuccessResponse>());
+    });
+  });
 }

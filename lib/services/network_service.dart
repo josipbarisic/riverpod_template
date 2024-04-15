@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:riverpod_template/data/constants/network_constants.dart';
 import 'package:riverpod_template/data/network/network_response.dart';
 import 'package:riverpod_template/flavors.dart';
 
@@ -39,6 +40,135 @@ class NetworkService {
         httpStatusCode: dioError.response?.statusCode,
         message: dioError.message,
         data: dioError.response?.data,
+      );
+    }
+  }
+
+  /// POST
+  Future<NetworkResponse> postHttp({
+    String? baseURL,
+    required String endpoint,
+    Map<String, dynamic>? queryParams,
+    Map<String, dynamic>? headers,
+    dynamic body,
+    bool imageUpload = false,
+  }) async {
+    baseURL ??= FlavorConfig.baseURL;
+
+    try {
+      body ??= <String, dynamic>{};
+
+      final Response<dynamic> response = await _dio.post(
+        baseURL + endpoint,
+        queryParameters: queryParams,
+        options: Options(
+          headers: headers,
+          contentType: imageUpload ? HTTP_FORM_DATA_TYPE : HTTP_CONTENT_TYPE,
+        ),
+        data: body,
+      );
+
+      return NetworkSuccessResponse(
+        httpStatusCode: response.statusCode,
+        data: response.data,
+        message: response.statusMessage,
+      );
+    } on DioException catch (dioError, _) {
+      return NetworkErrorResponse(
+        httpStatusCode: dioError.response?.statusCode,
+        message: dioError.message ?? '',
+        data: dioError.response?.data,
+      );
+    } catch (e) {
+      return NetworkErrorResponse(
+        httpStatusCode: 400,
+        message: 'Error: $e',
+      );
+    }
+  }
+
+  /// PATCH
+  Future<NetworkResponse> patchHttp({
+    String? baseURL,
+    required String endpoint,
+    Map<String, dynamic>? queryParams,
+    Map<String, dynamic>? headers,
+    dynamic body,
+    bool imageUpload = false,
+  }) async {
+    baseURL ??= FlavorConfig.baseURL;
+
+    try {
+      body ??= <String, dynamic>{};
+
+      final Response<dynamic> response = await _dio.patch(
+        baseURL + endpoint,
+        queryParameters: queryParams,
+        options: Options(
+          headers: headers,
+          contentType: HTTP_CONTENT_TYPE,
+        ),
+        data: body,
+      );
+
+      return NetworkSuccessResponse(
+        httpStatusCode: response.statusCode,
+        data: response.data,
+        message: response.statusMessage,
+      );
+    } on DioException catch (dioError, _) {
+      return NetworkErrorResponse(
+        httpStatusCode: dioError.response?.statusCode,
+        message: dioError.message ?? '',
+        data: dioError.response?.data,
+      );
+    } catch (e) {
+      return NetworkErrorResponse(
+        httpStatusCode: 400,
+        message: 'Error: $e',
+      );
+    }
+  }
+
+  /// DELETE
+  Future<NetworkResponse> deleteHttp({
+    String? baseURL,
+    required String endpoint,
+    Map<String, dynamic>? queryParams,
+    Map<String, dynamic>? headers,
+    dynamic body,
+    bool imageUpload = false,
+  }) async {
+    baseURL ??= FlavorConfig.baseURL;
+
+    try {
+      body ??= <String, dynamic>{};
+
+      final Response<dynamic> response = await _dio.delete(
+        baseURL + endpoint,
+        queryParameters: queryParams,
+        options: Options(
+          headers: headers,
+          contentType: HTTP_CONTENT_TYPE,
+        ),
+        data: body,
+      );
+
+      return NetworkSuccessResponse(
+        httpStatusCode: response.statusCode,
+        data: response.data,
+        message: response.statusMessage,
+      );
+    } on DioException catch (dioError, _) {
+      return NetworkErrorResponse(
+        httpStatusCode: dioError.response?.statusCode,
+        message: dioError.message ?? '',
+        data: dioError.response?.data,
+      );
+    } catch (e) {
+      return NetworkErrorResponse(
+        httpStatusCode: 400,
+        message: 'Error: $e',
       );
     }
   }
