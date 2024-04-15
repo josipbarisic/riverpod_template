@@ -63,7 +63,7 @@ class NetworkService {
         queryParameters: queryParams,
         options: Options(
           headers: headers,
-          contentType: imageUpload ? HTTP_FORM_DATA_TYPE : HTTP_CONTENT_TYPE,
+          contentType: imageUpload ? HTTP_FORM_DATA_TYPE : HTTP_CONTENT_TYPE_APP_JSON,
         ),
         data: body,
       );
@@ -106,7 +106,7 @@ class NetworkService {
         queryParameters: queryParams,
         options: Options(
           headers: headers,
-          contentType: HTTP_CONTENT_TYPE,
+          contentType: HTTP_CONTENT_TYPE_APP_JSON,
         ),
         data: body,
       );
@@ -149,7 +149,7 @@ class NetworkService {
         queryParameters: queryParams,
         options: Options(
           headers: headers,
-          contentType: HTTP_CONTENT_TYPE,
+          contentType: HTTP_CONTENT_TYPE_APP_JSON,
         ),
         data: body,
       );

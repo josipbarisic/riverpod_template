@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
+import 'package:riverpod_template/data/constants/network_constants.dart';
 
 const String mockBaseURL = 'https://riverpod_template_test.com';
 
@@ -8,8 +11,8 @@ final RequestOptions requestOptions = RequestOptions(
 );
 
 final Map<String, dynamic> mockHeaders = {
-  'content-type': 'application/json',
-  'content-length': 2,
+  HttpHeaders.contentTypeHeader: HTTP_CONTENT_TYPE_APP_JSON,
+  HttpHeaders.contentLengthHeader: 2,
 };
 
 /// ======================== Exceptions =========================
