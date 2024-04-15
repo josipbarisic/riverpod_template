@@ -1,19 +1,19 @@
 import 'package:dio/dio.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:riverpod_template/data/network/network_response.dart';
 import 'package:riverpod_template/flavors.dart';
 
-class NetworkServiceMock extends Mock implements NetworkService {}
-
 class NetworkService {
-  final Dio _dio = Dio()
-    ..options.connectTimeout = const Duration(seconds: 10)
-    // TODO(Me): Add custom interceptor
-    ..interceptors.add(LogInterceptor());
+  NetworkService({Dio? externalDio}) {
+    _dio = externalDio ?? Dio()
+      ..options.connectTimeout = const Duration(seconds: 10)
+      // TODO(Me): Add custom interceptor
+      ..interceptors.add(LogInterceptor());
+  }
+
+  late Dio _dio;
 
   /// ------------------------- HTTP METHODS --------------------------
   /// GET
-  // TODO(Me): Write unit tests for this method
   Future<NetworkResponse> getHttp({
     String? baseURL,
     required String endpoint,

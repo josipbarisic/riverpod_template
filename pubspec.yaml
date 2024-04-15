@@ -58,6 +58,9 @@ dev_dependencies:
   # https://pub.dev/packages/build_runner
   build_runner:
 
+  # https://pub.dev/packages/http_mock_adapter
+  http_mock_adapter:
+
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -70,6 +73,9 @@ dev_dependencies:
 
   # https://pub.dev/packages/json_serializable
   json_serializable:
+
+  # https://pub.dev/packages/mockito
+  mockito:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

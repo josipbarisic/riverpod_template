@@ -1,8 +1,5 @@
 sealed class NetworkResponse {
-  NetworkResponse({int? httpStatusCode, String? message, this.data
-      // Status code -1 would signify that none of the response data was available. Unit test the
-      // NetworkService methods to verify these cases.
-      })
+  NetworkResponse({int? httpStatusCode, String? message, this.data})
       : httpStatusCode = httpStatusCode ?? -1,
         message = message ?? 'Unknown status message';
 
