@@ -1,6 +1,6 @@
 sealed class NetworkResponse {
   NetworkResponse({int? httpStatusCode, String? message, this.data})
-      : httpStatusCode = httpStatusCode ?? -1,
+      : httpStatusCode = httpStatusCode ?? 400,
         message = message ?? 'Unknown status message';
 
   int httpStatusCode;

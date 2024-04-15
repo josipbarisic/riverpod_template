@@ -17,7 +17,7 @@ void main() {
         message: null,
         data: null,
       );
-      assert(sut.httpStatusCode == -1);
+      assert(sut.httpStatusCode == 400);
       assert(sut.message == 'Unknown status message');
       assert(sut.data == null);
     });
@@ -41,7 +41,7 @@ void main() {
         message: null,
         data: null,
       );
-      assert(sut.httpStatusCode == -1);
+      assert(sut.httpStatusCode == 400);
       assert(sut.message == 'Unknown status message');
       assert(sut.data == null);
     });
