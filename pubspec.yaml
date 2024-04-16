@@ -55,6 +55,9 @@ dependencies:
   # https://pub.dev/packages/mocktail
   mocktail:
 
+  # https://pub.dev/packages/flutter_dotenv
+  flutter_dotenv:
+
   # https://pub.dev/packages/flutter_hooks
   flutter_hooks:
 

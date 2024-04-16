@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_template/routing/router.dart';
 import 'package:riverpod_template/theme/theme.dart';
 
-void main() {
+void main() async {
+  await _appSetup();
+
   runApp(
     // For widgets to be able to read providers, we need to wrap the entire
     // application in a "ProviderScope" widget.
@@ -13,6 +16,18 @@ void main() {
       child: MyApp(),
     ),
   );
+}
+
+Future<void> _appSetup() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Load environment variables from .env file
+  await dotenv.load();
+
+  // This is the place to initialize Firebase if using it
+  /*await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );*/
 }
 
 class MyApp extends StatelessWidget {
