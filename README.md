@@ -25,16 +25,16 @@ There are multiple sources to get you more familiar with both riverpod in genera
 architecture/structure of this template:
 
 - [Structure](https://codewithandrea.com/articles/flutter-project-structure/)
-- [Domain Layer] https://codewithandrea.com/articles/flutter-app-architecture-domain-model/
-- [Presentation Layer] https://codewithandrea.com/articles/flutter-presentation-layer/
+- [Domain Layer](https://codewithandrea.com/articles/flutter-app-architecture-domain-model/)
+- [Presentation Layer](https://codewithandrea.com/articles/flutter-presentation-layer/)
 - Data Layer
-    - Data Layer encompasses Repositories and Models as mentioned in the Structure section.
-    - [Data utilisation/flow and mutations] (https://codewithandrea.com/articles/data-mutations-riverpod/)
-- [Repository Pattern] (https://codewithandrea.com/articles/flutter-repository-pattern/)
+  - Data Layer encompasses Repositories and Models as mentioned in the Structure section.
+  - [Data utilisation/flow and mutations](https://codewithandrea.com/articles/data-mutations-riverpod/)
+- [Repository Pattern](https://codewithandrea.com/articles/flutter-repository-pattern/)
 - [Application/Service
-  Layer] (https://codewithandrea.com/articles/flutter-app-architecture-application-layer/)
+  Layer](https://codewithandrea.com/articles/flutter-app-architecture-application-layer/)
 
 Several other useful resources:
 
 - [Data Caching and Provider
-  Lifecycle] (https://codewithandrea.com/articles/flutter-riverpod-data-caching-providers-lifecycle/)
+  Lifecycle](https://codewithandrea.com/articles/flutter-riverpod-data-caching-providers-lifecycle/)
