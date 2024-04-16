@@ -1,6 +1,6 @@
 import 'package:mocktail/mocktail.dart';
 import 'package:riverpod_template/data/network/network_response.dart';
-import 'package:riverpod_template/services/network_service.dart';
+import 'package:riverpod_template/services/network_service/network_service.dart';
 
 class NetworkTestHelper {
   NetworkTestHelper(this.networkService);

@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:riverpod_template/data/models/item/item.dart';
+import 'package:riverpod_template/domain/item/item.dart';
 
 part 'cart.freezed.dart';
 part 'cart.g.dart';
