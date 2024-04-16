@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:riverpod_template/data/network/network_response.dart';
-import 'package:riverpod_template/services/network_service.dart';
+import 'package:riverpod_template/services/network_service/network_service.dart';
 
 import '../test_data/network_service_test_data.dart';
 
