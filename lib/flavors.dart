@@ -13,11 +13,11 @@ final class FlavorConfig {
         Flavor.prod => 'Riverpod Template',
       };
 
-  // TODO(Me): Add later
-  /*static Image get logo => switch (appFlavor) {
-    Flavor.dev => Assets.icons.logoDev.image(),
-    Flavor.prod => Assets.icons.logo.image(),
-  };*/
+  // TODO(Developer): Uncomment and adjust if needed
+  // static Image get logo => switch (appFlavor) {
+  //   Flavor.dev => Assets.icons.logoDev.image(),
+  //   Flavor.prod => Assets.icons.logo.image(),
+  // };
 
   static String get baseURL => switch (appFlavor) {
         // TODO(User): Update these values
