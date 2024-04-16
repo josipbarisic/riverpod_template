@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_template/data/repositories/user_repository/user_repository.dart';
 import 'package:riverpod_template/domain/user/user.dart';
-import 'package:riverpod_template/services/network_service/network_service.dart';
+import 'package:riverpod_template/services/network_service/network_service_providers.dart';
 
 part 'user_repository_providers.g.dart';
 
