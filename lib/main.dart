@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_template/routing/router.dart';
+import 'package:riverpod_template/theme/theme.dart';
 
 void main() {
   runApp(
@@ -17,17 +20,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Example')),
-        body: const Center(
-          child: Column(
-            children: [
-              Text('Hello'),
-            ],
-          ),
-        ),
-      ),
+    // Set the color of the system status bar, according to the current theme
+    SystemChrome.setSystemUIOverlayStyle(
+        MediaQuery.of(context).platformBrightness == Brightness.dark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark);
+
+    return MaterialApp.router(
+      title: 'Riverpod Template',
+      routerDelegate: router.routerDelegate,
+      routeInformationParser: router.routeInformationParser,
+      routeInformationProvider: router.routeInformationProvider,
+      theme: appTheme.lightTheme,
+      darkTheme: appTheme.darkTheme,
     );
   }
 }
