@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_template/flavors.dart';
 import 'package:riverpod_template/routing/router.dart';
 import 'package:riverpod_template/theme/theme.dart';
 
-void main() async {
+Future<void> main() async {
   await _appSetup();
 
   runApp(
@@ -25,9 +26,9 @@ Future<void> _appSetup() async {
   await dotenv.load();
 
   // This is the place to initialize Firebase if using it
-  /*await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );*/
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
 }
 
 class MyApp extends StatelessWidget {
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
             : SystemUiOverlayStyle.dark);
 
     return MaterialApp.router(
-      title: 'Riverpod Template',
+      title: FlavorConfig.title,
       routerDelegate: router.routerDelegate,
       routeInformationParser: router.routeInformationParser,
       routeInformationProvider: router.routeInformationProvider,
