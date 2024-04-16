@@ -26,9 +26,9 @@ Future<void> _appSetup() async {
   await dotenv.load();
 
   // This is the place to initialize Firebase if using it
-  /*await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );*/
+  // await Firebase.initializeApp(
+  //   options: DefaultFirebaseOptions.currentPlatform,
+  // );
 }
 
 class MyApp extends StatelessWidget {
