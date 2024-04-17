@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:riverpod_template/services/local_notifications_service/local_notifications_service_provider.dart';
 import 'package:riverpod_template/utils/shared_prefs/shared_prefs_keys.dart';
 import 'package:riverpod_template/utils/shared_prefs/shared_prefs_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,7 +14,12 @@ class SplashController extends _$SplashController {
 
   @override
   FutureOr<void> build() {
-    _sharedPrefs = ref.watch(sharedPrefsProvider).value!;
+    log('==== CALLING SPLASH CONTROLLER BUILD METHOD =====');
+    _sharedPrefs = ref.watch(sharedPrefsProvider).requireValue;
+
+    /// Initialize local notifications
+    ref.read(localNotificationsServiceProvider).init();
+
     return _fetchInitialData();
   }
 
@@ -21,7 +27,6 @@ class SplashController extends _$SplashController {
     state = const AsyncLoading();
 
     await _sharedPrefs.setString(SharedPrefsKeys.test, 'testing shared prefs');
-
     log('FETCH ${SharedPrefsKeys.test} FROM PREFS ===> ${_sharedPrefs.get(SharedPrefsKeys.test)}');
 
     state = await AsyncValue.guard(() => Future.delayed(
