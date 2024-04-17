@@ -70,6 +70,9 @@ dependencies:
   # https://pub.dev/packages/riverpod_annotation
   riverpod_annotation:
 
+  # https://pub.dev/packages/shared_preferences
+  shared_preferences:
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
