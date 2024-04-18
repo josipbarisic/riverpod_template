@@ -38,3 +38,20 @@ Several other useful resources:
 
 - [Data Caching and Provider
   Lifecycle](https://codewithandrea.com/articles/flutter-riverpod-data-caching-providers-lifecycle/)
+
+This template is not a one-size-fits-all solution. It is a starting point and
+everything in it is subject to change based on the requirements of the project. It is a good idea to
+familiarise yourself with the architecture and structure of the template and adjust it to your
+needs.
+
+[Important note]: Template has Firebase set up in order to implement widely used features such as
+Push Notifications, Authentication, etc. If you are not planning to use Firebase, make sure to
+remove all the Firebase related code and dependencies. Outside of pubspec.yaml, those are:
+
+- firebase.json
+- firebase_options.dart
+- android/app/google-services.json
+- ios/Runner/GoogleService-Info.plist
+- android/app/src/main/AndroidManifest.xml notification icon meta-data=
+- Google services plugin in android/build.gradle and settings.gradle, and GoogleService-Info
+  mentions in project.pbxproj

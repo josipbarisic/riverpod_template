@@ -21,7 +21,7 @@ final userRepositoryProvider = Provider<UserRepository>.internal(
 );
 
 typedef UserRepositoryRef = ProviderRef<UserRepository>;
-String _$userDataHash() => r'4fdbdd40c6e74c52e3cd74ad973509dbc488eefc';
+String _$userDataHash() => r'2c3182be4558eb8f149b5880091ccaaec07d4316';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -55,10 +55,10 @@ class UserDataFamily extends Family<AsyncValue<User>> {
 
   /// See also [userData].
   UserDataProvider call(
-    String uid,
+    int id,
   ) {
     return UserDataProvider(
-      uid,
+      id,
     );
   }
 
@@ -67,7 +67,7 @@ class UserDataFamily extends Family<AsyncValue<User>> {
     covariant UserDataProvider provider,
   ) {
     return call(
-      provider.uid,
+      provider.id,
     );
   }
 
@@ -90,11 +90,11 @@ class UserDataFamily extends Family<AsyncValue<User>> {
 class UserDataProvider extends AutoDisposeFutureProvider<User> {
   /// See also [userData].
   UserDataProvider(
-    String uid,
+    int id,
   ) : this._internal(
           (ref) => userData(
             ref as UserDataRef,
-            uid,
+            id,
           ),
           from: userDataProvider,
           name: r'userDataProvider',
@@ -104,7 +104,7 @@ class UserDataProvider extends AutoDisposeFutureProvider<User> {
                   : _$userDataHash,
           dependencies: UserDataFamily._dependencies,
           allTransitiveDependencies: UserDataFamily._allTransitiveDependencies,
-          uid: uid,
+          id: id,
         );
 
   UserDataProvider._internal(
@@ -114,10 +114,10 @@ class UserDataProvider extends AutoDisposeFutureProvider<User> {
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
-    required this.uid,
+    required this.id,
   }) : super.internal();
 
-  final String uid;
+  final int id;
 
   @override
   Override overrideWith(
@@ -132,7 +132,7 @@ class UserDataProvider extends AutoDisposeFutureProvider<User> {
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
-        uid: uid,
+        id: id,
       ),
     );
   }
@@ -144,21 +144,21 @@ class UserDataProvider extends AutoDisposeFutureProvider<User> {
 
   @override
   bool operator ==(Object other) {
-    return other is UserDataProvider && other.uid == uid;
+    return other is UserDataProvider && other.id == id;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, uid.hashCode);
+    hash = _SystemHash.combine(hash, id.hashCode);
 
     return _SystemHash.finish(hash);
   }
 }
 
 mixin UserDataRef on AutoDisposeFutureProviderRef<User> {
-  /// The parameter `uid` of this provider.
-  String get uid;
+  /// The parameter `id` of this provider.
+  int get id;
 }
 
 class _UserDataProviderElement extends AutoDisposeFutureProviderElement<User>
@@ -166,7 +166,7 @@ class _UserDataProviderElement extends AutoDisposeFutureProviderElement<User>
   _UserDataProviderElement(super.provider);
 
   @override
-  String get uid => (origin as UserDataProvider).uid;
+  int get id => (origin as UserDataProvider).id;
 }
 
 String _$someUsersHash() => r'2cf1fa7a5b14f9c544cf7204c8b0ba8c0f49f3b2';

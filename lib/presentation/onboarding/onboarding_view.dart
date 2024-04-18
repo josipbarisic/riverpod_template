@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:riverpod_template/data/enums/hero_animations_enum.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_template/data/firebase/firebase_api_providers.dart';
 import 'package:riverpod_template/gen/assets.gen.dart';
 import 'package:riverpod_template/theme/helpers/app_icons_helper.dart';
+import 'package:riverpod_template/utils/enums/hero_animations_enum.dart';
 
-class OnboardingView extends StatelessWidget {
+class OnboardingView extends ConsumerWidget {
   const OnboardingView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -30,6 +32,7 @@ class OnboardingView extends StatelessWidget {
             ),
             const SizedBox(height: 250),
             const Text('ONBOARDING SCREEN'),
+             Text('HAS MSG ==> ${ref.watch(hasRemoteMessageProvider)}'),
           ],
         ),
       ),

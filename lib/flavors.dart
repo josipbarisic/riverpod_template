@@ -21,7 +21,7 @@ final class FlavorConfig {
 
   static String get baseURL => switch (appFlavor) {
         // TODO(User): Update these values
-        Flavor.dev => 'https://j85c3h.buildship.run',
-        Flavor.prod => 'https://j85c3h.buildship.run',
+        Flavor.dev => 'https://jsonplaceholder.typicode.com',
+        Flavor.prod => 'https://jsonplaceholder.typicode.com',
       };
 }

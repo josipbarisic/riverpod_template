@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:riverpod_template/data/constants/network_constants.dart';
+import 'package:riverpod_template/utils/constants/network_constants.dart';
 
 const String mockBaseURL = 'https://riverpod_template_test.com';
 

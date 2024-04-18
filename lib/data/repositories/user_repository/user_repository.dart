@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:riverpod_template/data/repositories/user_repository/user_repository_interface.dart';
 import 'package:riverpod_template/domain/user/user.dart';
 import 'package:riverpod_template/services/network_service/network_service.dart';
-import 'package:riverpod_template/template_mock_data/mocked_user_data.dart';
+import 'package:riverpod_template/utils/network/endpoints.dart';
 
 class UserRepository implements UserRepositoryInterface {
   UserRepository({
@@ -13,12 +13,20 @@ class UserRepository implements UserRepositoryInterface {
   final NetworkService networkService;
 
   @override
-  Future<User> fetchUserData(String uid) async => User.fromJson(mockedUserDataResponse);
+  Future<User> fetchUserData(int id) async {
+    var response = await networkService.getHttp(endpoint: Endpoints.user(id));
+
+    try {
+      return User.fromJson(response.data as Map<String, dynamic>);
+    } catch (e) {
+      log('Parsing user json failed: $e');
+      rethrow;
+    }
+  }
 
   @override
   Future<List<User>> fetchSomeUsers() async {
-    var response = await networkService.getHttp(
-        baseURL: 'https://jsonplaceholder.typicode.com', endpoint: '/users');
+    var response = await networkService.getHttp(endpoint: Endpoints.users);
 
     List<User> users = [];
 
