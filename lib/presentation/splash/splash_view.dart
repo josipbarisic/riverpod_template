@@ -18,7 +18,7 @@ class SplashView extends ConsumerWidget with ThemeMixin {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.listen(
       splashControllerProvider,
-      // If app was started from the background notification, do not navigation to the
+      // If app was started from the background notification, do not navigate to the
       // Onboarding screen.
       (_, next) => next.hasValue && !ref.read(hasRemoteMessageProvider)
           ? GoRouter.of(context).go(RoutePath.onboarding)
