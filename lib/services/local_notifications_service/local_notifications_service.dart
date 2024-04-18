@@ -1,11 +1,13 @@
 import 'dart:developer';
 
 import 'package:collection/collection.dart';
+import 'package:firebase_messaging_platform_interface/src/remote_message.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_template/theme/colors/light_app_colors.dart';
 import 'package:riverpod_template/utils/notifications/app_notification.dart';
+import 'package:riverpod_template/utils/notifications/notification_category.dart';
 import 'package:riverpod_template/utils/notifications/notification_status.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -18,6 +20,8 @@ class LocalNotificationsService {
 
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
+
+  int _remoteNotificationId = 0;
 
   Future<void> init() async {
     await _configureLocalTimeZone();
@@ -116,11 +120,37 @@ class LocalNotificationsService {
     return await Permission.notification.status;
   }
 
-  Future<bool> getDisabledByUser() async {
-    return await Future.value(sharedPrefs.getBool('disabledByUser') ?? false);
-  }
+  bool getDisabledByUser() => sharedPrefs.getBool('disabledByUser') ?? false;
 
-  Future<void> setDisabledByUser(bool value) async {
-    await sharedPrefs.setBool('disabledByUser', value);
+  Future<void> setDisabledByUser(bool value) => sharedPrefs.setBool('disabledByUser', value);
+
+  Future<void> showRemoteNotification(
+    RemoteMessage message, {
+    NotificationCategory notificationCategory = NotificationCategory.general,
+  }) async {
+    final androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      notificationCategory.channelId,
+      notificationCategory.channelName,
+      channelDescription: notificationCategory.description,
+      importance: Importance.defaultImportance,
+      priority: Priority.high,
+    );
+    final iOSPlatformChannelSpecifics = DarwinNotificationDetails(
+      categoryIdentifier: notificationCategory.channelId,
+      interruptionLevel: InterruptionLevel.active,
+    );
+
+    final platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+      iOS: iOSPlatformChannelSpecifics,
+    );
+    await _flutterLocalNotificationsPlugin
+        .show(
+          _remoteNotificationId,
+          message.notification!.title,
+          message.notification!.body,
+          platformChannelSpecifics,
+        )
+        .then((value) => _remoteNotificationId += 1);
   }
 }

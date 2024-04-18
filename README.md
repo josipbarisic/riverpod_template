@@ -52,5 +52,6 @@ remove all the Firebase related code and dependencies. Outside of pubspec.yaml, 
 - firebase_options.dart
 - android/app/google-services.json
 - ios/Runner/GoogleService-Info.plist
+- android/app/src/main/AndroidManifest.xml notification icon meta-data=
 - Google services plugin in android/build.gradle and settings.gradle, and GoogleService-Info
   mentions in project.pbxproj
