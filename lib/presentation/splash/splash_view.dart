@@ -3,11 +3,11 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:riverpod_template/data/enums/hero_animations_enum.dart';
 import 'package:riverpod_template/gen/assets.gen.dart';
 import 'package:riverpod_template/presentation/splash/splash_controller.dart';
 import 'package:riverpod_template/routing/router.dart';
 import 'package:riverpod_template/theme/helpers/app_icons_helper.dart';
+import 'package:riverpod_template/utils/enums/hero_animations_enum.dart';
 import 'package:riverpod_template/utils/mixins/theme_mixin.dart';
 
 class SplashView extends ConsumerWidget with ThemeMixin {

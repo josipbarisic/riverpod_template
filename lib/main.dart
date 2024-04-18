@@ -1,7 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_template/firebase_options.dart';
 import 'package:riverpod_template/flavors.dart';
 import 'package:riverpod_template/routing/router.dart';
 import 'package:riverpod_template/theme/theme.dart';
@@ -25,10 +27,10 @@ Future<void> _appSetup() async {
   // Load environment variables from .env file
   await dotenv.load();
 
-  // This is the place to initialize Firebase if using it
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
+  // Initialize Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 }
 
 class MyApp extends StatelessWidget {

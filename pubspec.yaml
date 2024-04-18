@@ -49,6 +49,12 @@ dependencies:
   # https://pub.dev/packages/equatable
   equatable:
 
+  # https://pub.dev/packages/firebase_core
+  firebase_core:
+
+  # https://pub.dev/packages/firebase_messaging
+  firebase_messaging:
+
   # https://pub.dev/packages/flutter_svg
   flutter_svg:
 

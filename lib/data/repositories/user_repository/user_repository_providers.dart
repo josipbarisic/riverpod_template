@@ -10,8 +10,8 @@ UserRepository userRepository(UserRepositoryRef ref) =>
     UserRepository(networkService: ref.watch(networkServiceProvider));
 
 @riverpod
-Future<User> userData(UserDataRef ref, String uid) =>
-    ref.watch(userRepositoryProvider).fetchUserData(uid);
+Future<User> userData(UserDataRef ref, int id) =>
+    ref.watch(userRepositoryProvider).fetchUserData(id);
 
 @riverpod
 Future<List<User>> someUsers(SomeUsersRef ref) =>

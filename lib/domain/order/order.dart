@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:riverpod_template/data/enums/order_status_enum.dart';
 import 'package:riverpod_template/domain/item/item.dart';
+import 'package:riverpod_template/utils/enums/order_status_enum.dart';
 
 part 'order.freezed.dart';
 part 'order.g.dart';

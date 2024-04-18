@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:riverpod_template/data/constants/network_constants.dart';
-import 'package:riverpod_template/data/network/network_response.dart';
 import 'package:riverpod_template/flavors.dart';
+import 'package:riverpod_template/utils/constants/network_constants.dart';
+import 'package:riverpod_template/utils/network/network_response.dart';
 
 class NetworkService {
   NetworkService({Dio? externalDio}) {

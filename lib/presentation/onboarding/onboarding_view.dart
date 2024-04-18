@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:riverpod_template/data/enums/hero_animations_enum.dart';
 import 'package:riverpod_template/gen/assets.gen.dart';
 import 'package:riverpod_template/theme/helpers/app_icons_helper.dart';
+import 'package:riverpod_template/utils/enums/hero_animations_enum.dart';
 
 class OnboardingView extends StatelessWidget {
   const OnboardingView({super.key});
