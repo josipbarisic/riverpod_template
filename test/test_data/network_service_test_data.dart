@@ -11,7 +11,7 @@ final RequestOptions requestOptions = RequestOptions(
 );
 
 final Map<String, dynamic> mockHeaders = {
-  HttpHeaders.contentTypeHeader: HTTP_CONTENT_TYPE_APP_JSON,
+  HttpHeaders.contentTypeHeader: httpContentTypeApplicationJson,
   HttpHeaders.contentLengthHeader: 2,
 };
 

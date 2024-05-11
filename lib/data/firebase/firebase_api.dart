@@ -54,7 +54,7 @@ class FirebaseApi {
       if (message != null) {
         hasRemoteMessage.updateHasRemoteMessage(true);
         log('Handling initial message: ${message.notification?.body}');
-        router.push(RoutePath.home, extra: message);
+        router.push(RoutePath.bottomNavigation, extra: message);
       }
     });
 

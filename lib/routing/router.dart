@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:riverpod_template/presentation/home/home_view.dart';
+import 'package:riverpod_template/presentation/bottom_navigation/bottom_navigation_view.dart';
 import 'package:riverpod_template/presentation/login/login_view.dart';
 import 'package:riverpod_template/presentation/onboarding/onboarding_view.dart';
 import 'package:riverpod_template/presentation/sign_up/sign_up_view.dart';
@@ -11,7 +11,7 @@ class RoutePath {
   static const String onboarding = '/onboarding';
   static const String login = '/login';
   static const String signUp = '/signUp';
-  static const String home = '/home';
+  static const String bottomNavigation = '/bottomNavigation';
 }
 
 final GoRouter router = GoRouter(
@@ -22,13 +22,6 @@ final GoRouter router = GoRouter(
       path: RoutePath.splash,
       builder: (BuildContext context, GoRouterState state) {
         return const SplashView();
-      },
-      routes: const <RouteBase>[],
-    ),
-    GoRoute(
-      path: RoutePath.home,
-      builder: (BuildContext context, GoRouterState state) {
-        return const HomeView();
       },
       routes: const <RouteBase>[],
     ),
@@ -50,6 +43,13 @@ final GoRouter router = GoRouter(
       path: RoutePath.login,
       builder: (BuildContext context, GoRouterState state) {
         return const LoginView();
+      },
+      routes: const <RouteBase>[],
+    ),
+    GoRoute(
+      path: RoutePath.bottomNavigation,
+      builder: (BuildContext context, GoRouterState state) {
+        return const BottomNavigationView();
       },
       routes: const <RouteBase>[],
     ),

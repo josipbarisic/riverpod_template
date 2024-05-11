@@ -7,7 +7,7 @@ class NetworkService {
   NetworkService({Dio? externalDio}) {
     _dio = externalDio ?? Dio()
       ..options.connectTimeout = const Duration(seconds: 10)
-      // TODO(Me): Add custom interceptor
+    // TODO(Me): Add custom interceptor
       ..interceptors.add(LogInterceptor());
   }
 
@@ -20,6 +20,7 @@ class NetworkService {
     required String endpoint,
     Map<String, dynamic>? queryParams,
     Map<String, dynamic>? headers,
+    CancelToken? cancelToken,
   }) async {
     baseURL ??= FlavorConfig.baseURL;
 
@@ -28,6 +29,7 @@ class NetworkService {
         baseURL + endpoint,
         queryParameters: queryParams,
         options: Options(headers: headers),
+        cancelToken: cancelToken,
       );
 
       return NetworkSuccessResponse(
@@ -52,6 +54,7 @@ class NetworkService {
     Map<String, dynamic>? headers,
     dynamic body,
     bool imageUpload = false,
+    CancelToken? cancelToken,
   }) async {
     baseURL ??= FlavorConfig.baseURL;
 
@@ -63,9 +66,10 @@ class NetworkService {
         queryParameters: queryParams,
         options: Options(
           headers: headers,
-          contentType: imageUpload ? HTTP_FORM_DATA_TYPE : HTTP_CONTENT_TYPE_APP_JSON,
+          contentType: imageUpload ? httpFormDataType : httpContentTypeApplicationJson,
         ),
         data: body,
+        cancelToken: cancelToken,
       );
 
       return NetworkSuccessResponse(
@@ -95,6 +99,7 @@ class NetworkService {
     Map<String, dynamic>? headers,
     dynamic body,
     bool imageUpload = false,
+    CancelToken? cancelToken,
   }) async {
     baseURL ??= FlavorConfig.baseURL;
 
@@ -106,9 +111,10 @@ class NetworkService {
         queryParameters: queryParams,
         options: Options(
           headers: headers,
-          contentType: HTTP_CONTENT_TYPE_APP_JSON,
+          contentType: httpContentTypeApplicationJson,
         ),
         data: body,
+        cancelToken: cancelToken,
       );
 
       return NetworkSuccessResponse(
@@ -138,6 +144,7 @@ class NetworkService {
     Map<String, dynamic>? headers,
     dynamic body,
     bool imageUpload = false,
+    CancelToken? cancelToken,
   }) async {
     baseURL ??= FlavorConfig.baseURL;
 
@@ -149,9 +156,10 @@ class NetworkService {
         queryParameters: queryParams,
         options: Options(
           headers: headers,
-          contentType: HTTP_CONTENT_TYPE_APP_JSON,
+          contentType: httpContentTypeApplicationJson,
         ),
         data: body,
+        cancelToken: cancelToken,
       );
 
       return NetworkSuccessResponse(
