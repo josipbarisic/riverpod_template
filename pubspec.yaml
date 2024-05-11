@@ -73,6 +73,9 @@ dependencies:
   # https://pub.dev/packages/flutter_hooks
   flutter_hooks:
 
+  # https://pub.dev/packages/flutter_lazy_indexed_stack
+  flutter_lazy_indexed_stack:
+
   # https://pub.dev/packages/flutter_local_notifications
   flutter_local_notifications:
 
@@ -85,6 +88,9 @@ dependencies:
   # https://pub.dev/packages/go_router
   go_router:
 
+  # https://pub.dev/packages/hooks_riverpod
+  hooks_riverpod:
+
   # https://pub.dev/packages/permission_handler
   permission_handler:
 
@@ -93,6 +99,9 @@ dependencies:
 
   # https://pub.dev/packages/shared_preferences
   shared_preferences:
+
+  # https://pub.dev/packages/smooth_page_indicator
+  smooth_page_indicator:
 
   # https://pub.dev/packages/timezone
   timezone:
