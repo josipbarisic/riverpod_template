@@ -18,8 +18,8 @@ class NetworkErrorResponse extends NetworkResponse {
 
 class NetworkSuccessResponse extends NetworkResponse {
   NetworkSuccessResponse({
-    super.httpStatusCode,
-    super.message,
+    super.httpStatusCode = 200,
+    super.message = 'Success',
     super.data,
   });
 }

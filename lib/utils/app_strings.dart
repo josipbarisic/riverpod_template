@@ -67,4 +67,7 @@ class ErrorStrings {
   static const String enterValidPhoneNumber = 'Please enter a valid phone number';
   static const String enterDateOfBirth = 'Please enter your date of birth';
   static const String verificationCodeInvalid = 'Verification code is invalid.';
+  static const String failedToAuthenticateUser =
+      'Failed to authenticate the user. Please try again.';
+  static const String failedToCreateUser = 'Failed to create a user. Please try again.';
 }
