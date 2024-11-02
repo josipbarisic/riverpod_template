@@ -49,6 +49,9 @@ dependencies:
   # https://pub.dev/packages/equatable
   equatable:
 
+  # https://pub.dev/packages/firebase_auth
+  firebase_auth:
+
   # https://pub.dev/packages/firebase_core
   firebase_core:
 
@@ -61,6 +64,9 @@ dependencies:
   # https://pub.dev/packages/freezed_annotation
   freezed_annotation:
 
+  # https://pub.dev/packages/google_sign_in
+  google_sign_in:
+
   # https://pub.dev/packages/json_annotation
   json_annotation:
 
@@ -69,6 +75,9 @@ dependencies:
 
   # https://pub.dev/packages/flutter_dotenv
   flutter_dotenv:
+
+  # https://pub.dev/packages/flutter_facebook_auth
+  flutter_facebook_auth:
 
   # https://pub.dev/packages/flutter_hooks
   flutter_hooks:
@@ -100,6 +109,9 @@ dependencies:
   # https://pub.dev/packages/shared_preferences
   shared_preferences:
 
+  # https://pub.dev/packages/sign_in_with_apple
+  sign_in_with_apple:
+
   # https://pub.dev/packages/smooth_page_indicator
   smooth_page_indicator:
 
@@ -116,6 +128,9 @@ dev_dependencies:
 
   # https://pub.dev/packages/http_mock_adapter
   http_mock_adapter:
+
+  # https://pub.dev/packages/faker
+  faker:
 
   # https://pub.dev/packages/flutter_flavorizr
   flutter_flavorizr:

@@ -6,7 +6,7 @@ part of 'firebase_api_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$firebaseApiHash() => r'252b7f0acb43a001e2d2f17b6c33dfcf3bddca45';
+String _$firebaseApiHash() => r'ed440253fb2bd6f9d400cb998810f5c0e682fcb2';
 
 /// See also [firebaseApi].
 @ProviderFor(firebaseApi)

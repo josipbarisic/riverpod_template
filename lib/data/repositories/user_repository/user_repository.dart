@@ -4,6 +4,7 @@ import 'package:riverpod_template/data/repositories/user_repository/user_reposit
 import 'package:riverpod_template/domain/user/user.dart';
 import 'package:riverpod_template/services/network_service/network_service.dart';
 import 'package:riverpod_template/utils/network/endpoints.dart';
+import 'package:riverpod_template/utils/network/network_response.dart';
 
 class UserRepository implements UserRepositoryInterface {
   UserRepository({
@@ -37,5 +38,11 @@ class UserRepository implements UserRepositoryInterface {
     }
 
     return users;
+  }
+
+  @override
+  Future<NetworkResponse> updateUserData(User user) {
+    // TODO: implement updateUserData
+    throw UnimplementedError();
   }
 }
