@@ -161,6 +161,7 @@ class AuthRepository with FirebaseAuthMixin implements AuthRepositoryInterface {
 
   @override
   Future<NetworkResponse> signOut() =>
+      // TODO(Josip): Adjust the sign out method to include all providers
       firebaseAuth.signOut().then((_) => _googleSignIn.signOut()).then<NetworkResponse>((_) {
         log('User signed out');
         return NetworkSuccessResponse();
