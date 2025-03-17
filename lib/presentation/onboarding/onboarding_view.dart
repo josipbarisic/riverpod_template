@@ -6,12 +6,12 @@ import 'package:riverpod_template/presentation/widgets/onboarding_scaffold.dart'
 import 'package:riverpod_template/routing/router.dart';
 import 'package:riverpod_template/theme/colors/light_app_colors.dart';
 import 'package:riverpod_template/utils/app_strings.dart';
-import 'package:riverpod_template/utils/mixins/theme_mixin.dart';
+import 'package:riverpod_template/utils/extensions/theme_extensions.dart';
 import 'package:riverpod_template/utils/shared_prefs/shared_prefs_keys.dart';
 import 'package:riverpod_template/utils/shared_prefs/shared_prefs_provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class OnboardingView extends HookConsumerWidget with ThemeMixin {
+class OnboardingView extends HookConsumerWidget {
   const OnboardingView({super.key});
 
   @override
@@ -82,14 +82,14 @@ class OnboardingView extends HookConsumerWidget with ThemeMixin {
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeIn,
                         )
-                      : GoRouter.of(context).push(RoutePath.signUp),
+                      : context.push(RoutePath.signUp),
                   child: Padding(
                     padding: const EdgeInsets.all(8),
                     child: Text(
                       !isLastPage.value ? AppStrings.next : AppStrings.getStarted,
-                      style: theme(context).textTheme.bodyMedium?.copyWith(
-                            letterSpacing: 1.92,
-                          ),
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        letterSpacing: 1.92,
+                      ),
                     ),
                   ),
                 ),

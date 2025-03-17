@@ -37,7 +37,8 @@ class AppTheme {
             disabledBackgroundColor: lightAppColors.primary600,
             disabledForegroundColor: lightAppColors.neutralsWhite,
             textStyle: lightAppTextStyles.primaryButtonTextStyle,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             splashFactory: defaultTargetPlatform == TargetPlatform.android
                 ? InkSparkle.splashFactory
                 : NoSplash.splashFactory,
@@ -50,7 +51,8 @@ class AppTheme {
             disabledBackgroundColor: lightAppColors.neutrals700,
             disabledForegroundColor: lightAppColors.neutrals800,
             textStyle: darkAppTextStyles.primaryButtonTextStyle,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             splashFactory: defaultTargetPlatform == TargetPlatform.android
                 ? InkSparkle.splashFactory
                 : NoSplash.splashFactory,
@@ -61,7 +63,8 @@ class AppTheme {
             side: const BorderSide(color: Colors.white),
             foregroundColor: Colors.white,
             textStyle: darkAppTextStyles.primaryButtonTextStyle,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             splashFactory: defaultTargetPlatform == TargetPlatform.android
                 ? InkSparkle.splashFactory
                 : NoSplash.splashFactory,
@@ -127,10 +130,11 @@ class AppTheme {
         snackBarTheme: SnackBarThemeData(
           behavior: SnackBarBehavior.floating,
           backgroundColor: lightAppColors.primaryDark,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          insetPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          contentTextStyle:
-              lightAppTextStyles.bodyMediumTextStyle.copyWith(color: lightAppColors.neutralsWhite),
+          contentTextStyle: lightAppTextStyles.bodyMediumTextStyle
+              .copyWith(color: lightAppColors.neutralsWhite),
         ),
 
         /// APP BARS
@@ -143,11 +147,13 @@ class AppTheme {
         navigationBarTheme: NavigationBarThemeData(
           backgroundColor: lightAppColors.backgroundColor,
           indicatorColor: lightAppColors.primary100,
-          labelTextStyle: MaterialStateProperty.resolveWith(
+          labelTextStyle: WidgetStateProperty.resolveWith(
             (states) => lightAppTextStyles.bodyMediumTextStyle.copyWith(
-                color: states.contains(MaterialState.selected) ? lightAppColors.primary100 : null),
+                color: states.contains(WidgetState.selected)
+                    ? lightAppColors.primary100
+                    : null),
           ),
-          iconTheme: MaterialStateProperty.resolveWith(
+          iconTheme: WidgetStateProperty.resolveWith(
             (states) => IconThemeData(color: darkAppColors.backgroundColor),
           ),
         ),
@@ -193,7 +199,8 @@ class AppTheme {
             disabledBackgroundColor: lightAppColors.primary300,
             disabledForegroundColor: lightAppColors.primary600,
             textStyle: darkAppTextStyles.primaryButtonTextStyle,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             splashFactory: defaultTargetPlatform == TargetPlatform.android
                 ? InkSparkle.splashFactory
                 : NoSplash.splashFactory,
@@ -206,7 +213,8 @@ class AppTheme {
             disabledBackgroundColor: lightAppColors.neutrals700,
             disabledForegroundColor: lightAppColors.neutrals800,
             textStyle: darkAppTextStyles.primaryButtonTextStyle,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             splashFactory: defaultTargetPlatform == TargetPlatform.android
                 ? InkSparkle.splashFactory
                 : NoSplash.splashFactory,
@@ -217,7 +225,8 @@ class AppTheme {
             side: const BorderSide(color: Colors.white),
             foregroundColor: Colors.white,
             textStyle: darkAppTextStyles.primaryButtonTextStyle,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             splashFactory: defaultTargetPlatform == TargetPlatform.android
                 ? InkSparkle.splashFactory
                 : NoSplash.splashFactory,
@@ -283,7 +292,8 @@ class AppTheme {
         snackBarTheme: SnackBarThemeData(
           behavior: SnackBarBehavior.floating,
           backgroundColor: darkAppColors.primary600,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          insetPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           contentTextStyle: lightAppTextStyles.bodyMediumTextStyle,
         ),
@@ -298,11 +308,13 @@ class AppTheme {
         navigationBarTheme: NavigationBarThemeData(
           backgroundColor: darkAppColors.backgroundColor,
           indicatorColor: darkAppColors.primary100,
-          labelTextStyle: MaterialStateProperty.resolveWith(
+          labelTextStyle: WidgetStateProperty.resolveWith(
             (states) => darkAppTextStyles.bodyMediumTextStyle.copyWith(
-                color: states.contains(MaterialState.selected) ? darkAppColors.primary100 : null),
+                color: states.contains(WidgetState.selected)
+                    ? darkAppColors.primary100
+                    : null),
           ),
-          iconTheme: MaterialStateProperty.resolveWith(
+          iconTheme: WidgetStateProperty.resolveWith(
             (states) => IconThemeData(color: lightAppColors.backgroundColor),
           ),
         ),

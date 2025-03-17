@@ -8,10 +8,10 @@ void main() {
   group('User', () {
     // Test split/Join method
     test('splitMapJoin transforms string correctly', () {
-      final input = 'hello world and hello everyone else';
+      const input = 'hello world and hello everyone else';
 
       final output = input.split(' ').skip(1).join(' ');
-      print('$output');
+      print(output);
 
       expect(output, 'world and hello everyone else');
     });

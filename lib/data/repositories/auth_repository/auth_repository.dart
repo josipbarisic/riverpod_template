@@ -67,7 +67,7 @@ class AuthRepository with FirebaseAuthMixin implements AuthRepositoryInterface {
       FacebookAuth.instance
           .login()
           .then((result) {
-            final accessToken = result.accessToken!.token;
+            final accessToken = result.accessToken!.tokenString;
             final facebookAuthCredential = FacebookAuthProvider.credential(accessToken);
             // Sign in with the Facebook credentials
             return firebaseAuth.signInWithCredential(facebookAuthCredential);

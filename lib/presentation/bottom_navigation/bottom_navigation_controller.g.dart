@@ -7,7 +7,7 @@ part of 'bottom_navigation_controller.dart';
 // **************************************************************************
 
 String _$bottomNavigationControllerHash() =>
-    r'a870a36b524f5e92e6d6c41563a2446d1f8a6aff';
+    r'698c61f52c39540e0606d2df46b3d688d61c572e';
 
 /// See also [BottomNavigationController].
 @ProviderFor(BottomNavigationController)
@@ -24,4 +24,4 @@ final bottomNavigationControllerProvider = NotifierProvider<
 
 typedef _$BottomNavigationController = Notifier<BottomNavigationState>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

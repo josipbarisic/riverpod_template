@@ -9,9 +9,9 @@ import 'package:riverpod_template/presentation/splash/splash_controller.dart';
 import 'package:riverpod_template/routing/router.dart';
 import 'package:riverpod_template/theme/helpers/app_icons_helper.dart';
 import 'package:riverpod_template/utils/enums/hero_animations_enum.dart';
-import 'package:riverpod_template/utils/mixins/theme_mixin.dart';
+import 'package:riverpod_template/utils/extensions/theme_extensions.dart';
 
-class SplashView extends ConsumerWidget with ThemeMixin {
+class SplashView extends ConsumerWidget {
   const SplashView({super.key});
 
   @override
@@ -40,7 +40,7 @@ class SplashView extends ConsumerWidget with ThemeMixin {
             Text('HAS MSG:${ref.watch(hasRemoteMessageProvider)}'),
             const SizedBox(height: 20),
             CircularProgressIndicator(
-              color: theme(context).secondaryHeaderColor,
+              color: context.theme.secondaryHeaderColor,
             )
           ],
         ),

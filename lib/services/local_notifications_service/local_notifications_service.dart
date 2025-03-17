@@ -30,9 +30,13 @@ class LocalNotificationsService {
         AndroidInitializationSettings('notification_icon');
 
     final DarwinInitializationSettings initializationSettingsDarwin =
-        DarwinInitializationSettings(onDidReceiveLocalNotification: (id, _, __, ___) {});
+        DarwinInitializationSettings(
+            requestAlertPermission: false,
+            requestBadgePermission: false,
+            requestSoundPermission: false);
 
-    final InitializationSettings initializationSettings = InitializationSettings(
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: initializationSettingsDarwin,
     );
@@ -43,10 +47,11 @@ class LocalNotificationsService {
 
   Future<NotificationStatus> requestPermission() async {
     try {
-      final disabledByUser = await getDisabledByUser();
+      final disabledByUser = getDisabledByUser();
       if (disabledByUser) {
         log("this should not have been called");
-        return NotificationStatus(await Permission.notification.status, disabledByUser);
+        return NotificationStatus(
+            await Permission.notification.status, disabledByUser);
       }
       final status = await Permission.notification.request();
 
@@ -57,9 +62,10 @@ class LocalNotificationsService {
     }
   }
 
-  Future<void> scheduleNotifications(List<AppNotification> notifications) async {
+  Future<void> scheduleNotifications(
+      List<AppNotification> notifications) async {
     await cancelAll();
-    bool isDisabled = await getDisabledByUser();
+    bool isDisabled = getDisabledByUser();
     if (isDisabled) {
       return;
     }
@@ -73,9 +79,12 @@ class LocalNotificationsService {
       _flutterLocalNotificationsPlugin.pendingNotificationRequests();
 
   Future<void> cancelAll({bool leaveActiveNotifications = true}) async {
-    List<ActiveNotification> activeNotifications = await getActiveNotifications();
-    List<int> activeNotificationsIDs = activeNotifications.map((e) => e.id ?? -1).toList();
-    List<PendingNotificationRequest> pendingNotifications = await getPendingNotifications();
+    List<ActiveNotification> activeNotifications =
+        await getActiveNotifications();
+    List<int> activeNotificationsIDs =
+        activeNotifications.map((e) => e.id ?? -1).toList();
+    List<PendingNotificationRequest> pendingNotifications =
+        await getPendingNotifications();
 
     if (leaveActiveNotifications) {
       await Future.wait(pendingNotifications
@@ -98,22 +107,25 @@ class LocalNotificationsService {
     if (date.isBefore(DateTime.now())) return;
 
     await _flutterLocalNotificationsPlugin.zonedSchedule(
-        index + 1,
-        element.title,
-        element.description,
-        date,
-        NotificationDetails(
-          /// Adding channelId and channelName prevents notifications scheduling exception from being thrown.
-          /// If necessary, change the id and the name parameter to match the rest of the config.
-          android: AndroidNotificationDetails(
-            'channel_id',
-            'notifications_channel',
-            color: lightAppColors.primary100,
-            importance: Importance.high,
-            priority: Priority.high,
-          ),
+      index + 1,
+      element.title,
+      element.description,
+      date,
+      NotificationDetails(
+        /// Adding channelId and channelName prevents notifications scheduling exception from being thrown.
+        /// If necessary, change the id and the name parameter to match the rest of the config.
+        android: AndroidNotificationDetails(
+          'channel_id',
+          'notifications_channel',
+          color: lightAppColors.primary100,
+          importance: Importance.high,
+          priority: Priority.high,
         ),
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.wallClockTime);
+      ),
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.wallClockTime,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.dateAndTime,
+    );
   }
 
   Future<PermissionStatus> getPermission() async {
@@ -122,7 +134,8 @@ class LocalNotificationsService {
 
   bool getDisabledByUser() => sharedPrefs.getBool('disabledByUser') ?? false;
 
-  Future<void> setDisabledByUser(bool value) => sharedPrefs.setBool('disabledByUser', value);
+  Future<void> setDisabledByUser(bool value) =>
+      sharedPrefs.setBool('disabledByUser', value);
 
   Future<void> showRemoteNotification(
     RemoteMessage message, {

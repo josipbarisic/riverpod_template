@@ -86,13 +86,13 @@ dependencies:
   flutter_lazy_indexed_stack:
 
   # https://pub.dev/packages/flutter_local_notifications
-  flutter_local_notifications:
+  flutter_local_notifications: 18.0.1
 
   # https://pub.dev/packages/flutter_riverpod
   flutter_riverpod:
 
   # https://pub.dev/packages/flutter_timezone
-  flutter_timezone:
+  flutter_timezone: 3.0.1
 
   # https://pub.dev/packages/go_router
   go_router:
@@ -166,7 +166,7 @@ flutter_launcher_icons:
   ios: true
   remove_alpha_ios: true
   image_path: "assets/icons/logo.png"
-  min_sdk_android: 21
+  min_sdk_android: 24
 
 # The following section is specific to Flutter packages.
 flutter:

@@ -6,7 +6,7 @@ part of 'splash_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$splashControllerHash() => r'668b17fb9c8162ca1a1e8a7046c9cfc2607e1869';
+String _$splashControllerHash() => r'74f8772b37d5657ad4ef7c0b74eeb2cf9e7cd2cc';
 
 /// See also [SplashController].
 @ProviderFor(SplashController)
@@ -23,4 +23,4 @@ final splashControllerProvider =
 
 typedef _$SplashController = AutoDisposeAsyncNotifier<void>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

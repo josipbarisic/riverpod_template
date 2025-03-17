@@ -6,7 +6,7 @@ part of 'firebase_api_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$firebaseApiHash() => r'ed440253fb2bd6f9d400cb998810f5c0e682fcb2';
+String _$firebaseApiHash() => r'2ba41767e5415a6f2ec7fb16d0c7a66d0669d16d';
 
 /// See also [firebaseApi].
 @ProviderFor(firebaseApi)
@@ -19,6 +19,8 @@ final firebaseApiProvider = Provider<FirebaseApi>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef FirebaseApiRef = ProviderRef<FirebaseApi>;
 String _$hasRemoteMessageHash() => r'9393da66eebfa139ba542a5958cde19f455ffa6e';
 
@@ -37,4 +39,4 @@ final hasRemoteMessageProvider =
 
 typedef _$HasRemoteMessage = AutoDisposeNotifier<bool>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

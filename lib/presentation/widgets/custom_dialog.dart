@@ -24,7 +24,7 @@ class CustomDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Dialog(
-        insetPadding: EdgeInsets.all(20),
+        insetPadding: const EdgeInsets.all(20),
         child: Container(
           padding: const EdgeInsets.all(50),
           child: Column(
@@ -33,7 +33,7 @@ class CustomDialog extends StatelessWidget {
             children: <Widget>[
               if (title != null)
                 Container(
-                  constraints: BoxConstraints(maxWidth: 230),
+                  constraints: const BoxConstraints(maxWidth: 230),
                   child: Text(
                     title!,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(

@@ -1,14 +1,17 @@
 import 'package:dio/dio.dart';
 import 'package:riverpod_template/flavors.dart';
 import 'package:riverpod_template/utils/constants/network_constants.dart';
+import 'package:riverpod_template/utils/network/error_interceptor.dart';
 import 'package:riverpod_template/utils/network/network_response.dart';
 
 class NetworkService {
   NetworkService({Dio? externalDio}) {
     _dio = externalDio ?? Dio()
       ..options.connectTimeout = const Duration(seconds: 10)
-    // TODO(Me): Add custom interceptor
-      ..interceptors.add(LogInterceptor());
+      ..interceptors.addAll([
+        LogInterceptor(),
+        ErrorInterceptor(),
+      ]);
   }
 
   late Dio _dio;

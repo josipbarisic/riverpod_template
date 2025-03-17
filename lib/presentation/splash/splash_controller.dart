@@ -14,9 +14,9 @@ class SplashController extends _$SplashController {
   late SharedPreferences _sharedPrefs;
 
   @override
-  FutureOr<void> build() {
+  FutureOr<void> build() async {
     log('==== CALLING SPLASH CONTROLLER BUILD METHOD =====');
-    _sharedPrefs = ref.watch(sharedPrefsProvider).requireValue;
+    _sharedPrefs = await ref.watch(sharedPrefsProvider.future);
 
     return _fetchInitialData();
   }

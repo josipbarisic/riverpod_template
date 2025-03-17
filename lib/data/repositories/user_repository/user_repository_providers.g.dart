@@ -6,7 +6,7 @@ part of 'user_repository_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$userRepositoryHash() => r'35b647df37daa7afbf615f587d84ea3b81af58dd';
+String _$userRepositoryHash() => r'f0f56701cfe81ec45862030feb9ac9de30fdeb11';
 
 /// See also [userRepository].
 @ProviderFor(userRepository)
@@ -20,8 +20,10 @@ final userRepositoryProvider = Provider<UserRepository>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef UserRepositoryRef = ProviderRef<UserRepository>;
-String _$userDataHash() => r'2c3182be4558eb8f149b5880091ccaaec07d4316';
+String _$userDataHash() => r'c42ac378c1544801e22c49b3f677188840750a13';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -156,6 +158,8 @@ class UserDataProvider extends AutoDisposeFutureProvider<User> {
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin UserDataRef on AutoDisposeFutureProviderRef<User> {
   /// The parameter `id` of this provider.
   int get id;
@@ -169,7 +173,7 @@ class _UserDataProviderElement extends AutoDisposeFutureProviderElement<User>
   int get id => (origin as UserDataProvider).id;
 }
 
-String _$someUsersHash() => r'2cf1fa7a5b14f9c544cf7204c8b0ba8c0f49f3b2';
+String _$someUsersHash() => r'840f5533e4455e18d98c788dc5197c4e5f05cc12';
 
 /// See also [someUsers].
 @ProviderFor(someUsers)
@@ -182,6 +186,8 @@ final someUsersProvider = AutoDisposeFutureProvider<List<User>>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef SomeUsersRef = AutoDisposeFutureProviderRef<List<User>>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
