@@ -6,37 +6,99 @@ part of 'firebase_api_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(firebaseApi)
+const firebaseApiProvider = FirebaseApiProvider._();
+
+final class FirebaseApiProvider
+    extends $FunctionalProvider<FirebaseApi, FirebaseApi, FirebaseApi>
+    with $Provider<FirebaseApi> {
+  const FirebaseApiProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'firebaseApiProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$firebaseApiHash();
+
+  @$internal
+  @override
+  $ProviderElement<FirebaseApi> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  FirebaseApi create(Ref ref) {
+    return firebaseApi(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(FirebaseApi value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<FirebaseApi>(value),
+    );
+  }
+}
+
 String _$firebaseApiHash() => r'2ba41767e5415a6f2ec7fb16d0c7a66d0669d16d';
 
-/// See also [firebaseApi].
-@ProviderFor(firebaseApi)
-final firebaseApiProvider = Provider<FirebaseApi>.internal(
-  firebaseApi,
-  name: r'firebaseApiProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$firebaseApiHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+@ProviderFor(HasRemoteMessage)
+const hasRemoteMessageProvider = HasRemoteMessageProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef FirebaseApiRef = ProviderRef<FirebaseApi>;
+final class HasRemoteMessageProvider
+    extends $NotifierProvider<HasRemoteMessage, bool> {
+  const HasRemoteMessageProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'hasRemoteMessageProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$hasRemoteMessageHash();
+
+  @$internal
+  @override
+  HasRemoteMessage create() => HasRemoteMessage();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
 String _$hasRemoteMessageHash() => r'9393da66eebfa139ba542a5958cde19f455ffa6e';
 
-/// See also [HasRemoteMessage].
-@ProviderFor(HasRemoteMessage)
-final hasRemoteMessageProvider =
-    AutoDisposeNotifierProvider<HasRemoteMessage, bool>.internal(
-  HasRemoteMessage.new,
-  name: r'hasRemoteMessageProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$hasRemoteMessageHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$HasRemoteMessage = AutoDisposeNotifier<bool>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$HasRemoteMessage extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<bool, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}

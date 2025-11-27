@@ -97,8 +97,8 @@ class LocalNotificationsService {
 
   Future<void> _configureLocalTimeZone() async {
     tz.initializeTimeZones();
-    final String timeZoneName = await FlutterTimezone.getLocalTimezone();
-    tz.setLocalLocation(tz.getLocation(timeZoneName));
+    final timeZoneInfo = await FlutterTimezone.getLocalTimezone();
+    tz.setLocalLocation(tz.getLocation(timeZoneInfo.identifier));
   }
 
   Future<void> _schedule(int index, AppNotification element) async {
@@ -122,7 +122,6 @@ class LocalNotificationsService {
           priority: Priority.high,
         ),
       ),
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.wallClockTime,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.dateAndTime,
     );

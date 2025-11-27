@@ -12,10 +12,6 @@ import 'package:riverpod_template/utils/network/network_response.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthRepository with FirebaseAuthMixin implements AuthRepositoryInterface {
-  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: [
-    // 'https://www.googleapis.com/auth/userinfo.email',
-    // 'https://www.googleapis.com/auth/userinfo.profile',
-  ]);
 
   @override
   Stream<domain.User?> authStateChanges() =>
@@ -30,23 +26,27 @@ class AuthRepository with FirebaseAuthMixin implements AuthRepositoryInterface {
   //   - https://pub.dev/packages/facebook_auth
 
   @override
-  Future<NetworkResponse> continueWithGoogle() => _googleSignIn
-      .signIn()
-      .then((googleUser) => googleUser != null
-          ? googleUser.authentication
-          : throw Exception('Google sign in failed.'))
-      .then((googleAuth) => firebaseAuth.signInWithCredential(GoogleAuthProvider.credential(
-            idToken: googleAuth.idToken,
-            accessToken: googleAuth.accessToken,
-          )))
-      .then((cred) => cred.user ?? (throw Exception(ErrorStrings.failedToAuthenticateUser)))
-      .then<NetworkResponse>((user) => NetworkSuccessResponse(data: user.toDomainUser()))
-      .onError(
-        (error, _) => NetworkErrorResponse(
-          httpStatusCode: 401,
-          message: error.toString(),
-        ),
+  Future<NetworkResponse> continueWithGoogle() async {
+    try {
+      final googleUser = await GoogleSignIn.instance.authenticate();
+      final googleAuth = googleUser.authentication;
+      final authorization = await googleUser.authorizationClient.authorizationForScopes([]);
+      
+      final credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+        accessToken: authorization?.accessToken,
       );
+      
+      final cred = await firebaseAuth.signInWithCredential(credential);
+      final user = cred.user ?? (throw Exception(ErrorStrings.failedToAuthenticateUser));
+      return NetworkSuccessResponse(data: user.toDomainUser());
+    } catch (error) {
+      return NetworkErrorResponse(
+        httpStatusCode: 401,
+        message: error.toString(),
+      );
+    }
+  }
 
   @override
   Future<NetworkResponse> continueWithApple() => firebaseAuth
@@ -162,7 +162,7 @@ class AuthRepository with FirebaseAuthMixin implements AuthRepositoryInterface {
   @override
   Future<NetworkResponse> signOut() =>
       // TODO(Josip): Adjust the sign out method to include all providers
-      firebaseAuth.signOut().then((_) => _googleSignIn.signOut()).then<NetworkResponse>((_) {
+      firebaseAuth.signOut().then((_) => GoogleSignIn.instance.signOut()).then<NetworkResponse>((_) {
         log('User signed out');
         return NetworkSuccessResponse();
       }).catchError((e) => NetworkErrorResponse(

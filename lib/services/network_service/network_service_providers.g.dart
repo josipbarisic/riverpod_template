@@ -6,22 +6,46 @@ part of 'network_service_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$networkServiceHash() => r'd735498741d1fb7f995af475d3dbb5b41c2c9dc2';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [networkService].
 @ProviderFor(networkService)
-final networkServiceProvider = Provider<NetworkService>.internal(
-  networkService,
-  name: r'networkServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$networkServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+const networkServiceProvider = NetworkServiceProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef NetworkServiceRef = ProviderRef<NetworkService>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class NetworkServiceProvider
+    extends $FunctionalProvider<NetworkService, NetworkService, NetworkService>
+    with $Provider<NetworkService> {
+  const NetworkServiceProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'networkServiceProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$networkServiceHash();
+
+  @$internal
+  @override
+  $ProviderElement<NetworkService> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  NetworkService create(Ref ref) {
+    return networkService(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(NetworkService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<NetworkService>(value),
+    );
+  }
+}
+
+String _$networkServiceHash() => r'd735498741d1fb7f995af475d3dbb5b41c2c9dc2';

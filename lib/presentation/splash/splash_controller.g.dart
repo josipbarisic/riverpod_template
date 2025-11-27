@@ -6,21 +6,50 @@ part of 'splash_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(SplashController)
+const splashControllerProvider = SplashControllerProvider._();
+
+final class SplashControllerProvider
+    extends $AsyncNotifierProvider<SplashController, void> {
+  const SplashControllerProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'splashControllerProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$splashControllerHash();
+
+  @$internal
+  @override
+  SplashController create() => SplashController();
+}
+
 String _$splashControllerHash() => r'74f8772b37d5657ad4ef7c0b74eeb2cf9e7cd2cc';
 
-/// See also [SplashController].
-@ProviderFor(SplashController)
-final splashControllerProvider =
-    AutoDisposeAsyncNotifierProvider<SplashController, void>.internal(
-  SplashController.new,
-  name: r'splashControllerProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$splashControllerHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$SplashController = AutoDisposeAsyncNotifier<void>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$SplashController extends $AsyncNotifier<void> {
+  FutureOr<void> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    build();
+    final ref = this.ref as $Ref<AsyncValue<void>, void>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<void>, void>,
+              AsyncValue<void>,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, null);
+  }
+}

@@ -6,7 +6,7 @@ part 'cart.g.dart';
 
 // Run "dart run build_runner build -d" to start code generation
 @freezed
-class Cart with _$Cart {
+abstract class Cart with _$Cart {
   const factory Cart({
     required List<Item> items,
     required double total,

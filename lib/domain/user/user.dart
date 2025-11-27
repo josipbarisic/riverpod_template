@@ -5,7 +5,7 @@ part 'user.g.dart';
 
 // Run "dart run build_runner build -d" to start code generation
 @Freezed(copyWith: true, toJson: true, toStringOverride: true)
-class User with _$User {
+abstract class User with _$User {
   const factory User({
     required String id,
     required String email,

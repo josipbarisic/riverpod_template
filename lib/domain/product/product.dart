@@ -5,7 +5,7 @@ part 'product.g.dart';
 
 // Run "dart run build_runner build -d" to start code generation
 @freezed
-class Product with _$Product {
+abstract class Product with _$Product {
   const factory Product({
     required String id,
     required String imageURL,

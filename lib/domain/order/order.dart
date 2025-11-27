@@ -7,7 +7,7 @@ part 'order.g.dart';
 
 // Run "dart run build_runner build -d" to start code generation
 @freezed
-class Order with _$Order {
+abstract class Order with _$Order {
   const factory Order({
     required String id,
     required String userID,

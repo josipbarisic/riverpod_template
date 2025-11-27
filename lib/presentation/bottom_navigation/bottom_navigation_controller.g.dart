@@ -6,22 +6,62 @@ part of 'bottom_navigation_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(BottomNavigationController)
+const bottomNavigationControllerProvider =
+    BottomNavigationControllerProvider._();
+
+final class BottomNavigationControllerProvider
+    extends
+        $NotifierProvider<BottomNavigationController, BottomNavigationState> {
+  const BottomNavigationControllerProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'bottomNavigationControllerProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$bottomNavigationControllerHash();
+
+  @$internal
+  @override
+  BottomNavigationController create() => BottomNavigationController();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(BottomNavigationState value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<BottomNavigationState>(value),
+    );
+  }
+}
+
 String _$bottomNavigationControllerHash() =>
     r'698c61f52c39540e0606d2df46b3d688d61c572e';
 
-/// See also [BottomNavigationController].
-@ProviderFor(BottomNavigationController)
-final bottomNavigationControllerProvider = NotifierProvider<
-    BottomNavigationController, BottomNavigationState>.internal(
-  BottomNavigationController.new,
-  name: r'bottomNavigationControllerProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$bottomNavigationControllerHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$BottomNavigationController = Notifier<BottomNavigationState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$BottomNavigationController
+    extends $Notifier<BottomNavigationState> {
+  BottomNavigationState build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<BottomNavigationState, BottomNavigationState>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<BottomNavigationState, BottomNavigationState>,
+              BottomNavigationState,
+              Object?,
+              Object?
+            >;
+    element.handleValue(ref, created);
+  }
+}
