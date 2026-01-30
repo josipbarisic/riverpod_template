@@ -1,0 +1,44 @@
+# Riverpod Patterns
+
+## State Class (Freezed)
+
+```dart
+@freezed
+abstract class UserState with _$UserState {
+  const factory UserState({
+    @Default(false) bool isLoading,
+    @Default(null) User? user,
+    @Default(null) String? error,
+  }) = _UserState;
+}
+```
+
+## Controller (Riverpod Codegen)
+
+```dart
+@riverpod
+class UserController extends _$UserController {
+  @override
+  FutureOr<UserState> build() async => const UserState();
+
+  Future<void> fetchUser() async {
+    state = const AsyncLoading();
+    try {
+      final user = await ref.read(userRepositoryProvider).fetchUser();
+      state = AsyncData(UserState(user: user));
+    } catch (e, stack) {
+      state = AsyncError(e, stack);
+    }
+  }
+}
+```
+
+## State Access
+
+- `ref.watch()` - Reactive state (rebuilds on change)
+- `ref.read()` - One-time access (in callbacks)
+- `ref.listen()` - Side effects (snackbars, navigation)
+
+## AsyncValue
+
+Use AsyncValue for async operations: AsyncData, AsyncLoading, AsyncError.

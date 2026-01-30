@@ -1,0 +1,61 @@
+{
+  "generatedAt": "2026-01-30T16:07:52.860729Z",
+  "feature": "bottom_navigation",
+  "exports": {
+    "views": [
+      "lib/presentation/bottom_navigation/bottom_navigation_view.dart"
+    ],
+    "controllers": [
+      "lib/presentation/bottom_navigation/bottom_navigation_controller.dart"
+    ],
+    "widgets": [],
+    "models": [],
+    "services": [],
+    "states": [
+      "lib/presentation/bottom_navigation/bottom_navigation_state.dart"
+    ],
+    "repositories": []
+  },
+  "dependencies": [
+    "bottom_navigation",
+    "home"
+  ],
+  "providers": [
+    {
+      "name": "bottomNavigationControllerProvider",
+      "type": "Notifier",
+      "returnType": "BottomNavigationController",
+      "file": "lib/presentation/bottom_navigation/bottom_navigation_controller.dart"
+    }
+  ],
+  "stateClasses": [
+    {
+      "name": "BottomNavigationState",
+      "fields": [],
+      "file": "lib/presentation/bottom_navigation/bottom_navigation_state.dart"
+    }
+  ],
+  "routes": [
+    {
+      "appRoute": "RoutePath.bottomNavigation",
+      "path": "/bottomNavigation",
+      "view": "BottomNavigationView"
+    }
+  ],
+  "apiEndpoints": [],
+  "externalServices": [],
+  "controllerMethods": {
+    "BottomNavigationController": [
+      {
+        "name": "BottomNavigationState",
+        "file": "lib/presentation/bottom_navigation/bottom_navigation_controller.dart",
+        "line": 0
+      },
+      {
+        "name": "selectPage",
+        "file": "lib/presentation/bottom_navigation/bottom_navigation_controller.dart",
+        "line": 0
+      }
+    ]
+  }
+}

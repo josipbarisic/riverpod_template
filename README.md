@@ -44,6 +44,46 @@ everything in it is subject to change based on the requirements of the project. 
 familiarise yourself with the architecture and structure of the template and adjust it to your
 needs.
 
+---
+
+## AI-First Setup (included in template)
+
+This template ships with an **AI-first development** setup so every project you start from it gets the same workflows and context for AI agents (e.g. Cursor, Claude).
+
+### What’s included
+
+- **`.cursor/rules/`** – Always-on rules: project context, AI workflow, discovery-first, pre-edit checklist, Dart conventions (imports, navigation, Riverpod, widgets).
+- **`.cursor/commands/`** – Slash commands: `/add-feature`, `/fix-bug`, `/review`, `/commit`, `/regenerate-manifests`, `/analyse`, etc. Type `/` in Cursor Chat to see them.
+- **`.cursor/docs/`** – Complexity scale and discovery-first workflow (Tier 1/2/3).
+- **`lib/manifests/`** – Auto-generated feature manifests (JSON per feature: exports, routes, providers, API usage). Keeps AI context in sync with the codebase.
+- **`scripts/generate_feature_manifests.dart`** – Generates manifests from `lib/presentation/`, `lib/routing/router.dart` (RoutePath), and repositories.
+- **`lib/AGENTS.md`** – Quick reference for AI agents (what to read, when to regenerate manifests).
+- **`ARCHITECTURE.md`** – Architecture and conventions.
+- **`CLAUDE.md`** – Claude-specific instructions (ZERO-DRIFT workflow).
+- **`.cursor/skills/`** – Agent skills: flutter-code-review, flutter-ui-refinement, git-commit, feature-planning (for deeper review, UI refinement, commit workflow, and feature planning).
+
+### When starting a new project from this template
+
+1. **Rename the package** (e.g. `riverpod_template` → `my_app`) in `pubspec.yaml` and across the codebase.
+2. **Update AI references** – In `.cursor/rules/`, `.cursor/commands/`, and `lib/AGENTS.md`, replace `riverpod_template` with your package name.
+3. **Regenerate manifests** after changing structure:
+   ```bash
+   dart run scripts/generate_feature_manifests.dart
+   ```
+4. **Use slash commands** – `/add-feature`, `/fix-bug`, `/review`, `/commit`, `/analyse` follow the same patterns as in this template.
+
+### Regenerating manifests
+
+Run after adding or moving views, controllers, routes, or repositories:
+
+```bash
+dart run scripts/generate_feature_manifests.dart
+```
+
+Manifests are written to `lib/manifests/*.manifest.generated.json`. Do not edit these files by hand.
+
+---
+
 [Important note]: Template has Firebase set up in order to implement widely used features such as
 Push Notifications, Authentication, etc. If you are not planning to use Firebase, make sure to
 remove all the Firebase related code and dependencies. Outside of pubspec.yaml, those are:

@@ -1,0 +1,36 @@
+{
+  "generatedAt": "2026-01-30T16:07:52.857804Z",
+  "feature": "sign_up",
+  "exports": {
+    "views": [
+      "lib/presentation/sign_up/sign_up_view.dart"
+    ],
+    "controllers": [
+      "lib/presentation/sign_up/sign_up_controller.dart"
+    ],
+    "widgets": [],
+    "models": [],
+    "services": [],
+    "states": [],
+    "repositories": [
+      "lib/data/repositories/auth_repository/auth_repository.dart",
+      "lib/data/repositories/auth_repository/auth_repository_interface.dart",
+      "lib/data/repositories/auth_repository/auth_repository_providers.dart"
+    ]
+  },
+  "dependencies": [
+    "firebase"
+  ],
+  "providers": [],
+  "stateClasses": [],
+  "routes": [
+    {
+      "appRoute": "RoutePath.signUp",
+      "path": "/signUp",
+      "view": "SignUpView"
+    }
+  ],
+  "apiEndpoints": [],
+  "externalServices": [],
+  "controllerMethods": {}
+}

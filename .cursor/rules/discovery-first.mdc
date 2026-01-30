@@ -1,0 +1,23 @@
+# Discovery-First Workflow
+
+## Before Writing Code
+
+For add-feature, fix-bug, refine-feature, and similar tasks:
+
+1. **Ask complexity** (if not already stated):
+   - **Tier 1 – Quick:** Single file, small change → 0–1 questions → execute
+   - **Tier 2 – Moderate:** A few files, clear scope → short discovery + plan → then execute
+   - **Tier 3 – Large:** New feature or big change → full discovery + spec + plan → **wait for approval** → then execute
+
+2. **Do not** start implementation until:
+   - Tier 1: You have enough to make the small change
+   - Tier 2: You have stated a brief plan
+   - Tier 3: You have a spec/plan and **explicit user approval**
+
+3. **Tier 2–3, existing feature:** Run **`/analyse`** first; use the report to inform your plan.
+
+## Rule
+
+- **Tier 3** = Never implement before approval. State plan, then say "Waiting for approval" and stop.
+- **Tier 2** = State plan before coding; no mandatory wait unless the user asks.
+- **Tier 1** = Minimal discovery; proceed once the change is clear.

@@ -1,0 +1,48 @@
+{
+  "generatedAt": "2026-01-30T16:07:52.844149Z",
+  "feature": "splash",
+  "exports": {
+    "views": [
+      "lib/presentation/splash/splash_view.dart"
+    ],
+    "controllers": [
+      "lib/presentation/splash/splash_controller.dart"
+    ],
+    "widgets": [],
+    "models": [],
+    "services": [],
+    "states": [],
+    "repositories": []
+  },
+  "dependencies": [
+    "firebase",
+    "splash"
+  ],
+  "providers": [
+    {
+      "name": "splashControllerProvider",
+      "type": "Notifier",
+      "returnType": "SplashController",
+      "file": "lib/presentation/splash/splash_controller.dart"
+    }
+  ],
+  "stateClasses": [],
+  "routes": [
+    {
+      "appRoute": "RoutePath.onboarding",
+      "path": "/onboarding",
+      "view": "OnboardingView"
+    }
+  ],
+  "apiEndpoints": [],
+  "externalServices": [],
+  "controllerMethods": {
+    "SplashController": [
+      {
+        "name": "Duration",
+        "file": "lib/presentation/splash/splash_controller.dart",
+        "line": 0
+      }
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+# Import Rules
+
+## ALWAYS Use Absolute Package Imports
+
+```dart
+// GOOD - absolute package imports
+import 'package:riverpod_template/presentation/login/login_view.dart';
+import 'package:riverpod_template/data/repositories/auth_repository/auth_repository.dart';
+
+// NEVER - relative imports
+import '../login/login_view.dart';
+import './auth_repository.dart';
+```
+
+## Import Order
+
+1. Dart core
+2. Flutter
+3. Third-party packages
+4. Project imports: `package:riverpod_template/...`
+
+## No Barrel Exports
+
+Do not use barrel files that re-export everything. Import each file directly.

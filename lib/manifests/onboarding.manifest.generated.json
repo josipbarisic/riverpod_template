@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-01-30T16:07:52.851619Z",
+  "feature": "onboarding",
+  "exports": {
+    "views": [
+      "lib/presentation/onboarding/onboarding_view.dart"
+    ],
+    "controllers": [],
+    "widgets": [],
+    "models": [],
+    "services": [],
+    "states": [],
+    "repositories": []
+  },
+  "dependencies": [
+    "widgets"
+  ],
+  "providers": [],
+  "stateClasses": [],
+  "routes": [
+    {
+      "appRoute": "RoutePath.signUp",
+      "path": "/signUp",
+      "view": "SignUpView"
+    }
+  ],
+  "apiEndpoints": [],
+  "externalServices": [],
+  "controllerMethods": {}
+}

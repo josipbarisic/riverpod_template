@@ -1,0 +1,27 @@
+# AI Workflow
+
+## Before Writing Code
+
+1. **Read `lib/AGENTS.md`** - AI agent quick reference
+2. **Read feature manifest** - `lib/manifests/{feature}/{feature}.manifest.generated.json`
+3. **Check manifest staleness** - If files newer than `generatedAt`, regenerate first
+
+## Feature Manifests
+
+Location: `lib/manifests/`
+
+Contains: exports, routes (RoutePath), providers, controllerMethods, apiEndpoints.
+
+## Regenerate Manifests
+
+Run after structural changes:
+
+```bash
+dart run scripts/generate_feature_manifests.dart
+```
+
+## Cursor Commands
+
+Type `/` in chat to see commands: add-feature, fix-bug, review, commit, regenerate-manifests, analyse, etc.
+
+See `.cursor/commands/README.md` for usage.

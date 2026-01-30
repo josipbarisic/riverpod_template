@@ -1,0 +1,42 @@
+# Riverpod Template - Project Context
+
+## Overview
+- **Template**: Flutter + Riverpod starter (AI-first from the start)
+- **Architecture**: Layer-based with Riverpod state management
+- **Code Generation**: Use `@riverpod` for providers, run build_runner after changes
+- **Environments**: dev, prod (flavors)
+
+## Project Structure
+
+```
+lib/
+├── core/           # (optional) Shared infrastructure
+├── data/           # Repositories, API clients, Firebase
+├── domain/         # Domain models (Freezed)
+├── presentation/   # UI by feature (views, controllers, widgets)
+├── routing/        # GoRouter, RoutePath constants
+├── services/       # Core services
+├── theme/          # Colors, text styles
+├── utils/          # Helpers, network, extensions
+└── manifests/      # Auto-generated feature manifests (for AI)
+```
+
+## Build Commands
+
+```bash
+# Run
+flutter run --flavor dev
+
+# Build
+flutter build apk --flavor dev
+```
+
+## Code Generation
+
+```bash
+# After @riverpod / @freezed changes
+dart run build_runner build -d
+
+# After structural changes (routes, features)
+dart run scripts/generate_feature_manifests.dart
+```
