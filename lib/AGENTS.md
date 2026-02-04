@@ -113,3 +113,174 @@ Full scale: `.cursor/docs/COMPLEXITY_AND_DISCOVERY.md`
 - **State:** `@riverpod`, `@freezed`, `AsyncValue`
 - **Widgets:** `ConsumerWidget` / `HookConsumerWidget`; no private `_build*` methods (extract to separate widget files)
 - **Routes:** Use `RoutePath.xxx` only (no string literals)
+
+---
+
+## Testing Workflow
+
+When modifying a feature:
+
+1. **Check manifest** for `testing.hasTests`
+2. **If tests exist**, run them before and after changes:
+   ```bash
+   flutter test test/presentation/{feature}/
+   ```
+3. **If adding new functionality**, add corresponding tests
+4. **All tests must pass** before committing
+
+Use the manifest's `testing.runCommand` for the exact command.
+
+---
+
+## Manifest Testing Section
+
+Each manifest includes a `testing` object:
+
+```json
+{
+  "testing": {
+    "testDirectory": "test/presentation/login",
+    "testFiles": ["test/presentation/login/login_controller_test.dart"],
+    "testDataFiles": ["test/test_data/auth_test_data.dart"],
+    "runCommand": "flutter test test/presentation/login",
+    "hasTests": true
+  }
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `testDirectory` | Where tests for this feature live |
+| `testFiles` | List of `*_test.dart` files |
+| `testDataFiles` | Test data factories related to this feature |
+| `runCommand` | Command to run feature tests |
+| `hasTests` | Quick check if tests exist |
+
+---
+
+## Test Structure
+
+```
+test/
+├── presentation/
+│   └── {feature}/
+│       ├── {feature}_controller_test.dart
+│       ├── {feature}_view_test.dart (widget tests)
+│       └── mocks/
+│           └── mock_{xxx}_repository.dart
+├── repositories/
+│   └── {feature}_repository_test.dart
+├── test_data/
+│   └── {feature}_test_data.dart
+└── helpers/
+    └── test_helpers.dart
+```
+
+- **Controller tests**: `test/presentation/{feature}/`
+- **Widget tests**: Same directory as controller tests
+- **Mocks**: `test/presentation/{feature}/mocks/`
+- **Test data**: `test/test_data/` (factories + constants)
+- **Helpers**: `test/helpers/` (shared utilities)
+
+---
+
+## Mocking
+
+### Strategy
+
+- **Mock repositories**, not controllers
+- Use **mocktail** for mocks
+- Use **ProviderContainer** with overrides for Riverpod testing
+
+### Mock Pattern
+
+```dart
+// test/presentation/login/mocks/mock_auth_repository.dart
+import 'package:mocktail/mocktail.dart';
+import 'package:riverpod_template/data/repositories/auth_repository/auth_repository.dart';
+
+class MockAuthRepository extends Mock implements AuthRepository {
+  void stubLoginSuccess(User user) {
+    when(() => login(any(), any())).thenAnswer((_) async => user);
+  }
+
+  void stubLoginError(Exception error) {
+    when(() => login(any(), any())).thenThrow(error);
+  }
+}
+```
+
+### Controller Test Pattern
+
+```dart
+void main() {
+  late ProviderContainer container;
+  late MockAuthRepository mockAuthRepository;
+
+  setUp(() {
+    mockAuthRepository = MockAuthRepository();
+    container = ProviderContainer(
+      overrides: [
+        authRepositoryProvider.overrideWithValue(mockAuthRepository),
+      ],
+    );
+  });
+
+  tearDown(() => container.dispose());
+
+  test('login success updates state', () async {
+    final testUser = TestUsers.basic;
+    mockAuthRepository.stubLoginSuccess(testUser);
+
+    final controller = container.read(loginControllerProvider.notifier);
+    await controller.login('email', 'password');
+
+    final state = container.read(loginControllerProvider);
+    expect(state.value?.user, equals(testUser));
+  });
+}
+```
+
+---
+
+## Testing Requirements (MANDATORY)
+
+### Before Every Commit
+
+```bash
+flutter test
+```
+
+All tests must pass. **Never commit with failing tests.**
+
+### What to Test
+
+| If You Modified... | Update Test In... |
+|-------------------|-------------------|
+| Controller logic | `test/presentation/{feature}/{feature}_controller_test.dart` |
+| Repository method | `test/repositories/{feature}_repository_test.dart` |
+| Model/domain | `test/domain/{model}_test.dart` |
+| Widget behavior | `test/presentation/{feature}/{feature}_view_test.dart` |
+| New API endpoint | Add repository test with mock network response |
+
+### Test Data Patterns
+
+Use factory functions in `test/test_data/`:
+
+```dart
+// test/test_data/auth_test_data.dart
+User createTestUser({
+  String? id,
+  String? email,
+  String? name,
+}) => User(
+  id: id ?? 'test-id',
+  email: email ?? 'test@example.com',
+  name: name ?? 'Test User',
+);
+
+class TestUsers {
+  static User get basic => createTestUser();
+  static User get admin => createTestUser(name: 'Admin', email: 'admin@example.com');
+}
+```

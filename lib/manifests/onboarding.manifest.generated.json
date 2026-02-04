@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-01-30T16:07:52.851619Z",
+  "generatedAt": "2026-02-04T21:13:27.985543Z",
   "feature": "onboarding",
   "exports": {
     "views": [
@@ -26,5 +26,12 @@
   ],
   "apiEndpoints": [],
   "externalServices": [],
-  "controllerMethods": {}
+  "controllerMethods": {},
+  "testing": {
+    "testDirectory": "test/presentation/onboarding",
+    "testFiles": [],
+    "testDataFiles": [],
+    "runCommand": "",
+    "hasTests": false
+  }
 }

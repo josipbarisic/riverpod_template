@@ -7,7 +7,8 @@ Slash commands for standardized AI workflows. Type `/` in Cursor Chat to see the
 - **`/add-feature`** - Add a new feature/screen (complexity Tier 1/2/3; Tier 3 requires approval)
 - **`/refine-feature`** - Iteratively refine an existing feature (violations, integrations, code quality)
 - **`/fix-bug`** - Fix bugs with proper context and manifest usage
-- **`/review`** - Pre-commit review (security, imports, NEVER rules, file size)
+- **`/test`** - Create tests for features, files, methods, or widgets (unit, widget, or integration)
+- **`/review`** - Pre-commit review (security, imports, NEVER rules, file size, **run tests**)
 - **`/commit`** - Create secure, atomic commits (security scan; untracked files confirmed before adding)
 - **`/regenerate-manifests`** - Regenerate feature manifests after structural changes
 - **`/analyse`** - Analyse a feature (manifest-based discovery, structured report)

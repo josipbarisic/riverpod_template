@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-01-30T16:07:52.860729Z",
+  "generatedAt": "2026-02-04T21:13:28.003597Z",
   "feature": "bottom_navigation",
   "exports": {
     "views": [
@@ -57,5 +57,14 @@
         "line": 0
       }
     ]
+  },
+  "testing": {
+    "testDirectory": "test/presentation/bottom_navigation",
+    "testFiles": [
+      "test/presentation/bottom_navigation/bottom_navigation_controller_test.dart"
+    ],
+    "testDataFiles": [],
+    "runCommand": "flutter test test/presentation/bottom_navigation",
+    "hasTests": true
   }
 }

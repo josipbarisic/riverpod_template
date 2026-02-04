@@ -120,6 +120,29 @@ class ControllerMethod {
       };
 }
 
+class TestingInfo {
+  final String testDirectory;
+  final List<String> testFiles;
+  final List<String> testDataFiles;
+  final String runCommand;
+  final bool hasTests;
+
+  TestingInfo({
+    required this.testDirectory,
+    required this.testFiles,
+    required this.testDataFiles,
+    required this.runCommand,
+  }) : hasTests = testFiles.isNotEmpty;
+
+  Map<String, dynamic> toJson() => {
+        'testDirectory': testDirectory,
+        'testFiles': testFiles,
+        'testDataFiles': testDataFiles,
+        'runCommand': runCommand,
+        'hasTests': hasTests,
+      };
+}
+
 class FeatureManifest {
   final String generatedAt;
   final String feature;
@@ -137,6 +160,7 @@ class FeatureManifest {
   final List<ApiEndpoint> apiEndpoints;
   final List<ExternalService> externalServices;
   final Map<String, List<ControllerMethod>> controllerMethods;
+  final TestingInfo testing;
 
   FeatureManifest({
     required this.generatedAt,
@@ -155,6 +179,7 @@ class FeatureManifest {
     required this.apiEndpoints,
     required this.externalServices,
     required this.controllerMethods,
+    required this.testing,
   });
 
   Map<String, dynamic> toJson() => {
@@ -178,6 +203,7 @@ class FeatureManifest {
         'controllerMethods': controllerMethods.map(
           (key, value) => MapEntry(key, value.map((m) => m.toJson()).toList()),
         ),
+        'testing': testing.toJson(),
       };
 }
 
@@ -372,6 +398,59 @@ List<ApiEndpoint> extractApiEndpoints(String content, String fileName, String en
   return endpoints;
 }
 
+/// Extract testing info for a feature by scanning test directories
+TestingInfo extractTestsForFeature(String featureName, String featurePath) {
+  final testDir = Directory('test/presentation/$featurePath');
+  final testDataDir = Directory('test/test_data');
+
+  // Find test files in test/presentation/{featurePath}/
+  final testFiles = <String>[];
+  if (testDir.existsSync()) {
+    for (final entity in testDir.listSync(recursive: true)) {
+      if (entity is File && entity.path.endsWith('_test.dart')) {
+        testFiles.add(entity.path.replaceAll('\\', '/'));
+      }
+    }
+  }
+  testFiles.sort();
+
+  // Find test data files that match feature name in test/test_data/
+  final testDataFiles = <String>[];
+  if (testDataDir.existsSync()) {
+    final featurePatterns = [
+      featureName.toLowerCase(),
+      featureName.replaceAll('_', '').toLowerCase(),
+    ];
+    // For auth-related features, also check for 'auth' pattern
+    if (featureName == 'login' || featureName == 'sign_up') {
+      featurePatterns.add('auth');
+    }
+
+    for (final entity in testDataDir.listSync()) {
+      if (entity is File && entity.path.endsWith('.dart')) {
+        final fileName = entity.path.split('/').last.toLowerCase();
+        for (final pattern in featurePatterns) {
+          if (fileName.contains(pattern)) {
+            testDataFiles.add(entity.path.replaceAll('\\', '/'));
+            break;
+          }
+        }
+      }
+    }
+  }
+  testDataFiles.sort();
+
+  final testDirectory = 'test/presentation/$featurePath';
+  final runCommand = testFiles.isNotEmpty ? 'flutter test $testDirectory' : '';
+
+  return TestingInfo(
+    testDirectory: testDirectory,
+    testFiles: testFiles,
+    testDataFiles: testDataFiles,
+    runCommand: runCommand,
+  );
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // GENERATE ONE MANIFEST
 // ═══════════════════════════════════════════════════════════════════════════
@@ -447,6 +526,9 @@ FeatureManifest generateManifestForFeature(String featureName, String featurePat
   final uniqueStateClasses = <String, StateClass>{};
   for (final s in allStateClasses) uniqueStateClasses[s.name] = s;
 
+  // Extract testing info
+  final testing = extractTestsForFeature(featureName, featurePath);
+
   return FeatureManifest(
     generatedAt: DateTime.now().toUtc().toIso8601String(),
     feature: featureName,
@@ -464,6 +546,7 @@ FeatureManifest generateManifestForFeature(String featureName, String featurePat
     apiEndpoints: allApiEndpoints..sort((a, b) => a.endpoint.compareTo(b.endpoint)),
     externalServices: externalServices,
     controllerMethods: allControllerMethods,
+    testing: testing,
   );
 }
 

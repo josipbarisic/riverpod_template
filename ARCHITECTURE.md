@@ -66,6 +66,59 @@ lib/
 
 ---
 
+## Controller Testability
+
+Controllers must be designed for easy testing:
+
+### Rule: Depend on Riverpod Only
+
+Controllers obtain dependencies via **Riverpod** (`ref.read(xxxRepositoryProvider)`), never by direct instantiation.
+
+```dart
+// ✅ CORRECT - Testable
+@riverpod
+class LoginController extends _$LoginController {
+  @override
+  FutureOr<LoginState> build() => const LoginState();
+
+  Future<void> login(String email, String password) async {
+    // Get repository via Riverpod - can be overridden in tests
+    final authRepo = ref.read(authRepositoryProvider);
+    final result = await authRepo.signInWithEmailAndPassword(email, password);
+    // ...
+  }
+}
+
+// ❌ WRONG - Not testable
+class LoginController {
+  final _authRepo = AuthRepository(); // Direct instantiation, can't mock in tests
+  
+  Future<void> login(String email, String password) async {
+    await _authRepo.signInWithEmailAndPassword(email, password);
+  }
+}
+```
+
+### Why This Matters
+
+In tests, you override the provider with a mock:
+
+```dart
+container = ProviderContainer(
+  overrides: [
+    authRepositoryProvider.overrideWithValue(mockAuthRepository),
+  ],
+);
+```
+
+If a controller instantiates dependencies directly, you cannot inject mocks.
+
+### Testing Pattern
+
+See `test/presentation/splash/splash_controller_test.dart` for a complete example of testing controllers with mocked dependencies.
+
+---
+
 ## Feature Manifests
 
 - **Location:** `lib/manifests/{feature}.manifest.generated.json`

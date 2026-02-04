@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-01-30T16:07:52.844149Z",
+  "generatedAt": "2026-02-04T21:13:27.970028Z",
   "feature": "splash",
   "exports": {
     "views": [
@@ -44,5 +44,14 @@
         "line": 0
       }
     ]
+  },
+  "testing": {
+    "testDirectory": "test/presentation/splash",
+    "testFiles": [
+      "test/presentation/splash/splash_controller_test.dart"
+    ],
+    "testDataFiles": [],
+    "runCommand": "flutter test test/presentation/splash",
+    "hasTests": true
   }
 }

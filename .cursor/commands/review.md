@@ -60,6 +60,24 @@ dart run build_runner build -d
 flutter analyze
 ```
 
-### Step 9: Summary
+### Step 9: Run Tests
+
+**All tests must pass before committing.**
+
+```bash
+flutter test
+```
+
+**If modifying a specific feature:**
+
+1. Check manifest for `testing.hasTests`
+2. Run feature tests: `flutter test test/presentation/{feature}/`
+
+**If tests fail:**
+
+- Fix failing tests before commit
+- If new functionality, add corresponding tests
+
+### Step 10: Summary
 
 If issues found → list them and ask to fix. If clean → recommend running `/commit`.

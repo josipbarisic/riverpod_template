@@ -84,6 +84,59 @@ Manifests are written to `lib/manifests/*.manifest.generated.json`. Do not edit 
 
 ---
 
+## Testing
+
+This template includes a complete testing setup with patterns for unit, widget, and integration tests.
+
+### Testing Documentation
+
+- **`docs/TESTING_STRATEGY.md`** – Philosophy, pyramid, patterns, and best practices
+- **`lib/AGENTS.md`** – Testing sections for AI agents (workflow, manifest testing, mocking)
+
+### Test Structure
+
+```
+test/
+├── presentation/           # Feature tests
+│   ├── splash/
+│   │   ├── splash_controller_test.dart
+│   │   └── mocks/
+│   │       ├── mock_firebase_api.dart
+│   │       └── mock_local_notifications_service.dart
+│   └── login/
+│       └── mocks/
+│           └── mock_auth_repository.dart
+├── test_data/              # Shared test data factories
+│   └── auth_test_data.dart
+└── helpers/                # Test utilities
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+flutter test
+
+# Run specific feature tests
+flutter test test/presentation/splash/
+
+# Run with coverage
+flutter test --coverage
+```
+
+### Pre-Commit Requirement
+
+**All tests must pass before every commit.** Never commit with failing tests.
+
+When modifying a feature:
+1. Check manifest for `testing.hasTests`
+2. Run feature tests before and after changes
+3. Add tests for new functionality
+
+Use `/review` command to run the full pre-commit checklist including tests.
+
+---
+
 [Important note]: Template has Firebase set up in order to implement widely used features such as
 Push Notifications, Authentication, etc. If you are not planning to use Firebase, make sure to
 remove all the Firebase related code and dependencies. Outside of pubspec.yaml, those are:
