@@ -1,6 +1,6 @@
-import 'package:riverpod_template/domain/item/item.dart';
-import 'package:riverpod_template/domain/order/order.dart';
-import 'package:riverpod_template/utils/enums/order_status_enum.dart';
+import 'package:riverpod_template/models/item/item.dart';
+import 'package:riverpod_template/models/order/order.dart';
+import 'package:riverpod_template/core/enums/order_status_enum.dart';
 
 /// Factory function to create test items with optional overrides
 Item createTestItem({

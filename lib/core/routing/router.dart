@@ -1,53 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:riverpod_template/core/routing/app_route.dart';
 import 'package:riverpod_template/presentation/bottom_navigation/bottom_navigation_view.dart';
 import 'package:riverpod_template/presentation/login/login_view.dart';
 import 'package:riverpod_template/presentation/onboarding/onboarding_view.dart';
 import 'package:riverpod_template/presentation/sign_up/sign_up_view.dart';
 import 'package:riverpod_template/presentation/splash/splash_view.dart';
 
-class RoutePath {
-  static const String splash = '/';
-  static const String onboarding = '/onboarding';
-  static const String login = '/login';
-  static const String signUp = '/signUp';
-  static const String bottomNavigation = '/bottomNavigation';
-}
-
 final GoRouter router = GoRouter(
-  initialLocation: RoutePath.splash,
+  initialLocation: AppRoute.splash,
   observers: [SimpleNavigationObserver()],
   routes: <RouteBase>[
     GoRoute(
-      path: RoutePath.splash,
+      path: AppRoute.splash,
       builder: (BuildContext context, GoRouterState state) {
         return const SplashView();
       },
       routes: const <RouteBase>[],
     ),
     GoRoute(
-      path: RoutePath.onboarding,
+      path: AppRoute.onboarding,
       builder: (BuildContext context, GoRouterState state) {
         return const OnboardingView();
       },
       routes: const <RouteBase>[],
     ),
     GoRoute(
-      path: RoutePath.signUp,
+      path: AppRoute.signUp,
       builder: (BuildContext context, GoRouterState state) {
         return const SignUpView();
       },
       routes: const <RouteBase>[],
     ),
     GoRoute(
-      path: RoutePath.login,
+      path: AppRoute.login,
       builder: (BuildContext context, GoRouterState state) {
         return const LoginView();
       },
       routes: const <RouteBase>[],
     ),
     GoRoute(
-      path: RoutePath.bottomNavigation,
+      path: AppRoute.bottomNavigation,
       builder: (BuildContext context, GoRouterState state) {
         return const BottomNavigationView();
       },
@@ -66,7 +59,7 @@ extension GoRouterExtension on GoRouter {
 }
 
 class SimpleNavigationObserver extends RouteObserver {
-  static String? currentRoute = RoutePath.splash;
+  static String? currentRoute = AppRoute.splash;
 
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {

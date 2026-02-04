@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-04T21:13:27.970028Z",
+  "generatedAt": "2026-02-04T21:36:06.967351Z",
   "feature": "splash",
   "exports": {
     "views": [
@@ -29,7 +29,7 @@
   "stateClasses": [],
   "routes": [
     {
-      "appRoute": "RoutePath.onboarding",
+      "appRoute": "AppRoute.onboarding",
       "path": "/onboarding",
       "view": "OnboardingView"
     }

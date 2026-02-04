@@ -1,6 +1,6 @@
 import 'package:faker/faker.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:riverpod_template/domain/user/user.dart';
+import 'package:riverpod_template/models/user/user.dart';
 
 void main() {
   final faker = Faker();

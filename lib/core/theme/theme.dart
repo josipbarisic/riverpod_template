@@ -2,10 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:riverpod_template/gen/fonts.gen.dart';
-import 'package:riverpod_template/theme/colors/dark_app_colors.dart';
-import 'package:riverpod_template/theme/colors/light_app_colors.dart';
-import 'package:riverpod_template/theme/styles/dark_app_text_styles.dart';
-import 'package:riverpod_template/theme/styles/light_app_text_styles.dart';
+import 'package:riverpod_template/core/theme/colors/dark_app_colors.dart';
+import 'package:riverpod_template/core/theme/colors/light_app_colors.dart';
+import 'package:riverpod_template/core/theme/styles/dark_app_text_styles.dart';
+import 'package:riverpod_template/core/theme/styles/light_app_text_styles.dart';
 
 final appTheme = AppTheme();
 

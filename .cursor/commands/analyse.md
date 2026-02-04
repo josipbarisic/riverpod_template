@@ -33,7 +33,7 @@ Write a short structured report:
 - **Views:** [list]
 - **Controllers:** [list]
 - **Widgets:** [list]
-- **Routes:** [list with RoutePath / path]
+- **Routes:** [list with AppRoute / path]
 - **Providers:** [list]
 - **Repositories / API:** [list or "none"]
 - **Dependencies:** [list]

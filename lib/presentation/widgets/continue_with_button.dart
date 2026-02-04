@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:riverpod_template/gen/assets.gen.dart';
 import 'package:riverpod_template/presentation/widgets/primary_button.dart';
-import 'package:riverpod_template/theme/colors/light_app_colors.dart';
-import 'package:riverpod_template/theme/helpers/app_icons_helper.dart';
+import 'package:riverpod_template/core/theme/colors/light_app_colors.dart';
+import 'package:riverpod_template/core/theme/helpers/app_icons_helper.dart';
 
 class ContinueWithButton extends StatelessWidget {
   final String? iconPath;

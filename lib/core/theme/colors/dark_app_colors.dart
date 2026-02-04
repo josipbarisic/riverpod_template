@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:riverpod_template/theme/colors/app_colors.dart';
+import 'package:riverpod_template/core/theme/colors/app_colors.dart';
 
-final lightAppColors = LightAppColors();
+final darkAppColors = DarkAppColors();
 
-class LightAppColors extends AppColors {
+class DarkAppColors extends AppColors {
   @override
   Color get primary100 => const Color(0xFF013577);
 
@@ -26,8 +26,8 @@ class LightAppColors extends AppColors {
   Color get primaryDark => const Color(0xFF001D4D);
 
   @override
-  Color get backgroundColor => const Color(0xFFF0F5F0);
+  Color get backgroundColor => const Color(0xFF111211);
 
   @override
-  Color get error => const Color(0xFFa32638);
+  Color get error => const Color(0xFFcb4154);
 }

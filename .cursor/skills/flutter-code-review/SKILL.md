@@ -58,7 +58,7 @@ grep -rn "EdgeInsets\.\(all\|symmetric\|only\)([0-9]" {path} --include="*.dart" 
 - [ ] **No relative imports** - Use `package:riverpod_template/...` (or project package name)
 - [ ] **No dynamic types** - Use specific types
 - [ ] **Views have no business logic** - Move to controllers
-- **Routes** - Use `RoutePath.xxx` only (no string literals)
+- **Routes** - Use `AppRoute.xxx` only (no string literals)
 
 ### Widget Structure
 

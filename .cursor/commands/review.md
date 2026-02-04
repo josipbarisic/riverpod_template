@@ -41,7 +41,7 @@ git diff | grep -iE "(API_KEY|SECRET|client_secret|FIREBASE_|PRIVATE_KEY|sk-)" |
 - [ ] No private `_build*` methods (extract to widgets)
 - [ ] Views: UI only; controllers: logic only
 - [ ] Not editing `*.g.dart` or `*.freezed.dart`
-- [ ] Routes use `RoutePath.xxx` (from `lib/routing/router.dart`)
+- [ ] Routes use `AppRoute.xxx` (from `lib/core/routing/router.dart`)
 
 ### Step 6: File Size (guidelines)
 

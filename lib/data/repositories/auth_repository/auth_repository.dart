@@ -4,11 +4,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:riverpod_template/data/repositories/auth_repository/auth_repository_interface.dart';
-import 'package:riverpod_template/domain/user/user.dart' as domain;
-import 'package:riverpod_template/utils/app_strings.dart';
-import 'package:riverpod_template/utils/extensions/user_extensions.dart';
-import 'package:riverpod_template/utils/mixins/firebase_auth_mixin.dart';
-import 'package:riverpod_template/utils/network/network_response.dart';
+import 'package:riverpod_template/models/user/user.dart' as domain;
+import 'package:riverpod_template/core/utils/app_strings.dart';
+import 'package:riverpod_template/core/extensions/user_extensions.dart';
+import 'package:riverpod_template/core/mixins/firebase_auth_mixin.dart';
+import 'package:riverpod_template/core/utils/network/network_response.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthRepository with FirebaseAuthMixin implements AuthRepositoryInterface {

@@ -34,7 +34,7 @@ Trigger phrases:
 2. Similar feature manifest – `lib/manifests/{feature}.manifest.generated.json`
 3. Similar feature README (if exists) – `lib/presentation/{feature}/README.md`
 
-**Extract from similar feature:** file structure, widget decomposition, state management, navigation (RoutePath usage).
+**Extract from similar feature:** file structure, widget decomposition, state management, navigation (AppRoute usage).
 
 ### Phase 3: Widget Decomposition
 
@@ -84,14 +84,14 @@ Location: `lib/presentation/{feature}/{feature}_controller.dart`
 ## Integration
 
 ### Routes
-- [ ] Add `RoutePath.{featureName}` in `lib/routing/router.dart`
+- [ ] Add `AppRoute.{featureName}` in `lib/core/routing/router.dart`
 - [ ] Add `GoRoute` in same file
 - [ ] Navigation from: {source_view}.dart
 
 ### Data
 - [ ] Repository: `lib/data/repositories/{feature}_repository/` (create or existing)
-- [ ] Domain models: `lib/domain/` (create or existing)
-- [ ] API / endpoints if needed: `lib/utils/network/endpoints.dart` or project API docs
+- [ ] Domain models: `lib/models/` (create or existing)
+- [ ] API / endpoints if needed: `lib/core/utils/network/endpoints.dart` or project API docs
 
 ### Entry points
 - [ ] Where should this appear? (bottom nav, menu, home, etc.)
@@ -111,7 +111,7 @@ Location: `lib/presentation/{feature}/{feature}_controller.dart`
 4. … (list all widgets and data layer files)
 
 ### Files to Modify
-- `lib/routing/router.dart` – add RoutePath constant and GoRoute
+- `lib/core/routing/router.dart` – add AppRoute constant and GoRoute
 - `lib/presentation/{source}/{source}_view.dart` – add navigation
 
 **Total: ~X files**

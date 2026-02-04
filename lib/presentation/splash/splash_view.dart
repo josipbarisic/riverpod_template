@@ -6,10 +6,10 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_template/data/firebase/firebase_api_providers.dart';
 import 'package:riverpod_template/gen/assets.gen.dart';
 import 'package:riverpod_template/presentation/splash/splash_controller.dart';
-import 'package:riverpod_template/routing/router.dart';
-import 'package:riverpod_template/theme/helpers/app_icons_helper.dart';
-import 'package:riverpod_template/utils/enums/hero_animations_enum.dart';
-import 'package:riverpod_template/utils/extensions/theme_extensions.dart';
+import 'package:riverpod_template/core/routing/app_route.dart';
+import 'package:riverpod_template/core/theme/helpers/app_icons_helper.dart';
+import 'package:riverpod_template/core/enums/hero_animations_enum.dart';
+import 'package:riverpod_template/core/extensions/theme_extensions.dart';
 
 class SplashView extends ConsumerWidget {
   const SplashView({super.key});
@@ -21,7 +21,7 @@ class SplashView extends ConsumerWidget {
       // If app was started from the background notification, do not navigate to the
       // Onboarding screen.
       (_, next) => next.hasValue && !ref.read(hasRemoteMessageProvider)
-          ? GoRouter.of(context).go(RoutePath.onboarding)
+          ? GoRouter.of(context).go(AppRoute.onboarding)
           : null,
       onError: (error, _) => log('Error on loading Splash data: $error'),
     );

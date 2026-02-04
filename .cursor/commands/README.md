@@ -33,7 +33,7 @@ Agent skills (optional, for deeper workflows) live in `.cursor/skills/`:
 - **Mandatory reads:** ARCHITECTURE.md (or AGENTS.md), feature manifest; check staleness.
 - **State what you read** before implementing.
 - **Complexity:** Ask Tier 1/2/3 at start; Tier 3 = wait for approval.
-- **Routes:** Use `RoutePath.xxx` (defined in `lib/routing/router.dart`).
+- **Routes:** Use `AppRoute.xxx` (defined in `lib/core/routing/router.dart`).
 - **Manifests:** `lib/manifests/{feature}.manifest.generated.json`.
 
 ## Regenerate Manifests

@@ -1,6 +1,6 @@
 import 'package:mocktail/mocktail.dart';
-import 'package:riverpod_template/services/network_service/network_service.dart';
-import 'package:riverpod_template/utils/network/network_response.dart';
+import 'package:riverpod_template/core/services/network_service/network_service.dart';
+import 'package:riverpod_template/core/utils/network/network_response.dart';
 
 /// Mock implementation of [NetworkService] for testing.
 ///

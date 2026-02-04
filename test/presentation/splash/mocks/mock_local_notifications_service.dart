@@ -1,9 +1,9 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:riverpod_template/services/local_notifications_service/local_notifications_service.dart';
-import 'package:riverpod_template/utils/notifications/app_notification.dart';
-import 'package:riverpod_template/utils/notifications/notification_status.dart';
+import 'package:riverpod_template/core/services/local_notifications_service/local_notifications_service.dart';
+import 'package:riverpod_template/core/utils/notifications/app_notification.dart';
+import 'package:riverpod_template/core/utils/notifications/notification_status.dart';
 
 /// Mock implementation of [LocalNotificationsService] for testing.
 class MockLocalNotificationsService extends Mock implements LocalNotificationsService {

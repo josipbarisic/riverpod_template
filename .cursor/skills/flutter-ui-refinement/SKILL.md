@@ -30,7 +30,7 @@ Before ANY code changes, gather information:
 
 **If user provides a reference component:**
 
-1. Locate the file (e.g. under `lib/presentation/` or `lib/theme/`).
+1. Locate the file (e.g. under `lib/presentation/` or `lib/core/theme/`).
 2. Read the file and extract design tokens:
    - Colors (theme, `AppColors`, or project color constants)
    - Spacing (padding, margins – theme or extensions like `.w`, `.h`, `.r` if the project uses them)

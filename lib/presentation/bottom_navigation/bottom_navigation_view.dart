@@ -5,8 +5,8 @@ import 'package:riverpod_template/gen/assets.gen.dart';
 import 'package:riverpod_template/presentation/bottom_navigation/bottom_navigation_controller.dart';
 import 'package:riverpod_template/presentation/bottom_navigation/bottom_navigation_state.dart';
 import 'package:riverpod_template/presentation/home/home_view.dart';
-import 'package:riverpod_template/theme/colors/light_app_colors.dart';
-import 'package:riverpod_template/theme/helpers/app_icons_helper.dart';
+import 'package:riverpod_template/core/theme/colors/light_app_colors.dart';
+import 'package:riverpod_template/core/theme/helpers/app_icons_helper.dart';
 
 class BottomNavigationView extends HookConsumerWidget {
   const BottomNavigationView({super.key});

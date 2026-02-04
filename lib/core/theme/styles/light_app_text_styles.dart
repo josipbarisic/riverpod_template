@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:riverpod_template/theme/colors/dark_app_colors.dart';
-import 'package:riverpod_template/theme/colors/light_app_colors.dart';
-import 'package:riverpod_template/theme/styles/app_text_styles.dart';
+import 'package:riverpod_template/core/theme/colors/dark_app_colors.dart';
+import 'package:riverpod_template/core/theme/colors/light_app_colors.dart';
+import 'package:riverpod_template/core/theme/styles/app_text_styles.dart';
 
 final lightAppTextStyles = LightAppTextStyles();
 

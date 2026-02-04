@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-04T21:13:28.003597Z",
+  "generatedAt": "2026-02-04T21:36:07.036189Z",
   "feature": "bottom_navigation",
   "exports": {
     "views": [
@@ -37,7 +37,7 @@
   ],
   "routes": [
     {
-      "appRoute": "RoutePath.bottomNavigation",
+      "appRoute": "AppRoute.bottomNavigation",
       "path": "/bottomNavigation",
       "view": "BottomNavigationView"
     }

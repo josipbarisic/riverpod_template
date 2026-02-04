@@ -1,4 +1,4 @@
-import 'package:riverpod_template/domain/product/product.dart';
+import 'package:riverpod_template/models/product/product.dart';
 
 /// Factory function to create test products with optional overrides
 Product createTestProduct({

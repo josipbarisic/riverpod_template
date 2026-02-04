@@ -2,10 +2,11 @@ import 'dart:developer';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:riverpod_template/data/firebase/firebase_api_providers.dart';
-import 'package:riverpod_template/routing/router.dart';
-import 'package:riverpod_template/services/local_notifications_service/local_notifications_service.dart';
-import 'package:riverpod_template/services/network_service/network_service.dart';
-import 'package:riverpod_template/utils/network/endpoints.dart';
+import 'package:riverpod_template/core/routing/app_route.dart';
+import 'package:riverpod_template/core/routing/router.dart';
+import 'package:riverpod_template/core/services/local_notifications_service/local_notifications_service.dart';
+import 'package:riverpod_template/core/services/network_service/network_service.dart';
+import 'package:riverpod_template/core/utils/network/endpoints.dart';
 
 class FirebaseApi {
   FirebaseApi({
@@ -54,7 +55,7 @@ class FirebaseApi {
       if (message != null) {
         hasRemoteMessage.updateHasRemoteMessage(true);
         log('Handling initial message: ${message.notification?.body}');
-        router.push(RoutePath.bottomNavigation, extra: message);
+        router.push(AppRoute.bottomNavigation, extra: message);
       }
     });
 
@@ -63,14 +64,14 @@ class FirebaseApi {
     FirebaseMessaging.onMessage.listen((message) {
       log('Handling message opened app: ${message.notification?.body}');
       hasRemoteMessage.updateHasRemoteMessage(true);
-      // router.push(RoutePath.signUp, extra: message);
+      // router.push(AppRoute.signUp, extra: message);
       localNotificationsService.showRemoteNotification(message);
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
       hasRemoteMessage.updateHasRemoteMessage(true);
       log('Handling message opened app: ${message.notification?.body}');
-      router.push(RoutePath.signUp, extra: message);
+      router.push(AppRoute.signUp, extra: message);
     });
     FirebaseMessaging.onBackgroundMessage(_handleMessage);
   }
@@ -79,5 +80,5 @@ class FirebaseApi {
 Future<void> _handleMessage(RemoteMessage message) async {
   log('Handling message: ${message.notification?.body}');
 
-  router.push(RoutePath.login, extra: message);
+  router.push(AppRoute.login, extra: message);
 }

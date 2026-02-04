@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:riverpod_template/theme/colors/light_app_colors.dart';
+import 'package:riverpod_template/core/theme/colors/light_app_colors.dart';
 
 class PrimaryButton extends StatelessWidget {
   final String? text;

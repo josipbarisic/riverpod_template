@@ -17,7 +17,7 @@ Before any code changes:
 3. Identify affected feature(s) from `lib/presentation/`
 4. Read manifest: `lib/manifests/{feature}/{feature}.manifest.generated.json`
 5. Read feature README (if exists): `lib/presentation/{feature}/README.md`
-6. If bug involves API: read `lib/utils/network/endpoints.dart` or API docs
+6. If bug involves API: read `lib/core/utils/network/endpoints.dart` or API docs
 
 Extract from manifest: views, controllers, stateClasses, providers, routes, apiEndpoints, dependencies.
 
@@ -37,7 +37,7 @@ Use manifest to find relevant views, controllers, repositories. Fix using:
 
 - Imports: `package:riverpod_template/...` only
 - No `dynamic`, no private `_build*`, no logic in views
-- Routes: use `RoutePath.xxx`
+- Routes: use `AppRoute.xxx`
 
 ### Step 6: Verify
 

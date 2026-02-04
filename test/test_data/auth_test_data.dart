@@ -1,4 +1,4 @@
-import 'package:riverpod_template/domain/user/user.dart';
+import 'package:riverpod_template/models/user/user.dart';
 
 /// Factory function to create test users with optional overrides
 User createTestUser({

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:riverpod_template/theme/colors/light_app_colors.dart';
+import 'package:riverpod_template/core/theme/colors/light_app_colors.dart';
 
 class VerificationCodeWidget extends HookWidget {
   const VerificationCodeWidget({

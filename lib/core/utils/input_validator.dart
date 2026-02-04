@@ -1,4 +1,4 @@
-import 'package:riverpod_template/utils/app_strings.dart';
+import 'package:riverpod_template/core/utils/app_strings.dart';
 
 class InputValidator {
   static String? validateEmail(String? value) {

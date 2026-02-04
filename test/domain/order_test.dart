@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:riverpod_template/domain/item/item.dart';
-import 'package:riverpod_template/domain/order/order.dart';
-import 'package:riverpod_template/utils/enums/order_status_enum.dart';
+import 'package:riverpod_template/models/item/item.dart';
+import 'package:riverpod_template/models/order/order.dart';
+import 'package:riverpod_template/core/enums/order_status_enum.dart';
 
 import '../test_data/order_test_data.dart';
 

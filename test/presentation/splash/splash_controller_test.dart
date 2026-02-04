@@ -4,9 +4,9 @@ import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_template/data/firebase/firebase_api.dart';
 import 'package:riverpod_template/data/firebase/firebase_api_providers.dart';
 import 'package:riverpod_template/presentation/splash/splash_controller.dart';
-import 'package:riverpod_template/services/local_notifications_service/local_notifications_service.dart';
-import 'package:riverpod_template/services/local_notifications_service/local_notifications_service_provider.dart';
-import 'package:riverpod_template/utils/shared_prefs/shared_prefs_provider.dart';
+import 'package:riverpod_template/core/services/local_notifications_service/local_notifications_service.dart';
+import 'package:riverpod_template/core/services/local_notifications_service/local_notifications_service_provider.dart';
+import 'package:riverpod_template/core/utils/shared_prefs/shared_prefs_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'mocks/mock_firebase_api.dart';

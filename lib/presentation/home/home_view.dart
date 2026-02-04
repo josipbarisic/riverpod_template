@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_template/data/firebase/firebase_api_providers.dart';
 import 'package:riverpod_template/gen/assets.gen.dart';
-import 'package:riverpod_template/theme/helpers/app_icons_helper.dart';
-import 'package:riverpod_template/utils/enums/hero_animations_enum.dart';
+import 'package:riverpod_template/core/theme/helpers/app_icons_helper.dart';
+import 'package:riverpod_template/core/enums/hero_animations_enum.dart';
 
 class HomeView extends ConsumerWidget {
   const HomeView({super.key});

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:riverpod_template/domain/product/product.dart';
+import 'package:riverpod_template/models/product/product.dart';
 
 import '../test_data/product_test_data.dart';
 

@@ -6,8 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:riverpod_template/firebase_options.dart';
 import 'package:riverpod_template/flavors.dart';
-import 'package:riverpod_template/routing/router.dart';
-import 'package:riverpod_template/theme/theme.dart';
+import 'package:riverpod_template/core/routing/router.dart';
+import 'package:riverpod_template/core/theme/theme.dart';
 
 Future<void> main() async {
   await _appSetup();

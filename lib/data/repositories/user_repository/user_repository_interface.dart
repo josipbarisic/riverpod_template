@@ -1,5 +1,5 @@
-import 'package:riverpod_template/domain/user/user.dart';
-import 'package:riverpod_template/utils/network/network_response.dart';
+import 'package:riverpod_template/models/user/user.dart';
+import 'package:riverpod_template/core/utils/network/network_response.dart';
 
 abstract interface class UserRepositoryInterface {
   Future<User> fetchUserData(int id);

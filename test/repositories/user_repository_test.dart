@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:riverpod_template/data/repositories/user_repository/user_repository.dart';
-import 'package:riverpod_template/domain/user/user.dart';
-import 'package:riverpod_template/utils/network/endpoints.dart';
+import 'package:riverpod_template/models/user/user.dart';
+import 'package:riverpod_template/core/utils/network/endpoints.dart';
 
 import '../helpers/mock_network_service.dart';
 import '../test_data/auth_test_data.dart';

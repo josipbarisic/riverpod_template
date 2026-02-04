@@ -7,14 +7,14 @@ Quick reference for AI agents working on projects started from this template.
 When working on a feature, read BOTH:
 
 1. **`ARCHITECTURE.md`** (repo root) – Architecture, layers, conventions
-2. **`lib/manifests/{feature}/{feature}.manifest.generated.json`** – Technical specifics (auto-generated)
+2. **`lib/manifests/{feature}.manifest.generated.json`** – Technical specifics (auto-generated)
 
 ### Manifest Structure
 
 Each manifest contains:
 
 - **`exports`** – views, controllers, widgets, models, states, repositories
-- **`routes`** – Navigation (RoutePath constant, path, view)
+- **`routes`** – Navigation (AppRoute constant, path, view)
 - **`providers`** – Riverpod provider definitions
 - **`stateClasses`** – State classes and fields
 - **`controllerMethods`** – Controller method signatures
@@ -27,7 +27,7 @@ Each manifest contains:
   ```bash
   dart run scripts/generate_feature_manifests.dart
   ```
-- **Never edit** `lib/manifests/**/*.manifest.generated.json` by hand. Change the generator or code, then regenerate.
+- **Never edit** `lib/manifests/*.manifest.generated.json` by hand. Change the generator or code, then regenerate.
 
 ### Feature areas (template)
 
@@ -46,28 +46,44 @@ Manifests: `lib/manifests/splash.manifest.generated.json`, `lib/manifests/login.
 
 ### Layers
 
-- **`lib/presentation/`** – Views, controllers, widgets (by feature)
-- **`lib/data/repositories/`** – Repository implementations
-- **`lib/domain/`** – Domain models (Freezed)
-- **`lib/routing/`** – GoRouter, RoutePath constants
-- **`lib/services/`** – Core services
-- **`lib/theme/`**, **`lib/utils/`** – Theme, helpers, network
+```
+lib/
+├── core/                    # Shared infrastructure
+│   ├── constants/           # App-wide constants
+│   ├── enums/               # Enumerations
+│   ├── extensions/          # Dart extensions
+│   ├── mixins/              # Reusable mixins
+│   ├── routing/             # GoRouter, AppRoute constants
+│   ├── services/            # Core services (network, notifications)
+│   ├── theme/               # Colors, text styles, theming
+│   └── utils/               # Utilities, network config, shared prefs
+├── data/                    # Data layer
+│   ├── firebase/            # Firebase API
+│   └── repositories/        # Repository implementations
+├── models/                  # Domain models (Freezed)
+├── presentation/            # UI by feature (views, controllers)
+└── manifests/               # Auto-generated feature manifests
+```
 
 ### Imports
 
 **Always use absolute package imports:**
 
 ```dart
-import 'package:riverpod_template/presentation/login/login_view.dart';
+import 'package:riverpod_template/core/routing/app_route.dart';
+import 'package:riverpod_template/core/services/network_service/network_service.dart';
 import 'package:riverpod_template/data/repositories/auth_repository/auth_repository.dart';
+import 'package:riverpod_template/models/user/user.dart';
+import 'package:riverpod_template/presentation/login/login_view.dart';
 ```
 
 **Never:** relative imports (`../`, `./`), barrel exports.
 
 ### Routing
 
-- **Route constants:** `lib/routing/router.dart` → `RoutePath.login`, `RoutePath.splash`, etc.
-- **Navigation:** `context.go(RoutePath.login);`, `context.push(RoutePath.signUp);`
+- **Route constants:** `lib/core/routing/app_route.dart` → `AppRoute.login`, `AppRoute.splash`, etc.
+- **Route definitions:** `lib/core/routing/router.dart`
+- **Navigation:** `context.go(AppRoute.login);`, `context.push(AppRoute.signUp);`
 
 ---
 
@@ -91,6 +107,7 @@ Type `/` in Cursor Chat:
 - **`/fix-bug`** – Fix bugs with manifest context
 - **`/review`** – Pre-commit review
 - **`/commit`** – Secure, atomic commits
+- **`/test`** – Create tests for features
 - **`/regenerate-manifests`** – Regenerate manifests
 - **`/analyse`** – Analyse a feature (manifest-based report)
 
@@ -112,7 +129,7 @@ Full scale: `.cursor/docs/COMPLEXITY_AND_DISCOVERY.md`
 
 - **State:** `@riverpod`, `@freezed`, `AsyncValue`
 - **Widgets:** `ConsumerWidget` / `HookConsumerWidget`; no private `_build*` methods (extract to separate widget files)
-- **Routes:** Use `RoutePath.xxx` only (no string literals)
+- **Routes:** Use `AppRoute.xxx` only (no string literals)
 
 ---
 
@@ -162,6 +179,8 @@ Each manifest includes a `testing` object:
 
 ```
 test/
+├── domain/
+│   └── {model}_test.dart
 ├── presentation/
 │   └── {feature}/
 │       ├── {feature}_controller_test.dart
@@ -169,13 +188,16 @@ test/
 │       └── mocks/
 │           └── mock_{xxx}_repository.dart
 ├── repositories/
-│   └── {feature}_repository_test.dart
+│   └── {repository}_test.dart
+├── services/
+│   └── {service}_test.dart
 ├── test_data/
 │   └── {feature}_test_data.dart
 └── helpers/
     └── test_helpers.dart
 ```
 
+- **Domain tests**: `test/domain/` (model tests)
 - **Controller tests**: `test/presentation/{feature}/`
 - **Widget tests**: Same directory as controller tests
 - **Mocks**: `test/presentation/{feature}/mocks/`
@@ -258,7 +280,7 @@ All tests must pass. **Never commit with failing tests.**
 | If You Modified... | Update Test In... |
 |-------------------|-------------------|
 | Controller logic | `test/presentation/{feature}/{feature}_controller_test.dart` |
-| Repository method | `test/repositories/{feature}_repository_test.dart` |
+| Repository method | `test/repositories/{repository}_test.dart` |
 | Model/domain | `test/domain/{model}_test.dart` |
 | Widget behavior | `test/presentation/{feature}/{feature}_view_test.dart` |
 | New API endpoint | Add repository test with mock network response |

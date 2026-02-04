@@ -10,7 +10,7 @@ Regenerate all feature manifests to keep them up-to-date with the codebase.
 
 - **After** adding new views, controllers, routes, or repositories
 - **After** renaming or moving files
-- **After** modifying route definitions in `lib/routing/router.dart`
+- **After** modifying route definitions in `lib/core/routing/router.dart`
 - **Before** using other commands that rely on manifests
 
 ### Step 1: Run Manifest Generator
@@ -26,7 +26,7 @@ The script outputs generated manifest paths under `lib/manifests/`. Check for er
 ### Step 3: If Errors Occur
 
 - Run `dart analyze` first
-- Verify route definitions in `lib/routing/router.dart` and `RoutePath` constants
+- Verify route definitions in `lib/core/routing/router.dart` and `AppRoute` constants
 - Ensure feature folders exist under `lib/presentation/`
 
 ### Step 4: Commit Manifest Changes (optional)

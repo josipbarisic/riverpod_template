@@ -3,7 +3,7 @@
 /// Feature Manifest Generator (Riverpod Template)
 ///
 /// Scans lib/presentation/ and generates {feature}.manifest.generated.json per feature.
-/// Uses RoutePath from lib/routing/router.dart. Output schema matches AI-first playbook.
+/// Uses AppRoute from lib/core/routing/app_route.dart. Output schema matches AI-first playbook.
 ///
 /// Usage: dart run scripts/generate_feature_manifests.dart
 library;
@@ -42,7 +42,7 @@ class RouteDefinition {
   final String pathValue;
   final String? view;
   RouteDefinition({required this.routePathConstant, required this.pathValue, this.view});
-  String get appRoute => 'RoutePath.$routePathConstant';
+  String get appRoute => 'AppRoute.$routePathConstant';
   Map<String, dynamic> toJson() => {
         'appRoute': appRoute,
         'path': pathValue,
@@ -214,9 +214,10 @@ class FeatureManifest {
 const _packageName = 'riverpod_template';
 final presentationDir = Directory('lib/presentation');
 final dataRepositoriesDir = Directory('lib/data/repositories');
-final domainDir = Directory('lib/domain');
-final routerFile = File('lib/routing/router.dart');
-final endpointsFile = File('lib/utils/network/endpoints.dart');
+final modelsDir = Directory('lib/models');
+final appRouteFile = File('lib/core/routing/app_route.dart');
+final routerFile = File('lib/core/routing/router.dart');
+final endpointsFile = File('lib/core/utils/network/endpoints.dart');
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PARSING UTILITIES
@@ -250,11 +251,11 @@ String getRelativePath(String absolutePath) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ROUTE PATH (template uses RoutePath in router.dart)
+// APP ROUTE (template uses AppRoute in app_route.dart)
 // ═══════════════════════════════════════════════════════════════════════════
 
-/// Extract RoutePath constants from router.dart: static const String xxx = 'path';
-Map<String, String> extractRoutePathConstants(String routerContent) {
+/// Extract AppRoute constants from app_route.dart: static const String xxx = 'path';
+Map<String, String> extractAppRouteConstants(String routerContent) {
   final constants = <String, String>{};
   final regex = RegExp(r"static\s+const\s+String\s+(\w+)\s*=\s*'([^']+)';");
   for (final m in regex.allMatches(routerContent)) {
@@ -266,30 +267,30 @@ Map<String, String> extractRoutePathConstants(String routerContent) {
 List<RouteDefinition> extractRoutesForFeature(
   String featureName,
   String routerContent,
-  Map<String, String> routePathConstants,
+  Map<String, String> appRouteConstants,
   List<String> featureFiles,
 ) {
   final routes = <RouteDefinition>[];
   final usedRoutes = <String>{};
-  final usageRegex = RegExp(r'RoutePath\.(\w+)');
+  final usageRegex = RegExp(r'AppRoute\.(\w+)');
   for (final filePath in featureFiles) {
     final content = readFileSafe(filePath);
     for (final m in usageRegex.allMatches(content)) {
       final name = m.group(1)!;
-      if (routePathConstants.containsKey(name)) usedRoutes.add(name);
+      if (appRouteConstants.containsKey(name)) usedRoutes.add(name);
     }
   }
 
   List<String> routeNames = usedRoutes.isNotEmpty
       ? usedRoutes.toList()
-      : _featureToRouteNames(featureName).where(routePathConstants.containsKey).toList();
+      : _featureToRouteNames(featureName).where(appRouteConstants.containsKey).toList();
   if (routeNames.isEmpty) return routes;
 
   for (final routeName in routeNames) {
-    final pathValue = routePathConstants[routeName] ?? '/$routeName';
+    final pathValue = appRouteConstants[routeName] ?? '/$routeName';
     // Match builder: ... => XxxView( or builder: ... return const XxxView(
     final routePattern = RegExp(
-      'path:\\s*RoutePath\\.$routeName[\\s\\S]*?builder:[\\s\\S]*?(?:=>\\s*(?:const\\s+)?(\\w+View)\\s*\\(|return\\s+(?:const\\s+)?(\\w+View)\\s*\\()',
+      'path:\\s*AppRoute\\.$routeName[\\s\\S]*?builder:[\\s\\S]*?(?:=>\\s*(?:const\\s+)?(\\w+View)\\s*\\(|return\\s+(?:const\\s+)?(\\w+View)\\s*\\()',
       multiLine: true,
     );
     for (final m in routePattern.allMatches(routerContent)) {
@@ -459,8 +460,9 @@ FeatureManifest generateManifestForFeature(String featureName, String featurePat
   final featureDir = Directory('lib/presentation/$featurePath');
   if (!featureDir.existsSync()) throw Exception('Feature directory not found: $featureDir');
 
+  final appRouteContent = readFileSafe(appRouteFile.path);
   final routerContent = readFileSafe(routerFile.path);
-  final routePathConstants = extractRoutePathConstants(routerContent);
+  final appRouteConstants = extractAppRouteConstants(appRouteContent);
   final endpointsContent = readFileSafe(endpointsFile.path);
 
   final allDartFiles = listDartFilesRecursive(featureDir);
@@ -510,7 +512,7 @@ FeatureManifest generateManifestForFeature(String featureName, String featurePat
     allApiEndpoints.addAll(extractApiEndpoints(content, getRelativePath(filePath), endpointsContent, allDartFiles));
   }
 
-  final routes = extractRoutesForFeature(featureName, routerContent, routePathConstants, allDartFiles);
+  final routes = extractRoutesForFeature(featureName, routerContent, appRouteConstants, allDartFiles);
   final routesDedup = routes.fold<Map<String, RouteDefinition>>({}, (map, r) {
     map[r.routePathConstant] = r;
     return map;

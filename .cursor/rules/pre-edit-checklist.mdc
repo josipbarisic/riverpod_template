@@ -28,6 +28,6 @@ Before EVERY code edit, verify:
 
 ## Routes
 
-- [ ] Am I using string literals for routes? → **STOP** - Use `RoutePath.xxx`
+- [ ] Am I using string literals for routes? → **STOP** - Use `AppRoute.xxx`
 
 ## If ANY check fails, fix BEFORE proceeding.

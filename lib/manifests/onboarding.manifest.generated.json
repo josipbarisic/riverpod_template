@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-04T21:13:27.985543Z",
+  "generatedAt": "2026-02-04T21:36:07.000178Z",
   "feature": "onboarding",
   "exports": {
     "views": [
@@ -19,7 +19,7 @@
   "stateClasses": [],
   "routes": [
     {
-      "appRoute": "RoutePath.signUp",
+      "appRoute": "AppRoute.signUp",
       "path": "/signUp",
       "view": "SignUpView"
     }

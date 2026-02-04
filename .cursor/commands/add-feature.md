@@ -24,7 +24,7 @@ Ask the user if not already stated:
 
 **Tier 2:** Feature name, what screens/data, how user reaches it (3–5 questions).
 
-**Tier 3:** Feature name, screens/views, data, repository API(s), navigation (RoutePath), similar feature to copy from, integration points.
+**Tier 3:** Feature name, screens/views, data, repository API(s), navigation (AppRoute), similar feature to copy from, integration points.
 
 ---
 
@@ -36,7 +36,7 @@ Ask the user if not already stated:
 2. Run: `dart run scripts/generate_feature_manifests.dart`
 3. Read similar feature manifest: `lib/manifests/{similar}/{similar}.manifest.generated.json`
 4. Read similar feature README (if exists): `lib/presentation/{similar}/README.md`
-5. If API calls involved, read `lib/utils/network/endpoints.dart` or API docs
+5. If API calls involved, read `lib/core/utils/network/endpoints.dart` or API docs
 
 Extract from manifest: exports.views, exports.controllers, providers, routes, apiEndpoints, dependencies.
 
@@ -54,11 +54,11 @@ State what you will create: files, routes, controllers, views. For Tier 3, wait 
 
 **Routes:**
 
-1. Add constant in `lib/routing/router.dart` (class `RoutePath`):
+1. Add constant in `lib/core/routing/router.dart` (class `AppRoute`):
    ```dart
    static const String myFeature = '/myFeature';
    ```
-2. Add `GoRoute` in same file with `path: RoutePath.myFeature` and builder returning the view.
+2. Add `GoRoute` in same file with `path: AppRoute.myFeature` and builder returning the view.
 
 **NEVER:** relative imports, `dynamic`, private `_build*` methods, logic in views, editing `*.g.dart`/`*.freezed.dart`.
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:riverpod_template/presentation/widgets/primary_button.dart';
 import 'package:riverpod_template/presentation/widgets/underlined_text_button.dart';
-import 'package:riverpod_template/theme/colors/light_app_colors.dart';
-import 'package:riverpod_template/utils/app_strings.dart';
+import 'package:riverpod_template/core/theme/colors/light_app_colors.dart';
+import 'package:riverpod_template/core/utils/app_strings.dart';
 
 class CustomDialog extends StatelessWidget {
   final String? title;

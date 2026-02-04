@@ -3,12 +3,12 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_template/presentation/widgets/onboarding_scaffold.dart';
-import 'package:riverpod_template/routing/router.dart';
-import 'package:riverpod_template/theme/colors/light_app_colors.dart';
-import 'package:riverpod_template/utils/app_strings.dart';
-import 'package:riverpod_template/utils/extensions/theme_extensions.dart';
-import 'package:riverpod_template/utils/shared_prefs/shared_prefs_keys.dart';
-import 'package:riverpod_template/utils/shared_prefs/shared_prefs_provider.dart';
+import 'package:riverpod_template/core/routing/app_route.dart';
+import 'package:riverpod_template/core/theme/colors/light_app_colors.dart';
+import 'package:riverpod_template/core/utils/app_strings.dart';
+import 'package:riverpod_template/core/extensions/theme_extensions.dart';
+import 'package:riverpod_template/core/utils/shared_prefs/shared_prefs_keys.dart';
+import 'package:riverpod_template/core/utils/shared_prefs/shared_prefs_provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class OnboardingView extends HookConsumerWidget {
@@ -82,7 +82,7 @@ class OnboardingView extends HookConsumerWidget {
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeIn,
                         )
-                      : context.push(RoutePath.signUp),
+                      : context.push(AppRoute.signUp),
                   child: Padding(
                     padding: const EdgeInsets.all(8),
                     child: Text(

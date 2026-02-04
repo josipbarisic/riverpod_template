@@ -10,7 +10,7 @@
 
 Location: `lib/manifests/`
 
-Contains: exports, routes (RoutePath), providers, controllerMethods, apiEndpoints.
+Contains: exports, routes (AppRoute), providers, controllerMethods, apiEndpoints.
 
 ## Regenerate Manifests
 

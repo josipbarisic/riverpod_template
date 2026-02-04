@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:riverpod_template/domain/user/user.dart' as domain;
+import 'package:riverpod_template/models/user/user.dart' as domain;
 
 extension FirebaseUserToDomainUser on User {
   domain.User toDomainUser() => domain.User(
