@@ -16,10 +16,12 @@ void main() {
         httpStatusCode: null,
         message: null,
         data: null,
+        errorCode: null,
       );
       assert(sut.httpStatusCode == 400);
-      assert(sut.message == 'Unknown status message');
+      assert(sut.message == 'Request failed');
       assert(sut.data == null);
+      assert(sut.errorCode == null);
     });
 
     test('Success response data', () {
@@ -32,6 +34,18 @@ void main() {
       assert(sut.message == 'Success');
       assert(sut.data is Map);
     });
+
+    test('Success response with errorCode', () {
+      sut = NetworkSuccessResponse(
+        httpStatusCode: 200,
+        message: 'Success',
+        data: {'key': 'value'},
+        errorCode: 0,
+      );
+      assert(sut.httpStatusCode == 200);
+      assert(sut.message == 'Success');
+      assert(sut.errorCode == 0);
+    });
   });
 
   group('NetworkErrorResponse', () {
@@ -40,10 +54,12 @@ void main() {
         httpStatusCode: null,
         message: null,
         data: null,
+        errorCode: null,
       );
       assert(sut.httpStatusCode == 400);
-      assert(sut.message == 'Unknown status message');
+      assert(sut.message == 'Request failed');
       assert(sut.data == null);
+      assert(sut.errorCode == null);
     });
 
     test('Error response data', () {
@@ -55,6 +71,18 @@ void main() {
       assert(sut.httpStatusCode == 404);
       assert(sut.message == 'Error');
       assert(sut.data == null);
+    });
+
+    test('Error response with backend errorCode', () {
+      sut = NetworkErrorResponse(
+        httpStatusCode: 400,
+        message: 'Validation failed',
+        data: {'errors': ['Invalid email']},
+        errorCode: 1001,
+      );
+      assert(sut.httpStatusCode == 400);
+      assert(sut.message == 'Validation failed');
+      assert(sut.errorCode == 1001);
     });
   });
 }
