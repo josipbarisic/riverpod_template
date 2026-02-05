@@ -1,45 +1,48 @@
 {
-  "generatedAt": "2026-02-04T21:36:07.026655Z",
+  "generatedAt": "2026-02-05T16:22:50.910410Z",
   "feature": "sign_up",
-  "exports": {
-    "views": [
-      "lib/presentation/sign_up/sign_up_view.dart"
-    ],
-    "controllers": [
-      "lib/presentation/sign_up/sign_up_controller.dart"
-    ],
-    "widgets": [],
-    "models": [],
-    "services": [],
-    "states": [],
-    "repositories": [
-      "lib/data/repositories/auth_repository/auth_repository.dart",
-      "lib/data/repositories/auth_repository/auth_repository_interface.dart",
-      "lib/data/repositories/auth_repository/auth_repository_providers.dart"
-    ]
-  },
-  "dependencies": [
-    "firebase"
+  "views": [
+    "lib/presentation/sign_up/sign_up_view.dart"
+  ],
+  "controllers": [
+    "lib/presentation/sign_up/sign_up_controller.dart"
+  ],
+  "widgets": [],
+  "models": [],
+  "repositories": [
+    "lib/data/repositories/auth_repository/auth_repository.dart",
+    "lib/data/repositories/auth_repository/auth_repository_interface.dart"
   ],
   "providers": [],
   "stateClasses": [],
-  "routes": [
+  "routes": [],
+  "apiEndpoints": [],
+  "coreServices": [],
+  "thirdPartyDependencies": [
     {
-      "appRoute": "AppRoute.signUp",
-      "path": "/signUp",
-      "view": "SignUpView"
+      "package": "firebase_messaging",
+      "usedIn": [
+        "lib/presentation/sign_up/sign_up_view.dart"
+      ]
+    },
+    {
+      "package": "flutter_riverpod",
+      "usedIn": [
+        "lib/presentation/sign_up/sign_up_view.dart"
+      ]
+    },
+    {
+      "package": "go_router",
+      "usedIn": [
+        "lib/presentation/sign_up/sign_up_view.dart"
+      ]
     }
   ],
-  "apiEndpoints": [],
-  "externalServices": [],
   "controllerMethods": {},
   "testing": {
-    "testDirectory": "test/presentation/sign_up",
     "testFiles": [],
-    "testDataFiles": [
-      "test/test_data/auth_test_data.dart"
-    ],
-    "runCommand": "",
+    "testDataFiles": [],
+    "runCommand": "fvm flutter test test/presentation/sign_up/",
     "hasTests": false
   }
 }

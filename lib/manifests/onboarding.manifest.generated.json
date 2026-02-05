@@ -1,37 +1,49 @@
 {
-  "generatedAt": "2026-02-04T21:36:07.000178Z",
+  "generatedAt": "2026-02-05T16:22:50.902650Z",
   "feature": "onboarding",
-  "exports": {
-    "views": [
-      "lib/presentation/onboarding/onboarding_view.dart"
-    ],
-    "controllers": [],
-    "widgets": [],
-    "models": [],
-    "services": [],
-    "states": [],
-    "repositories": []
-  },
-  "dependencies": [
-    "widgets"
+  "views": [
+    "lib/presentation/onboarding/onboarding_view.dart"
   ],
+  "controllers": [],
+  "widgets": [],
+  "models": [],
+  "repositories": [],
   "providers": [],
   "stateClasses": [],
-  "routes": [
+  "routes": [],
+  "apiEndpoints": [],
+  "coreServices": [],
+  "thirdPartyDependencies": [
     {
-      "appRoute": "AppRoute.signUp",
-      "path": "/signUp",
-      "view": "SignUpView"
+      "package": "flutter_hooks",
+      "usedIn": [
+        "lib/presentation/onboarding/onboarding_view.dart"
+      ]
+    },
+    {
+      "package": "go_router",
+      "usedIn": [
+        "lib/presentation/onboarding/onboarding_view.dart"
+      ]
+    },
+    {
+      "package": "hooks_riverpod",
+      "usedIn": [
+        "lib/presentation/onboarding/onboarding_view.dart"
+      ]
+    },
+    {
+      "package": "smooth_page_indicator",
+      "usedIn": [
+        "lib/presentation/onboarding/onboarding_view.dart"
+      ]
     }
   ],
-  "apiEndpoints": [],
-  "externalServices": [],
   "controllerMethods": {},
   "testing": {
-    "testDirectory": "test/presentation/onboarding",
     "testFiles": [],
     "testDataFiles": [],
-    "runCommand": "",
+    "runCommand": "fvm flutter test test/presentation/onboarding/",
     "hasTests": false
   }
 }

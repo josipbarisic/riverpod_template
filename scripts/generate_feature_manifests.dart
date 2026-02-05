@@ -3,7 +3,7 @@
 /// Feature Manifest Generator (Riverpod Template)
 ///
 /// Scans lib/presentation/ and generates {feature}.manifest.generated.json per feature.
-/// Uses AppRoute from lib/core/routing/app_route.dart. Output schema matches AI-first playbook.
+/// Uses AppRoute from lib/core/routing/app_route.dart.
 ///
 /// Usage: dart run scripts/generate_feature_manifests.dart
 library;
@@ -12,7 +12,7 @@ import 'dart:convert';
 import 'dart:io';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// TYPES (same schema as playbook)
+// TYPES
 // ═══════════════════════════════════════════════════════════════════════════
 
 class RiverpodProvider {
@@ -20,7 +20,9 @@ class RiverpodProvider {
   final String type;
   final String? returnType;
   final String file;
+
   RiverpodProvider({required this.name, required this.type, this.returnType, required this.file});
+
   Map<String, dynamic> toJson() => {
         'name': name,
         'type': type,
@@ -31,21 +33,26 @@ class RiverpodProvider {
 
 class StateClass {
   final String name;
-  final List<String> fields;
+  final List<String> fields; // Format: "Type? fieldName" or "Type fieldName"
   final String file;
+
   StateClass({required this.name, required this.fields, required this.file});
+
   Map<String, dynamic> toJson() => {'name': name, 'fields': fields, 'file': file};
 }
 
 class RouteDefinition {
-  final String routePathConstant;
-  final String pathValue;
+  final String appRouteConstant; // AppRoute constant name
   final String? view;
-  RouteDefinition({required this.routePathConstant, required this.pathValue, this.view});
-  String get appRoute => 'AppRoute.$routePathConstant';
+
+  RouteDefinition({required this.appRouteConstant, this.view});
+
+  String get path => '/$appRouteConstant';
+  String get appRoute => 'AppRoute.$appRouteConstant';
+
   Map<String, dynamic> toJson() => {
         'appRoute': appRoute,
-        'path': pathValue,
+        'path': path,
         if (view != null) 'view': view,
       };
 }
@@ -59,6 +66,7 @@ class ApiEndpoint {
   final List<String> endpointPathParams;
   final Map<String, dynamic>? endpointBody;
   final List<String> usedIn;
+
   ApiEndpoint({
     required this.httpMethod,
     required this.endpoint,
@@ -69,6 +77,7 @@ class ApiEndpoint {
     this.endpointBody,
     required this.usedIn,
   });
+
   Map<String, dynamic> toJson() => {
         'httpMethod': httpMethod,
         'endpoint': endpoint,
@@ -81,12 +90,45 @@ class ApiEndpoint {
       };
 }
 
+class CoreService {
+  final String name;
+  final String path;
+  final List<String> usedIn;
+
+  CoreService({required this.name, required this.path, required this.usedIn});
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'path': path,
+        'usedIn': usedIn,
+      };
+}
+
+class ThirdPartyDependency {
+  final String package;
+  final List<String> usedIn;
+
+  ThirdPartyDependency({required this.package, required this.usedIn});
+
+  Map<String, dynamic> toJson() => {
+        'package': package,
+        'usedIn': usedIn,
+      };
+}
+
 class MethodParameter {
   final String name;
   final String type;
   final bool isRequired;
   final String? defaultValue;
-  MethodParameter({required this.name, required this.type, this.isRequired = false, this.defaultValue});
+
+  MethodParameter({
+    required this.name,
+    required this.type,
+    this.isRequired = false,
+    this.defaultValue,
+  });
+
   Map<String, dynamic> toJson() => {
         'name': name,
         'type': type,
@@ -95,21 +137,23 @@ class MethodParameter {
       };
 }
 
-class ExternalService {
-  final String service;
-  final List<String> usedIn;
-  ExternalService({required this.service, required this.usedIn});
-  Map<String, dynamic> toJson() => {'service': service, 'usedIn': usedIn};
-}
-
 class ControllerMethod {
   final String name;
   final String? returnType;
-  final String? params;
+  final String? params; // Kept for backward compatibility
   final List<MethodParameter>? parameters;
   final String file;
   final int line;
-  ControllerMethod({required this.name, this.returnType, this.params, this.parameters, required this.file, required this.line});
+
+  ControllerMethod({
+    required this.name,
+    this.returnType,
+    this.params,
+    this.parameters,
+    required this.file,
+    required this.line,
+  });
+
   Map<String, dynamic> toJson() => {
         'name': name,
         if (returnType != null) 'returnType': returnType,
@@ -121,25 +165,24 @@ class ControllerMethod {
 }
 
 class TestingInfo {
-  final String testDirectory;
+  final String? testDirectory; // Nullable if no tests exist
   final List<String> testFiles;
   final List<String> testDataFiles;
   final String runCommand;
-  final bool hasTests;
 
   TestingInfo({
-    required this.testDirectory,
+    this.testDirectory,
     required this.testFiles,
     required this.testDataFiles,
     required this.runCommand,
-  }) : hasTests = testFiles.isNotEmpty;
+  });
 
   Map<String, dynamic> toJson() => {
-        'testDirectory': testDirectory,
+        if (testDirectory != null) 'testDirectory': testDirectory,
         'testFiles': testFiles,
         'testDataFiles': testDataFiles,
         'runCommand': runCommand,
-        'hasTests': hasTests,
+        'hasTests': testFiles.isNotEmpty,
       };
 }
 
@@ -150,15 +193,13 @@ class FeatureManifest {
   final List<String> controllers;
   final List<String> widgets;
   final List<String> models;
-  final List<String> services;
-  final List<String> states;
   final List<String> repositories;
-  final List<String> dependencies;
   final List<RiverpodProvider> providers;
   final List<StateClass> stateClasses;
   final List<RouteDefinition> routes;
   final List<ApiEndpoint> apiEndpoints;
-  final List<ExternalService> externalServices;
+  final List<CoreService> coreServices;
+  final List<ThirdPartyDependency> thirdPartyDependencies;
   final Map<String, List<ControllerMethod>> controllerMethods;
   final TestingInfo testing;
 
@@ -169,15 +210,13 @@ class FeatureManifest {
     required this.controllers,
     required this.widgets,
     required this.models,
-    required this.services,
-    required this.states,
     required this.repositories,
-    required this.dependencies,
     required this.providers,
     required this.stateClasses,
     required this.routes,
     required this.apiEndpoints,
-    required this.externalServices,
+    required this.coreServices,
+    required this.thirdPartyDependencies,
     required this.controllerMethods,
     required this.testing,
   });
@@ -185,21 +224,17 @@ class FeatureManifest {
   Map<String, dynamic> toJson() => {
         'generatedAt': generatedAt,
         'feature': feature,
-        'exports': {
-          'views': views,
-          'controllers': controllers,
-          'widgets': widgets,
-          'models': models,
-          'services': services,
-          'states': states,
-          'repositories': repositories,
-        },
-        'dependencies': dependencies,
+        'views': views,
+        'controllers': controllers,
+        'widgets': widgets,
+        'models': models,
+        'repositories': repositories,
         'providers': providers.map((p) => p.toJson()).toList(),
         'stateClasses': stateClasses.map((s) => s.toJson()).toList(),
         'routes': routes.map((r) => r.toJson()).toList(),
         'apiEndpoints': apiEndpoints.map((e) => e.toJson()).toList(),
-        'externalServices': externalServices.map((e) => e.toJson()).toList(),
+        'coreServices': coreServices.map((s) => s.toJson()).toList(),
+        'thirdPartyDependencies': thirdPartyDependencies.map((d) => d.toJson()).toList(),
         'controllerMethods': controllerMethods.map(
           (key, value) => MapEntry(key, value.map((m) => m.toJson()).toList()),
         ),
@@ -208,15 +243,17 @@ class FeatureManifest {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// CONSTANTS (template layout)
+// CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
 
 const _packageName = 'riverpod_template';
 final presentationDir = Directory('lib/presentation');
 final dataRepositoriesDir = Directory('lib/data/repositories');
 final modelsDir = Directory('lib/models');
-final appRouteFile = File('lib/core/routing/app_route.dart');
+final testDir = Directory('test');
+final testDataDir = Directory('test/test_data');
 final routerFile = File('lib/core/routing/router.dart');
+final appRouteFile = File('lib/core/routing/app_route.dart');
 final endpointsFile = File('lib/core/utils/network/endpoints.dart');
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -233,6 +270,7 @@ String readFileSafe(String filePath) {
 
 List<String> listDartFilesRecursive(Directory dir) {
   if (!dir.existsSync()) return [];
+
   return dir
       .listSync(recursive: true)
       .whereType<File>()
@@ -251,198 +289,566 @@ String getRelativePath(String absolutePath) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// APP ROUTE (template uses AppRoute in app_route.dart)
+// EXTRACTORS
 // ═══════════════════════════════════════════════════════════════════════════
 
-/// Extract AppRoute constants from app_route.dart: static const String xxx = 'path';
-Map<String, String> extractAppRouteConstants(String routerContent) {
-  final constants = <String, String>{};
-  final regex = RegExp(r"static\s+const\s+String\s+(\w+)\s*=\s*'([^']+)';");
-  for (final m in regex.allMatches(routerContent)) {
-    constants[m.group(1)!] = m.group(2)!;
+List<RiverpodProvider> extractProviders(String content, String fileName) {
+  final providers = <RiverpodProvider>[];
+
+  // Pattern 1: @riverpod or @Riverpod annotation followed by class
+  final classProviderRegex = RegExp(
+    r'@(?:riverpod|Riverpod)(?:\([^)]+\))?\s*\n\s*class\s+(\w+)\s+extends\s+_\$\w+',
+    multiLine: true,
+  );
+  for (final match in classProviderRegex.allMatches(content)) {
+    final className = match.group(1)!;
+    providers.add(
+      RiverpodProvider(
+        name: _toProviderName(className),
+        type: 'Notifier',
+        returnType: className,
+        file: fileName,
+      ),
+    );
   }
+
+  // Pattern 2: @riverpod annotation followed by function
+  final funcProviderRegex = RegExp(
+    r'@riverpod\s*\n\s*(\w+(?:<[^>]+>)?)\s+(\w+)\s*\(',
+    multiLine: true,
+  );
+  for (final match in funcProviderRegex.allMatches(content)) {
+    final returnType = match.group(1)!;
+    final funcName = match.group(2)!;
+    if (returnType == 'class') continue;
+    providers.add(
+      RiverpodProvider(
+        name: _toProviderName(funcName),
+        type: 'Provider',
+        returnType: returnType,
+        file: fileName,
+      ),
+    );
+  }
+
+  return providers;
+}
+
+String _toProviderName(String name) {
+  final lowerFirst = name[0].toLowerCase() + name.substring(1);
+  return '${lowerFirst}Provider';
+}
+
+List<StateClass> extractStateClasses(String content, String fileName) {
+  final states = <StateClass>[];
+
+  // Skip widget files - they don't contain state management state classes
+  final isWidgetFile = RegExp(
+    r'extends\s+(?:StatelessWidget|StatefulWidget|ConsumerWidget|ConsumerStatefulWidget|HookWidget|HookConsumerWidget)',
+  ).hasMatch(content);
+
+  if (isWidgetFile) return states;
+
+  // Pattern 1: @freezed class XxxState with _$XxxState
+  final freezedRegex = RegExp(
+    r'@freezed\s*\n?\s*(?:abstract\s+)?class\s+(\w+State)\s+with\s+_\$\w+\s*\{',
+    multiLine: true,
+  );
+
+  for (final match in freezedRegex.allMatches(content)) {
+    final className = match.group(1)!;
+    final fields = _extractFreezedFields(content, className);
+    states.add(StateClass(name: className, fields: fields, file: fileName));
+  }
+
+  // Pattern 2: Equatable-based state classes
+  final equatableRegex = RegExp(
+    r'(?:sealed\s+)?class\s+(\w+State)\s+extends\s+(?:Equatable|\w+State)',
+    multiLine: true,
+  );
+
+  for (final match in equatableRegex.allMatches(content)) {
+    final className = match.group(1)!;
+    final fields = _extractEquatableFields(content);
+    if (fields.isNotEmpty) {
+      states.add(StateClass(name: className, fields: fields, file: fileName));
+    }
+  }
+
+  return states;
+}
+
+List<String> _extractFreezedFields(String content, String className) {
+  final fields = <String>[];
+  final factoryRegex = RegExp(
+    r'const\s+factory\s+' + className + r'\s*\(\s*\{([^}]+)\}\s*\)',
+    multiLine: true,
+  );
+  final factoryMatch = factoryRegex.firstMatch(content);
+
+  if (factoryMatch != null) {
+    final factoryBody = factoryMatch.group(1) ?? '';
+    final fieldRegex = RegExp(
+      r'(required\s+)?([A-Za-z_][A-Za-z0-9_<>?,\s]+?)\s+([A-Za-z_][A-Za-z0-9_]*)(?:\s*=\s*([^,]+))?',
+    );
+    for (final fieldMatch in fieldRegex.allMatches(factoryBody)) {
+      final typeStr = fieldMatch.group(2)?.trim() ?? '';
+      final fieldName = fieldMatch.group(3)?.trim() ?? '';
+
+      if (fieldName.isEmpty || fieldName.startsWith('_') || fieldName == 'factory') continue;
+
+      final isNullable = typeStr.endsWith('?');
+      final cleanType = isNullable ? typeStr.substring(0, typeStr.length - 1).trim() : typeStr;
+      fields.add('$cleanType${isNullable ? '?' : ''} $fieldName');
+    }
+  }
+
+  return fields;
+}
+
+List<String> _extractEquatableFields(String content) {
+  final fields = <String>[];
+  final fieldDeclRegex = RegExp(
+    r'final\s+([A-Za-z_][A-Za-z0-9_<>?,\s\\.]+?)\s+([A-Za-z_][A-Za-z0-9_]*)\s*;',
+    multiLine: true,
+  );
+
+  for (final fieldDeclMatch in fieldDeclRegex.allMatches(content)) {
+    final typeStr = fieldDeclMatch.group(1)?.trim() ?? '';
+    final fieldName = fieldDeclMatch.group(2)?.trim() ?? '';
+
+    if (fieldName.isEmpty || fieldName == 'props' || fieldName == 'copyWith') continue;
+
+    final isNullable = typeStr.trim().endsWith('?');
+    final cleanType =
+        isNullable ? typeStr.trim().substring(0, typeStr.trim().length - 1).trim() : typeStr.trim();
+    final normalizedType = cleanType.replaceAll(RegExp(r'\s+'), ' ');
+    fields.add('$normalizedType${isNullable ? '?' : ''} $fieldName');
+  }
+
+  return fields;
+}
+
+/// Extract AppRoute constants from app_route.dart
+Map<String, String> extractAppRouteConstants(String appRouteContent) {
+  final constants = <String, String>{};
+  final constantRegex = RegExp("static\\s+const\\s+String\\s+(\\w+)\\s*=\\s*['\"]([^'\"]+)['\"];");
+
+  for (final match in constantRegex.allMatches(appRouteContent)) {
+    final constantName = match.group(1)!;
+    final constantValue = match.group(2)!;
+    constants[constantName] = constantValue;
+  }
+
   return constants;
 }
 
 List<RouteDefinition> extractRoutesForFeature(
   String featureName,
   String routerContent,
-  Map<String, String> appRouteConstants,
+  String appRouteContent,
   List<String> featureFiles,
 ) {
   final routes = <RouteDefinition>[];
+  final appRouteConstants = extractAppRouteConstants(appRouteContent);
+
+  // Zero-drift route discovery: scan feature files for actual AppRoute usage
   final usedRoutes = <String>{};
-  final usageRegex = RegExp(r'AppRoute\.(\w+)');
+  final appRouteUsagePattern = RegExp(r'AppRoute\.(\w+)');
+
   for (final filePath in featureFiles) {
     final content = readFileSafe(filePath);
-    for (final m in usageRegex.allMatches(content)) {
-      final name = m.group(1)!;
-      if (appRouteConstants.containsKey(name)) usedRoutes.add(name);
+    for (final match in appRouteUsagePattern.allMatches(content)) {
+      final routeName = match.group(1)!;
+      if (appRouteConstants.containsKey(routeName)) {
+        usedRoutes.add(routeName);
+      }
     }
   }
 
-  List<String> routeNames = usedRoutes.isNotEmpty
-      ? usedRoutes.toList()
-      : _featureToRouteNames(featureName).where(appRouteConstants.containsKey).toList();
-  if (routeNames.isEmpty) return routes;
+  // Also include the feature's entry route by name
+  final entryRouteName = _featureNameToRouteConstant(featureName);
+  if (entryRouteName != null &&
+      appRouteConstants.containsKey(entryRouteName) &&
+      !usedRoutes.contains(entryRouteName)) {
+    usedRoutes.add(entryRouteName);
+  }
 
-  for (final routeName in routeNames) {
-    final pathValue = appRouteConstants[routeName] ?? '/$routeName';
-    // Match builder: ... => XxxView( or builder: ... return const XxxView(
-    final routePattern = RegExp(
-      'path:\\s*AppRoute\\.$routeName[\\s\\S]*?builder:[\\s\\S]*?(?:=>\\s*(?:const\\s+)?(\\w+View)\\s*\\(|return\\s+(?:const\\s+)?(\\w+View)\\s*\\()',
+  if (usedRoutes.isEmpty) return routes;
+
+  for (final routeConstantName in usedRoutes) {
+    if (!appRouteConstants.containsKey(routeConstantName)) continue;
+
+    // Find the view associated with this route in router.dart
+    final blockPattern =
+        "(?:name|path):\\s*AppRoute\\.$routeConstantName[\\s\\S]*?(?:builder:|pageBuilder:)";
+    final blockRegex = RegExp(blockPattern, multiLine: true);
+    final blockMatch = blockRegex.firstMatch(routerContent);
+    if (blockMatch == null) continue;
+
+    final blockEnd = blockMatch.end;
+    const maxBlockLength = 800;
+    final restOfRouter = routerContent.length - blockEnd > maxBlockLength
+        ? routerContent.substring(blockEnd, blockEnd + maxBlockLength)
+        : routerContent.substring(blockEnd);
+
+    // Try builder: ... => (const)? XxxView(
+    final builderViewRegex = RegExp(
+      r'=>\s*(?:const\s+)?(\w+View)\s*\(',
       multiLine: true,
+      dotAll: true,
     );
-    for (final m in routePattern.allMatches(routerContent)) {
-      final view = m.group(1) ?? m.group(2);
-      if (view != null) routes.add(RouteDefinition(routePathConstant: routeName, pathValue: pathValue, view: view));
+    final builderMatch = builderViewRegex.firstMatch(restOfRouter);
+
+    // Try child: (const)? XxxView(
+    final childViewRegex = RegExp(
+      r'child:\s*(?:const\s+)?(\w+View)\s*\(',
+      multiLine: true,
+      dotAll: true,
+    );
+    final childMatch = childViewRegex.firstMatch(restOfRouter);
+
+    final view = (builderMatch != null && childMatch != null)
+        ? (builderMatch.start <= childMatch.start ? builderMatch.group(1) : childMatch.group(1))
+        : (builderMatch?.group(1) ?? childMatch?.group(1));
+
+    if (view != null) {
+      routes.add(RouteDefinition(appRouteConstant: routeConstantName, view: view));
     }
   }
+
   return routes;
 }
 
-List<String> _featureToRouteNames(String featureName) {
-  if (featureName == 'sign_up') return ['signUp'];
-  if (featureName == 'bottom_navigation') return ['bottomNavigation'];
-  return [featureName];
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// EXTRACTORS (simplified from playbook)
-// ═══════════════════════════════════════════════════════════════════════════
-
-List<RiverpodProvider> extractProviders(String content, String fileName) {
-  final providers = <RiverpodProvider>[];
-  final classRegex = RegExp(
-    r'@(?:riverpod|Riverpod)(?:\([^)]+\))?\s*\n\s*class\s+(\w+)\s+extends\s+_\$\w+',
-    multiLine: true,
-  );
-  for (final m in classRegex.allMatches(content)) {
-    final className = m.group(1)!;
-    final name = '${className[0].toLowerCase()}${className.substring(1)}Provider';
-    providers.add(RiverpodProvider(name: name, type: 'Notifier', returnType: className, file: fileName));
+String? _featureNameToRouteConstant(String featureName) {
+  if (featureName.contains('_')) {
+    final camelCase = featureName.split('_').map((word) {
+      if (word.isEmpty) return word;
+      return word[0].toUpperCase() + word.substring(1);
+    }).join();
+    return camelCase[0].toLowerCase() + camelCase.substring(1);
   }
-  return providers;
+  return featureName;
 }
 
-List<StateClass> extractStateClasses(String content, String fileName) {
-  final states = <StateClass>[];
-  final regex = RegExp(
-    r'(?:@freezed\s*\n?\s*(?:abstract\s+)?class\s+(\w+State)\s+with\s+_\$\w+|(?:sealed\s+)?class\s+(\w+State)\s+extends\s+(?:Equatable|\w+State))',
-    multiLine: true,
-  );
-  for (final m in regex.allMatches(content)) {
-    final name = m.group(1) ?? m.group(2)!;
-    states.add(StateClass(name: name, fields: [], file: fileName));
-  }
-  return states;
-}
+/// Extract third-party package dependencies from imports
+Set<String> extractThirdPartyDependencies(String content) {
+  final packages = <String>{};
+  final importRegex = RegExp(r'''import\s+['"]package:([^/'"]+)/''');
 
-List<String> extractFeatureDependencies(String content) {
-  final deps = <String>{};
-  final regex = RegExp(
-    'import\\s+[\'"]package:$_packageName/(?:presentation|data|domain)/(\\w+)',
-  );
-  for (final m in regex.allMatches(content)) {
-    deps.add(m.group(1)!);
-  }
-  return deps.toList()..sort();
-}
+  const excludedPackages = <String>{
+    'flutter',
+    'dart',
+    _packageName,
+    'flutter_test',
+    'flutter_driver',
+    'integration_test',
+    'build_runner',
+    'freezed_annotation',
+    'json_annotation',
+    'riverpod_annotation',
+  };
 
-Map<String, List<ControllerMethod>> extractControllerMethods(String content, String fileName) {
-  final result = <String, List<ControllerMethod>>{};
-  final classRegex = RegExp(r'class\s+(\w+Controller)\s+extends\s+_\$');
-  final match = classRegex.firstMatch(content);
-  if (match == null) return result;
-  final className = match.group(1)!;
-  final methodRegex = RegExp(
-    r'^\s*(Future<[^>]+>|FutureOr<[^>]+>|void|bool|int|String|\w+)\s+(\w+)\s*\(',
-    multiLine: true,
-  );
-  final methods = <ControllerMethod>[];
-  for (final m in methodRegex.allMatches(content)) {
-    final methodName = m.group(2)!;
-    if (methodName == 'build' || methodName.startsWith('_')) continue;
-    methods.add(ControllerMethod(name: methodName, file: fileName, line: 0));
-  }
-  if (methods.isNotEmpty) result[className] = methods;
-  return result;
-}
-
-List<ExternalService> extractExternalServices(String content, String fileName) {
-  final services = <String, Set<String>>{};
-  if (content.contains('FirebaseAuth') || content.contains('firebaseAuth')) {
-    services.putIfAbsent('FirebaseAuth', () => {}).add(fileName);
-  }
-  if (content.contains('GoogleSignIn')) services.putIfAbsent('GoogleSignIn', () => {}).add(fileName);
-  return services.entries.map((e) => ExternalService(service: e.key, usedIn: e.value.toList()..sort())).toList();
-}
-
-List<ApiEndpoint> extractApiEndpoints(String content, String fileName, String endpointsContent, List<String> allDartFiles) {
-  final endpoints = <ApiEndpoint>[];
-  final methodRegex = RegExp(r'Future<[^>]+>\s+(\w+)\s*\([^)]*\)\s*(?:async\s*)?(?:=>|{)', multiLine: true);
-  final networkRegex = RegExp(r'networkService\.(getHttp|postHttp|putHttp|deleteHttp)\s*\(');
-  for (final methodMatch in methodRegex.allMatches(content)) {
-    final methodName = methodMatch.group(1)!;
-    if (networkRegex.hasMatch(content.substring(methodMatch.start, methodMatch.end + 200))) {
-      endpoints.add(ApiEndpoint(
-        httpMethod: 'GET',
-        endpoint: '/$methodName',
-        repository: fileName,
-        method: methodName,
-        methodParameters: [],
-        endpointPathParams: [],
-        usedIn: [fileName],
-      ));
+  for (final match in importRegex.allMatches(content)) {
+    final packageName = match.group(1)!;
+    if (!excludedPackages.contains(packageName)) {
+      packages.add(packageName);
     }
   }
+
+  return packages;
+}
+
+/// Extract core services (from lib/core/services/) used in a file
+Map<String, Set<String>> extractCoreServices(String content, String fileName) {
+  final services = <String, Set<String>>{};
+  final importRegex = RegExp(
+    '''import\\s+['"]package:$_packageName/core/services/([^/]+)/''',
+  );
+
+  for (final match in importRegex.allMatches(content)) {
+    final serviceName = match.group(1)!;
+    services.putIfAbsent(serviceName, () => <String>{});
+    services[serviceName]!.add(fileName);
+  }
+
+  return services;
+}
+
+/// Extract models (from lib/models/) used in a file
+Set<String> extractModels(String content) {
+  final models = <String>{};
+  final importRegex = RegExp(
+    '''import\\s+['"]package:$_packageName/models/([^/]+)/''',
+  );
+
+  for (final match in importRegex.allMatches(content)) {
+    final modelName = match.group(1)!;
+    models.add('lib/models/$modelName');
+  }
+
+  return models;
+}
+
+List<ControllerMethod> extractControllerMethods(String content, String fileName) {
+  final methods = <ControllerMethod>[];
+  final lines = content.split('\n');
+
+  final classRegex = RegExp(r'class\s+(\w+Controller)\s+extends\s+_\$');
+  if (!classRegex.hasMatch(content)) return methods;
+
+  int braceDepth = 0;
+  bool inClass = false;
+
+  for (int i = 0; i < lines.length; i++) {
+    final line = lines[i];
+    final trimmed = line.trim();
+
+    if (classRegex.hasMatch(line)) {
+      inClass = true;
+      braceDepth = 0;
+    }
+
+    if (inClass) {
+      braceDepth += '{'.allMatches(line).length;
+      braceDepth -= '}'.allMatches(line).length;
+
+      if (braceDepth <= 0 && inClass && line.contains('}')) {
+        inClass = false;
+        continue;
+      }
+
+      final methodStartRegex = RegExp(
+        r'^\s*(Future<[^>]+>|FutureOr<[^>]+>|void|bool|int|String|List<[^>]+>|Map<[^>]+>|\w+)\s+(\w+)\s*\(',
+      );
+
+      final match = methodStartRegex.firstMatch(trimmed);
+      if (match != null) {
+        final returnType = match.group(1);
+        final methodName = match.group(2)!;
+
+        if (methodName == 'build' || methodName == 'constructor' || methodName.startsWith('_')) {
+          continue;
+        }
+
+        // Collect full parameter string across multiple lines
+        String fullSignature = trimmed;
+        int parenDepth = '('.allMatches(trimmed).length - ')'.allMatches(trimmed).length;
+        int sigEndLine = i;
+
+        while (parenDepth > 0 && sigEndLine < lines.length - 1) {
+          sigEndLine++;
+          final nextLine = lines[sigEndLine].trim();
+          fullSignature += ' $nextLine';
+          parenDepth += '('.allMatches(nextLine).length;
+          parenDepth -= ')'.allMatches(nextLine).length;
+        }
+
+        if (!RegExp(r'\)\s*(async\s*)?[{=]').hasMatch(fullSignature)) continue;
+
+        // Extract params from full signature
+        final paramsMatch = RegExp(r'\(([^)]*)\)').firstMatch(fullSignature);
+        var paramsStr = paramsMatch?.group(1)?.trim() ?? '';
+        paramsStr = paramsStr.replaceAll(RegExp(r'/\*[\s\S]*?\*/'), '');
+        paramsStr = paramsStr.replaceAll(RegExp(r'//[^\n,]*'), '');
+        paramsStr = paramsStr.trim();
+
+        final parameters = _parseMethodParameters(paramsStr);
+
+        methods.add(
+          ControllerMethod(
+            name: methodName,
+            returnType: returnType,
+            params: paramsStr.isEmpty ? null : '($paramsStr)',
+            parameters: parameters.isNotEmpty ? parameters : null,
+            file: fileName,
+            line: i + 1,
+          ),
+        );
+      }
+    }
+  }
+
+  return methods;
+}
+
+List<MethodParameter> _parseMethodParameters(String paramsStr) {
+  final params = <MethodParameter>[];
+  if (paramsStr.isEmpty) return params;
+
+  final isNamedParams = paramsStr.startsWith('{') && paramsStr.endsWith('}');
+  final paramsContent =
+      isNamedParams ? paramsStr.substring(1, paramsStr.length - 1).trim() : paramsStr;
+
+  if (paramsContent.isEmpty) return params;
+
+  // Split by comma, respecting generics
+  final paramParts = <String>[];
+  int depth = 0;
+  String currentParam = '';
+
+  for (int j = 0; j < paramsContent.length; j++) {
+    final char = paramsContent[j];
+    if (char == '<' || char == '(' || char == '{') {
+      depth++;
+      currentParam += char;
+    } else if (char == '>' || char == ')' || char == '}') {
+      depth--;
+      currentParam += char;
+    } else if (char == ',' && depth == 0) {
+      if (currentParam.trim().isNotEmpty) paramParts.add(currentParam.trim());
+      currentParam = '';
+    } else {
+      currentParam += char;
+    }
+  }
+  if (currentParam.trim().isNotEmpty) paramParts.add(currentParam.trim());
+
+  for (final paramStr in paramParts) {
+    final trimmedParam = paramStr.trim();
+    if (trimmedParam.isEmpty) continue;
+
+    final requiredMatch = RegExp(r'^(required\s+)').firstMatch(trimmedParam);
+    final isRequired = requiredMatch != null || !isNamedParams;
+
+    final paramWithoutRequired =
+        requiredMatch != null ? trimmedParam.substring(requiredMatch.group(0)!.length).trim() : trimmedParam;
+
+    // Extract type and name
+    final typeNameMatch = RegExp(r'^([A-Za-z_][A-Za-z0-9_<>?,\s]*?)\s+([A-Za-z_][A-Za-z0-9_]*)').firstMatch(paramWithoutRequired);
+    if (typeNameMatch == null) continue;
+
+    final typeStr = typeNameMatch.group(1)!.trim();
+    final paramName = typeNameMatch.group(2)!.trim();
+
+    final defaultValueMatch = RegExp(r'=\s*([^,]+)').firstMatch(paramWithoutRequired);
+    final defaultValue = defaultValueMatch?.group(1)?.trim();
+
+    final isNullable = typeStr.endsWith('?');
+    final cleanType = isNullable ? typeStr.substring(0, typeStr.length - 1).trim() : typeStr;
+
+    params.add(
+      MethodParameter(
+        name: paramName,
+        type: cleanType,
+        isRequired: isRequired,
+        defaultValue: defaultValue,
+      ),
+    );
+  }
+
+  return params;
+}
+
+List<ApiEndpoint> extractApiEndpoints(
+  String content,
+  String fileName,
+  String endpointsContent,
+  List<String> allDartFiles,
+) {
+  final endpoints = <ApiEndpoint>[];
+
+  final methodRegex = RegExp(
+    r'(?:@override\s+)?Future(?:<[^>]+>)?\s+(\w+)\s*\([^)]*\)\s*(?:async\s*)?(?:=>|{)',
+    multiLine: true,
+    dotAll: true,
+  );
+
+  final networkServiceStartRegex = RegExp(
+    r'networkService\.(getHttp|postHttp|putHttp|deleteHttp)\s*\(',
+    multiLine: true,
+    dotAll: true,
+  );
+
+  for (final methodMatch in methodRegex.allMatches(content)) {
+    final methodName = methodMatch.group(1)!;
+    final methodStart = methodMatch.start;
+
+    int methodEnd = content.length;
+    final nextMethodMatch = methodRegex.firstMatch(content.substring(methodMatch.end));
+    if (nextMethodMatch != null) {
+      methodEnd = methodMatch.end + nextMethodMatch.start;
+    }
+
+    final methodBody = content.substring(methodStart, methodEnd);
+
+    for (final networkMatch in networkServiceStartRegex.allMatches(methodBody)) {
+      final httpMethodName = networkMatch.group(1)!;
+      final httpMethod = httpMethodName.replaceAll('Http', '').toUpperCase();
+
+      // Extract endpoint
+      final endpointMatch = RegExp(
+        r'''endpoint:\s*(Endpoints\.\w+(?:\([^)]*\))?|['"]([^'"]+)['"])''',
+        multiLine: true,
+        dotAll: true,
+      ).firstMatch(methodBody);
+
+      String? endpoint;
+      if (endpointMatch != null) {
+        final endpointRef = endpointMatch.group(1) ?? endpointMatch.group(2);
+        endpoint = endpointRef;
+      }
+
+      if (endpoint == null) continue;
+
+      endpoints.add(
+        ApiEndpoint(
+          httpMethod: httpMethod,
+          endpoint: endpoint,
+          repository: fileName,
+          method: methodName,
+          methodParameters: [],
+          endpointPathParams: [],
+          usedIn: [fileName],
+        ),
+      );
+    }
+  }
+
   return endpoints;
 }
 
-/// Extract testing info for a feature by scanning test directories
+/// Extracts test information for a feature
 TestingInfo extractTestsForFeature(String featureName, String featurePath) {
-  final testDir = Directory('test/presentation/$featurePath');
-  final testDataDir = Directory('test/test_data');
+  final testDirPath = 'test/presentation/$featurePath';
+  final featureTestDir = Directory(testDirPath);
 
-  // Find test files in test/presentation/{featurePath}/
   final testFiles = <String>[];
-  if (testDir.existsSync()) {
-    for (final entity in testDir.listSync(recursive: true)) {
-      if (entity is File && entity.path.endsWith('_test.dart')) {
-        testFiles.add(entity.path.replaceAll('\\', '/'));
-      }
-    }
-  }
-  testFiles.sort();
+  String? testDirectory;
 
-  // Find test data files that match feature name in test/test_data/
+  if (featureTestDir.existsSync()) {
+    testDirectory = testDirPath;
+    testFiles.addAll(
+      listDartFilesRecursive(featureTestDir)
+          .where((f) => f.endsWith('_test.dart'))
+          .map((f) => f.startsWith('test/') ? f : 'test/${f.split('test/').last}')
+          .toList()
+        ..sort(),
+    );
+  }
+
+  // Find test data files related to this feature
   final testDataFiles = <String>[];
   if (testDataDir.existsSync()) {
     final featurePatterns = [
-      featureName.toLowerCase(),
-      featureName.replaceAll('_', '').toLowerCase(),
+      featureName,
+      featureName.replaceAll('_', ''),
     ];
-    // For auth-related features, also check for 'auth' pattern
-    if (featureName == 'login' || featureName == 'sign_up') {
-      featurePatterns.add('auth');
-    }
 
-    for (final entity in testDataDir.listSync()) {
-      if (entity is File && entity.path.endsWith('.dart')) {
-        final fileName = entity.path.split('/').last.toLowerCase();
-        for (final pattern in featurePatterns) {
-          if (fileName.contains(pattern)) {
-            testDataFiles.add(entity.path.replaceAll('\\', '/'));
-            break;
-          }
+    for (final file in listDartFilesRecursive(testDataDir)) {
+      final fileName = file.split('/').last.toLowerCase();
+      for (final pattern in featurePatterns) {
+        if (fileName.contains(pattern)) {
+          testDataFiles.add(file.startsWith('test/') ? file : 'test/${file.split('test/').last}');
+          break;
         }
       }
     }
+    testDataFiles.sort();
   }
-  testDataFiles.sort();
 
-  final testDirectory = 'test/presentation/$featurePath';
-  final runCommand = testFiles.isNotEmpty ? 'flutter test $testDirectory' : '';
+  final runCommand =
+      testFiles.isNotEmpty ? 'fvm flutter test $testDirPath/' : 'fvm flutter test test/presentation/$featurePath/';
 
   return TestingInfo(
     testDirectory: testDirectory,
@@ -453,82 +859,167 @@ TestingInfo extractTestsForFeature(String featureName, String featurePath) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// GENERATE ONE MANIFEST
+// MAIN GENERATION LOGIC
 // ═══════════════════════════════════════════════════════════════════════════
 
 FeatureManifest generateManifestForFeature(String featureName, String featurePath) {
   final featureDir = Directory('lib/presentation/$featurePath');
-  if (!featureDir.existsSync()) throw Exception('Feature directory not found: $featureDir');
 
-  final appRouteContent = readFileSafe(appRouteFile.path);
+  if (!featureDir.existsSync()) {
+    throw Exception('Feature directory not found: $featureDir');
+  }
+
   final routerContent = readFileSafe(routerFile.path);
-  final appRouteConstants = extractAppRouteConstants(appRouteContent);
+  final appRouteContent = readFileSafe(appRouteFile.path);
   final endpointsContent = readFileSafe(endpointsFile.path);
 
   final allDartFiles = listDartFilesRecursive(featureDir);
 
-  final views = allDartFiles.where((f) => f.endsWith('_view.dart')).map(getRelativePath).toList()..sort();
-  final controllers = allDartFiles.where((f) => f.endsWith('_controller.dart')).map(getRelativePath).toList()..sort();
-  final widgets = allDartFiles.where((f) => f.contains('/widgets/') && !f.endsWith('_view.dart')).map(getRelativePath).toList()..sort();
-  final states = allDartFiles.where((f) => f.endsWith('_state.dart')).map(getRelativePath).toList()..sort();
+  // Extract file lists
+  final views =
+      allDartFiles.where((f) => f.endsWith('_view.dart')).map((f) => getRelativePath(f)).toList()..sort();
 
+  final controllers =
+      allDartFiles.where((f) => f.endsWith('_controller.dart')).map((f) => getRelativePath(f)).toList()
+        ..sort();
+
+  final widgets =
+      allDartFiles
+          .where((f) => f.contains('/widgets/') && !f.endsWith('_view.dart'))
+          .map((f) => getRelativePath(f))
+          .toList()
+        ..sort();
+
+  // Find repositories
   final pathParts = featurePath.split('/');
   final parentGroup = pathParts.isNotEmpty ? pathParts[0] : featureName;
-  final repoPattern = parentGroup == 'auth' || featureName == 'login' || featureName == 'sign_up'
-      ? 'auth_repository'
-      : '${featureName}_repository';
-  final repoDir = Directory('lib/data/repositories/$repoPattern');
-  final repositoryFiles = repoDir.existsSync()
-      ? listDartFilesRecursive(repoDir).where((f) => f.contains('repository') && !f.contains('.g.dart')).toList()
-      : <String>[];
-  final repositories = repositoryFiles.map(getRelativePath).toList()..sort();
 
+  String repositoryPattern;
+  if (parentGroup == 'auth' || featureName == 'login' || featureName == 'sign_up') {
+    repositoryPattern = 'auth_repository';
+  } else {
+    repositoryPattern = '${featureName}_repository';
+    final altRepositoryDir = Directory('lib/data/repositories/$repositoryPattern');
+    if (!altRepositoryDir.existsSync()) {
+      repositoryPattern = '${parentGroup}_repository';
+    }
+  }
+
+  final repositoryDir = Directory('lib/data/repositories/$repositoryPattern');
+  final repositoryFiles = repositoryDir.existsSync()
+      ? listDartFilesRecursive(repositoryDir)
+          .where((f) => f.contains('repository') && !f.contains('_providers'))
+          .toList()
+      : <String>[];
+  final repositories = repositoryFiles.map((f) => getRelativePath(f)).toList()..sort();
+
+  // Aggregate enhanced data
   final allProviders = <RiverpodProvider>[];
   final allStateClasses = <StateClass>[];
   final allApiEndpoints = <ApiEndpoint>[];
-  final externalServicesMap = <String, Set<String>>{};
-  final allDependencies = <String>{};
+  final coreServicesMap = <String, Set<String>>{};
+  final thirdPartyMap = <String, Set<String>>{};
+  final allModels = <String>{};
   final allControllerMethods = <String, List<ControllerMethod>>{};
 
+  // Scan all presentation dart files
   for (final filePath in allDartFiles) {
     final content = readFileSafe(filePath);
     if (content.isEmpty) continue;
-    final rel = getRelativePath(filePath);
-    allProviders.addAll(extractProviders(content, rel));
-    allStateClasses.addAll(extractStateClasses(content, rel));
-    for (final e in extractExternalServices(content, rel)) {
-      externalServicesMap.putIfAbsent(e.service, () => {}).addAll(e.usedIn);
+
+    final relativeName = getRelativePath(filePath);
+
+    allProviders.addAll(extractProviders(content, relativeName));
+    allStateClasses.addAll(extractStateClasses(content, relativeName));
+
+    // Extract third-party package dependencies
+    final packages = extractThirdPartyDependencies(content);
+    for (final pkg in packages) {
+      thirdPartyMap.putIfAbsent(pkg, () => <String>{});
+      thirdPartyMap[pkg]!.add(relativeName);
     }
-    allDependencies.addAll(extractFeatureDependencies(content));
-    final cm = extractControllerMethods(content, rel);
-    for (final entry in cm.entries) {
-      allControllerMethods[entry.key] = entry.value;
+
+    // Extract core services
+    final coreServices = extractCoreServices(content, relativeName);
+    for (final entry in coreServices.entries) {
+      coreServicesMap.putIfAbsent(entry.key, () => <String>{});
+      coreServicesMap[entry.key]!.addAll(entry.value);
+    }
+
+    // Extract models used by this feature
+    allModels.addAll(extractModels(content));
+
+    if (relativeName.contains('controller')) {
+      final methods = extractControllerMethods(content, relativeName);
+      if (methods.isNotEmpty) {
+        final controllerName = relativeName
+            .split('/')
+            .last
+            .replaceAll('.dart', '')
+            .split('_')
+            .map((w) => w[0].toUpperCase() + w.substring(1))
+            .join();
+        allControllerMethods[controllerName] = methods;
+      }
     }
   }
 
+  // Scan repository files for API endpoints
   for (final filePath in repositoryFiles) {
     final content = readFileSafe(filePath);
     if (content.isEmpty) continue;
-    allApiEndpoints.addAll(extractApiEndpoints(content, getRelativePath(filePath), endpointsContent, allDartFiles));
+
+    final relativeName = getRelativePath(filePath);
+    allApiEndpoints.addAll(
+      extractApiEndpoints(content, relativeName, endpointsContent, allDartFiles),
+    );
   }
 
-  final routes = extractRoutesForFeature(featureName, routerContent, appRouteConstants, allDartFiles);
-  final routesDedup = routes.fold<Map<String, RouteDefinition>>({}, (map, r) {
-    map[r.routePathConstant] = r;
-    return map;
-  }).values.toList()..sort((a, b) => a.routePathConstant.compareTo(b.routePathConstant));
+  // Extract routes
+  final allRoutes = extractRoutesForFeature(featureName, routerContent, appRouteContent, allDartFiles);
 
-  final externalServices = externalServicesMap.entries
-      .map((e) => ExternalService(service: e.key, usedIn: e.value.toList()..sort()))
+  // Deduplicate routes
+  final routes =
+      allRoutes
+          .fold<Map<String, RouteDefinition>>({}, (map, route) {
+            map[route.appRouteConstant] = route;
+            return map;
+          })
+          .values
+          .toList()
+        ..sort((a, b) => a.appRouteConstant.compareTo(b.appRouteConstant));
+
+  // Convert core services map to list
+  final coreServicesList = coreServicesMap.entries
+      .map((e) => CoreService(
+            name: e.key,
+            path: 'lib/core/services/${e.key}',
+            usedIn: e.value.toList()..sort(),
+          ))
       .toList()
-    ..sort((a, b) => a.service.compareTo(b.service));
+    ..sort((a, b) => a.name.compareTo(b.name));
 
+  // Convert third-party dependencies map to list
+  final thirdPartyList = thirdPartyMap.entries
+      .map((e) => ThirdPartyDependency(
+            package: e.key,
+            usedIn: e.value.toList()..sort(),
+          ))
+      .toList()
+    ..sort((a, b) => a.package.compareTo(b.package));
+
+  // Deduplicate
   final uniqueProviders = <String, RiverpodProvider>{};
-  for (final p in allProviders) uniqueProviders[p.name] = p;
-  final uniqueStateClasses = <String, StateClass>{};
-  for (final s in allStateClasses) uniqueStateClasses[s.name] = s;
+  for (final p in allProviders) {
+    uniqueProviders[p.name] = p;
+  }
 
-  // Extract testing info
+  final uniqueStateClasses = <String, StateClass>{};
+  for (final s in allStateClasses) {
+    uniqueStateClasses[s.name] = s;
+  }
+
+  // Extract testing information
   final testing = extractTestsForFeature(featureName, featurePath);
 
   return FeatureManifest(
@@ -537,32 +1028,34 @@ FeatureManifest generateManifestForFeature(String featureName, String featurePat
     views: views,
     controllers: controllers,
     widgets: widgets,
-    models: [],
-    services: [],
-    states: states,
+    models: allModels.toList()..sort(),
     repositories: repositories,
-    dependencies: allDependencies.toList()..sort(),
     providers: uniqueProviders.values.toList()..sort((a, b) => a.name.compareTo(b.name)),
     stateClasses: uniqueStateClasses.values.toList()..sort((a, b) => a.name.compareTo(b.name)),
-    routes: routesDedup,
+    routes: routes,
     apiEndpoints: allApiEndpoints..sort((a, b) => a.endpoint.compareTo(b.endpoint)),
-    externalServices: externalServices,
+    coreServices: coreServicesList,
+    thirdPartyDependencies: thirdPartyList,
     controllerMethods: allControllerMethods,
     testing: testing,
   );
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// GENERATE ALL (template features)
+// GENERATE ALL
 // ═══════════════════════════════════════════════════════════════════════════
 
 void generateAllManifests() {
   print('Generating feature manifests...\n');
 
   final outputDir = Directory('lib/manifests');
-  if (!outputDir.existsSync()) outputDir.createSync(recursive: true);
+  if (!outputDir.existsSync()) {
+    outputDir.createSync(recursive: true);
+  }
 
-  int count = 0;
+  int generatedCount = 0;
+
+  // Template features
   final features = [
     ('splash', 'splash'),
     ('onboarding', 'onboarding'),
@@ -573,7 +1066,7 @@ void generateAllManifests() {
   ];
 
   for (final entry in features) {
-    final (name, path) = (entry.$1, entry.$2);
+    final (name, path) = entry;
     final featureDir = Directory('lib/presentation/$path');
     if (!featureDir.existsSync()) {
       print('  ⚠️  Skip $name (no lib/presentation/$path)');
@@ -581,17 +1074,22 @@ void generateAllManifests() {
     }
     try {
       final manifest = generateManifestForFeature(name, path);
-      final outPath = '${outputDir.path}/$name.manifest.generated.json';
-      File(outPath).writeAsStringSync('${const JsonEncoder.withIndent('  ').convert(manifest.toJson())}\n');
+      final outputPath = '${outputDir.path}/$name.manifest.generated.json';
+      final encoder = JsonEncoder.withIndent('  ');
+      File(outputPath).writeAsStringSync('${encoder.convert(manifest.toJson())}\n');
       print('  ✅ $name.manifest.generated.json');
-      count++;
+      generatedCount++;
     } catch (e) {
       print('  ⚠️  Error $name: $e');
     }
   }
 
-  print('\n✨ Done! Generated $count manifests in lib/manifests/');
+  print('\n✨ Done! Generated $generatedCount manifests in lib/manifests/');
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CLI
+// ═══════════════════════════════════════════════════════════════════════════
 
 void main() {
   generateAllManifests();

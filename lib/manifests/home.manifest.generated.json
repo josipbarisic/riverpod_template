@@ -1,33 +1,33 @@
 {
-  "generatedAt": "2026-02-04T21:36:07.040924Z",
+  "generatedAt": "2026-02-05T16:22:50.917648Z",
   "feature": "home",
-  "exports": {
-    "views": [
-      "lib/presentation/home/home_view.dart"
-    ],
-    "controllers": [
-      "lib/presentation/home/home_controller.dart"
-    ],
-    "widgets": [],
-    "models": [],
-    "services": [],
-    "states": [],
-    "repositories": []
-  },
-  "dependencies": [
-    "firebase"
+  "views": [
+    "lib/presentation/home/home_view.dart"
   ],
+  "controllers": [
+    "lib/presentation/home/home_controller.dart"
+  ],
+  "widgets": [],
+  "models": [],
+  "repositories": [],
   "providers": [],
   "stateClasses": [],
   "routes": [],
   "apiEndpoints": [],
-  "externalServices": [],
+  "coreServices": [],
+  "thirdPartyDependencies": [
+    {
+      "package": "flutter_riverpod",
+      "usedIn": [
+        "lib/presentation/home/home_view.dart"
+      ]
+    }
+  ],
   "controllerMethods": {},
   "testing": {
-    "testDirectory": "test/presentation/home",
     "testFiles": [],
     "testDataFiles": [],
-    "runCommand": "",
+    "runCommand": "fvm flutter test test/presentation/home/",
     "hasTests": false
   }
 }

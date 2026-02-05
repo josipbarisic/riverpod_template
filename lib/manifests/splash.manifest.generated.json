@@ -1,23 +1,15 @@
 {
-  "generatedAt": "2026-02-04T21:36:06.967351Z",
+  "generatedAt": "2026-02-05T16:22:50.895129Z",
   "feature": "splash",
-  "exports": {
-    "views": [
-      "lib/presentation/splash/splash_view.dart"
-    ],
-    "controllers": [
-      "lib/presentation/splash/splash_controller.dart"
-    ],
-    "widgets": [],
-    "models": [],
-    "services": [],
-    "states": [],
-    "repositories": []
-  },
-  "dependencies": [
-    "firebase",
-    "splash"
+  "views": [
+    "lib/presentation/splash/splash_view.dart"
   ],
+  "controllers": [
+    "lib/presentation/splash/splash_controller.dart"
+  ],
+  "widgets": [],
+  "models": [],
+  "repositories": [],
   "providers": [
     {
       "name": "splashControllerProvider",
@@ -27,31 +19,45 @@
     }
   ],
   "stateClasses": [],
-  "routes": [
+  "routes": [],
+  "apiEndpoints": [],
+  "coreServices": [
     {
-      "appRoute": "AppRoute.onboarding",
-      "path": "/onboarding",
-      "view": "OnboardingView"
+      "name": "local_notifications_service",
+      "path": "lib/core/services/local_notifications_service",
+      "usedIn": [
+        "lib/presentation/splash/splash_controller.dart"
+      ]
     }
   ],
-  "apiEndpoints": [],
-  "externalServices": [],
-  "controllerMethods": {
-    "SplashController": [
-      {
-        "name": "Duration",
-        "file": "lib/presentation/splash/splash_controller.dart",
-        "line": 0
-      }
-    ]
-  },
+  "thirdPartyDependencies": [
+    {
+      "package": "flutter_riverpod",
+      "usedIn": [
+        "lib/presentation/splash/splash_view.dart"
+      ]
+    },
+    {
+      "package": "go_router",
+      "usedIn": [
+        "lib/presentation/splash/splash_view.dart"
+      ]
+    },
+    {
+      "package": "shared_preferences",
+      "usedIn": [
+        "lib/presentation/splash/splash_controller.dart"
+      ]
+    }
+  ],
+  "controllerMethods": {},
   "testing": {
     "testDirectory": "test/presentation/splash",
     "testFiles": [
       "test/presentation/splash/splash_controller_test.dart"
     ],
     "testDataFiles": [],
-    "runCommand": "flutter test test/presentation/splash",
+    "runCommand": "fvm flutter test test/presentation/splash/",
     "hasTests": true
   }
 }

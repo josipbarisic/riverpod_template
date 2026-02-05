@@ -1,45 +1,37 @@
 {
-  "generatedAt": "2026-02-04T21:36:07.017795Z",
+  "generatedAt": "2026-02-05T16:22:50.907771Z",
   "feature": "login",
-  "exports": {
-    "views": [
-      "lib/presentation/login/login_view.dart"
-    ],
-    "controllers": [
-      "lib/presentation/login/login_controller.dart"
-    ],
-    "widgets": [],
-    "models": [],
-    "services": [],
-    "states": [],
-    "repositories": [
-      "lib/data/repositories/auth_repository/auth_repository.dart",
-      "lib/data/repositories/auth_repository/auth_repository_interface.dart",
-      "lib/data/repositories/auth_repository/auth_repository_providers.dart"
-    ]
-  },
-  "dependencies": [
-    "firebase"
+  "views": [
+    "lib/presentation/login/login_view.dart"
+  ],
+  "controllers": [
+    "lib/presentation/login/login_controller.dart"
+  ],
+  "widgets": [],
+  "models": [],
+  "repositories": [
+    "lib/data/repositories/auth_repository/auth_repository.dart",
+    "lib/data/repositories/auth_repository/auth_repository_interface.dart"
   ],
   "providers": [],
   "stateClasses": [],
-  "routes": [
+  "routes": [],
+  "apiEndpoints": [],
+  "coreServices": [],
+  "thirdPartyDependencies": [
     {
-      "appRoute": "AppRoute.login",
-      "path": "/login",
-      "view": "LoginView"
+      "package": "flutter_riverpod",
+      "usedIn": [
+        "lib/presentation/login/login_view.dart"
+      ]
     }
   ],
-  "apiEndpoints": [],
-  "externalServices": [],
   "controllerMethods": {},
   "testing": {
     "testDirectory": "test/presentation/login",
     "testFiles": [],
-    "testDataFiles": [
-      "test/test_data/auth_test_data.dart"
-    ],
-    "runCommand": "",
+    "testDataFiles": [],
+    "runCommand": "fvm flutter test test/presentation/login/",
     "hasTests": false
   }
 }

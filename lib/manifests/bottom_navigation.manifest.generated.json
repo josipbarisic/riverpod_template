@@ -1,25 +1,15 @@
 {
-  "generatedAt": "2026-02-04T21:36:07.036189Z",
+  "generatedAt": "2026-02-05T16:22:50.915507Z",
   "feature": "bottom_navigation",
-  "exports": {
-    "views": [
-      "lib/presentation/bottom_navigation/bottom_navigation_view.dart"
-    ],
-    "controllers": [
-      "lib/presentation/bottom_navigation/bottom_navigation_controller.dart"
-    ],
-    "widgets": [],
-    "models": [],
-    "services": [],
-    "states": [
-      "lib/presentation/bottom_navigation/bottom_navigation_state.dart"
-    ],
-    "repositories": []
-  },
-  "dependencies": [
-    "bottom_navigation",
-    "home"
+  "views": [
+    "lib/presentation/bottom_navigation/bottom_navigation_view.dart"
   ],
+  "controllers": [
+    "lib/presentation/bottom_navigation/bottom_navigation_controller.dart"
+  ],
+  "widgets": [],
+  "models": [],
+  "repositories": [],
   "providers": [
     {
       "name": "bottomNavigationControllerProvider",
@@ -31,30 +21,50 @@
   "stateClasses": [
     {
       "name": "BottomNavigationState",
-      "fields": [],
+      "fields": [
+        "SelectedBottomNavigationPage page"
+      ],
       "file": "lib/presentation/bottom_navigation/bottom_navigation_state.dart"
     }
   ],
-  "routes": [
+  "routes": [],
+  "apiEndpoints": [],
+  "coreServices": [],
+  "thirdPartyDependencies": [
     {
-      "appRoute": "AppRoute.bottomNavigation",
-      "path": "/bottomNavigation",
-      "view": "BottomNavigationView"
+      "package": "equatable",
+      "usedIn": [
+        "lib/presentation/bottom_navigation/bottom_navigation_state.dart"
+      ]
+    },
+    {
+      "package": "flutter_lazy_indexed_stack",
+      "usedIn": [
+        "lib/presentation/bottom_navigation/bottom_navigation_view.dart"
+      ]
+    },
+    {
+      "package": "hooks_riverpod",
+      "usedIn": [
+        "lib/presentation/bottom_navigation/bottom_navigation_view.dart"
+      ]
     }
   ],
-  "apiEndpoints": [],
-  "externalServices": [],
   "controllerMethods": {
     "BottomNavigationController": [
       {
-        "name": "BottomNavigationState",
-        "file": "lib/presentation/bottom_navigation/bottom_navigation_controller.dart",
-        "line": 0
-      },
-      {
         "name": "selectPage",
+        "returnType": "void",
+        "params": "(SelectedBottomNavigationPage page)",
+        "parameters": [
+          {
+            "name": "page",
+            "type": "SelectedBottomNavigationPage",
+            "isRequired": true
+          }
+        ],
         "file": "lib/presentation/bottom_navigation/bottom_navigation_controller.dart",
-        "line": 0
+        "line": 12
       }
     ]
   },
@@ -64,7 +74,7 @@
       "test/presentation/bottom_navigation/bottom_navigation_controller_test.dart"
     ],
     "testDataFiles": [],
-    "runCommand": "flutter test test/presentation/bottom_navigation",
+    "runCommand": "fvm flutter test test/presentation/bottom_navigation/",
     "hasTests": true
   }
 }
