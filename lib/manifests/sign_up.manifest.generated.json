@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-05T16:22:50.910410Z",
+  "generatedAt": "2026-02-05T16:25:30.719773Z",
   "feature": "sign_up",
   "views": [
     "lib/presentation/sign_up/sign_up_view.dart"
@@ -10,8 +10,7 @@
   "widgets": [],
   "models": [],
   "repositories": [
-    "lib/data/repositories/auth_repository/auth_repository.dart",
-    "lib/data/repositories/auth_repository/auth_repository_interface.dart"
+    "lib/data/repositories/auth_repository/auth_repository.dart"
   ],
   "providers": [],
   "stateClasses": [],

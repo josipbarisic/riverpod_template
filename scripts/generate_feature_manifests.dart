@@ -908,7 +908,10 @@ FeatureManifest generateManifestForFeature(String featureName, String featurePat
   final repositoryDir = Directory('lib/data/repositories/$repositoryPattern');
   final repositoryFiles = repositoryDir.existsSync()
       ? listDartFilesRecursive(repositoryDir)
-          .where((f) => f.contains('repository') && !f.contains('_providers'))
+          .where((f) =>
+              f.contains('repository') &&
+              !f.contains('_providers') &&
+              !f.contains('_interface'))
           .toList()
       : <String>[];
   final repositories = repositoryFiles.map((f) => getRelativePath(f)).toList()..sort();
