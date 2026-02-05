@@ -1,6 +1,6 @@
 ---
 name: git-commit
-description: Create well-formatted git commits with conventional or prefix-style messages, security scanning, and optional push. Use when the user says "commit", "commit this", "push", "save changes", or "commit and push".
+description: Create well-formatted git commits with conventional or prefix-style messages, security scanning, test validation, and optional push. Use when the user says "commit", "commit this", "push", "save changes", or "commit and push".
 ---
 
 # Git Commit Skill
@@ -56,6 +56,38 @@ Examples: `feat(auth): add login`, `fix(home): crash on load`, `chore(manifests)
 
 ## Workflow
 
+### Step 0: Run Tests (MANDATORY)
+
+**Before any commit, run the test suite:**
+
+```bash
+fvm flutter test
+```
+
+**If tests fail:**
+
+```markdown
+⛔ **COMMIT BLOCKED - TESTS FAILING**
+
+Found failing tests:
+- {test file}: {failure description}
+
+**Required Actions:**
+1. Fix the failing tests
+2. If you modified a model, update its test in `test/models/`
+3. If you modified a repository, update its test in `test/repositories/`
+4. If you modified a controller, update its test in `test/presentation/`
+5. Re-run `fvm flutter test` until all pass
+```
+
+**Test update guidelines:**
+
+| Changed File | Update Test In |
+|--------------|----------------|
+| `lib/models/*.dart` | `test/models/*_test.dart` |
+| `lib/data/repositories/**/*.dart` | `test/repositories/*_test.dart` |
+| `lib/presentation/**/*_controller.dart` | `test/presentation/**/*_controller_test.dart` |
+
 ### Step 1: Analyze Changes
 
 ```bash
@@ -102,7 +134,16 @@ Only push if the user explicitly asked. Verify branch name and that you are not 
 
 ### Step 8: Confirmation
 
-Report: hash, message, files changed, security check result, pushed yes/no.
+```markdown
+✅ **Commit Created**
+
+- **Hash**: `abc1234`
+- **Message**: `Add: Login screen`
+- **Files**: 5 files changed, +120 -45
+- **Tests**: ✅ All tests passing
+- **Security**: ✅ No secrets detected
+- **Pushed**: Yes/No
+```
 
 ## Do NOT Commit
 

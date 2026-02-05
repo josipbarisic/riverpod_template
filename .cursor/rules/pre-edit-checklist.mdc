@@ -1,6 +1,11 @@
+---
+description: Mandatory checklist to verify BEFORE every code edit to prevent architecture violations
+alwaysApply: true
+---
+
 # Pre-Edit Checklist (MANDATORY)
 
-Before EVERY code edit, verify:
+Before EVERY code edit, mentally verify:
 
 ## Widget Edits
 
@@ -29,5 +34,16 @@ Before EVERY code edit, verify:
 ## Routes
 
 - [ ] Am I using string literals for routes? → **STOP** - Use `AppRoute.xxx`
+
+## Feedback (Snackbars / Toasts)
+
+- [ ] Am I showing a snackbar or toast? → **STOP** - Use `SnackbarMixin` and `showInfoSnackbar(context, message)` (not `ScaffoldMessenger.of(context).showSnackBar`)
+
+## Testing (After Edits)
+
+- [ ] Did I modify a model in `lib/models/`? → **UPDATE** its test in `test/models/` and run tests
+- [ ] Did I modify a repository in `lib/data/repositories/`? → **UPDATE** its test in `test/repositories/` and run tests
+- [ ] Did I modify a controller? → **UPDATE** its test in `test/presentation/` and run tests
+- [ ] Before committing → **RUN** `fvm flutter test` and ensure all tests pass
 
 ## If ANY check fails, fix BEFORE proceeding.
