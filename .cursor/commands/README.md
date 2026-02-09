@@ -14,6 +14,10 @@ Slash commands for standardized AI workflows. Type `/` in Cursor Chat to see the
 - **`/analyse`** - Analyse a feature (manifest-based discovery, structured report)
 - **`/remove`** - Logically remove a feature, widget, or file and all references (impact analysis; IMPORTANT WARNING when removal affects other app parts)
 
+## Prompt Engineering
+
+- **`/enhance-prompt`** - Enhance and optimize any prompt for maximum AI effectiveness (adds context, structure, constraints, success criteria)
+
 ## Workflow
 
 - **`/branch`** - Create feature branch
