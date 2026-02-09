@@ -33,8 +33,9 @@ Each manifest contains:
 
 - **`splash`** – App initialization
 - **`onboarding`** – Onboarding flow
-- **`login`** – Login screen
-- **`sign_up`** – Sign up flow
+- **`login`** – Login, forgot password, email verification, phone verification controllers
+- **`sign_up`** – Registration with modular step flow (`RegistrationController`)
+- **`profile`** – Profile viewing and editing (`ProfileController`)
 - **`bottom_navigation`** – Main shell / tabs
 - **`home`** – Home tab content
 
@@ -49,19 +50,24 @@ Manifests: `lib/manifests/splash.manifest.generated.json`, `lib/manifests/login.
 ```
 lib/
 ├── core/                    # Shared infrastructure
-│   ├── constants/           # App-wide constants
-│   ├── enums/               # Enumerations
+│   ├── config/              # Auth config, feature toggles
+│   ├── constants/           # App-wide constants, state errors
+│   ├── enums/               # Sign-in providers, registration steps
 │   ├── extensions/          # Dart extensions
-│   ├── mixins/              # Reusable mixins
-│   ├── routing/             # GoRouter, AppRoute constants
-│   ├── services/            # Core services (network, notifications)
+│   ├── mixins/              # Snackbar, dialog mixins
+│   ├── routing/             # GoRouter, AppRoute, page transitions
+│   ├── services/            # Network, notifications, language service
 │   ├── theme/               # Colors, text styles, theming
-│   └── utils/               # Utilities, network config, shared prefs
+│   └── utils/               # Helpers, formatters, validators, user handler
 ├── data/                    # Data layer
-│   ├── firebase/            # Firebase API
-│   └── repositories/        # Repository implementations
+│   ├── firebase/            # Firebase API (auth, messaging)
+│   └── repositories/        # Auth & user repositories
 ├── models/                  # Domain models (Freezed)
 ├── presentation/            # UI by feature (views, controllers)
+│   ├── login/               # Login, forgot password, verification controllers
+│   ├── sign_up/             # Registration controller (modular steps)
+│   ├── profile/             # Profile controller
+│   └── ...
 └── manifests/               # Auto-generated feature manifests
 ```
 
@@ -84,6 +90,42 @@ import 'package:riverpod_template/presentation/login/login_view.dart';
 - **Route constants:** `lib/core/routing/app_route.dart` → `AppRoute.login`, `AppRoute.splash`, etc.
 - **Route definitions:** `lib/core/routing/router.dart`
 - **Navigation:** `context.go(AppRoute.login);`, `context.push(AppRoute.signUp);`
+
+---
+
+## Authentication & User Management
+
+### Modular Auth (AuthConfig)
+
+`lib/core/config/auth_config.dart` controls which providers and registration steps are enabled:
+
+- `enableEmailAuth`, `enablePhoneAuth`, `enableGoogleAuth`, `enableAppleAuth`, `enableFacebookAuth`
+- `requireEmailVerification`, `requirePhoneVerification`, `requireProfileCompletion`
+- `enableForgotPassword`
+
+Controllers (`LoginController`, `RegistrationController`) read these flags automatically.
+
+### Global User State
+
+`UserHandler` at `lib/core/utils/user_handler/user_handler.dart` is a `@Riverpod(keepAlive: true)` provider holding `User?`. Both auth and user repositories update it on success.
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `lib/core/config/auth_config.dart` | Provider/feature toggles |
+| `lib/presentation/login/login_controller.dart` | Unified sign-in (all providers) |
+| `lib/presentation/login/forgot_password_controller.dart` | Password reset |
+| `lib/presentation/login/email_verification_controller.dart` | Email verify flow |
+| `lib/presentation/login/phone_verification_controller.dart` | Phone verify flow |
+| `lib/presentation/sign_up/registration_controller.dart` | Multi-step registration |
+| `lib/presentation/profile/profile_controller.dart` | Profile CRUD |
+| `lib/core/utils/helpers/firebase_error_helper.dart` | Firebase error extraction |
+| `lib/core/utils/helpers/deeplink_helper.dart` | Deeplink parsing + auth gate |
+| `lib/core/utils/input_formatters/phone_number_formatter.dart` | Phone formatting |
+| `lib/core/utils/helpers/screenshot_detection_hook.dart` | Screenshot detection |
+| `lib/core/routing/page_transitions.dart` | Custom GoRouter transitions |
+| `lib/core/services/language_service/` | Remote translations |
 
 ---
 
@@ -130,6 +172,10 @@ Full scale: `.cursor/docs/COMPLEXITY_AND_DISCOVERY.md`
 - **State:** `@riverpod`, `@freezed`, `AsyncValue`
 - **Widgets:** `ConsumerWidget` / `HookConsumerWidget`; no private `_build*` methods (extract to separate widget files)
 - **Routes:** Use `AppRoute.xxx` only (no string literals)
+- **Auth:** Check `AuthConfig.isProviderEnabled()` before sign-in; use `LoginController.onSubmit(provider:)`
+- **User State:** Read `ref.watch(userHandlerProvider)` for current user; repositories update it automatically
+- **Errors:** Use `FirebaseErrorHelper.getFirebaseErrorMessage(error)` for user-friendly messages
+- **Deeplinks:** Use `DeeplinkHelper.parseDeeplink()` → `navigateFromDeeplinkWithAuthCheck()`
 
 ---
 

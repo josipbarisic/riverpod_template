@@ -24,6 +24,9 @@ abstract class AuthRepositoryInterface {
   /// Signs the user in with email and password.
   Future<NetworkResponse> signInWithEmailAndPassword(String email, String password);
 
+  /// Sends a password reset email to the specified address.
+  Future<NetworkResponse> sendPasswordResetEmail({required String email});
+
   /// Sends an email verification to the user.
   Future<NetworkResponse> initEmailVerification();
 
@@ -39,6 +42,6 @@ abstract class AuthRepositoryInterface {
   /// Verifies the phone number with the code sent to the user.
   Future<NetworkResponse> verifyPhoneNumber(String code);
 
-  /// Signs the user out.
+  /// Signs the user out and clears local state.
   Future<NetworkResponse> signOut();
 }

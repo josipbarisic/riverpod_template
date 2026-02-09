@@ -1,10 +1,11 @@
 {
-  "generatedAt": "2026-02-09T22:05:47.817107Z",
+  "generatedAt": "2026-02-09T23:38:42.561159Z",
   "feature": "sign_up",
   "views": [
     "lib/presentation/sign_up/sign_up_view.dart"
   ],
   "controllers": [
+    "lib/presentation/sign_up/registration_controller.dart",
     "lib/presentation/sign_up/sign_up_controller.dart"
   ],
   "widgets": [],
@@ -12,7 +13,14 @@
   "repositories": [
     "lib/data/repositories/auth_repository/auth_repository.dart"
   ],
-  "providers": [],
+  "providers": [
+    {
+      "name": "registrationControllerProvider",
+      "type": "Notifier",
+      "returnType": "RegistrationController",
+      "file": "lib/presentation/sign_up/registration_controller.dart"
+    }
+  ],
   "stateClasses": [],
   "routes": [],
   "apiEndpoints": [],
@@ -37,7 +45,49 @@
       ]
     }
   ],
-  "controllerMethods": {},
+  "controllerMethods": {
+    "RegistrationController": [
+      {
+        "name": "createAccountWithEmail",
+        "returnType": "Future<void>",
+        "params": "({ required String email, required String password, })",
+        "parameters": [
+          {
+            "name": "email",
+            "type": "String",
+            "isRequired": true
+          },
+          {
+            "name": "password",
+            "type": "String",
+            "isRequired": true
+          }
+        ],
+        "file": "lib/presentation/sign_up/registration_controller.dart",
+        "line": 31
+      },
+      {
+        "name": "createAccountWithSocial",
+        "returnType": "Future<void>",
+        "params": "(SignInProvider provider)",
+        "parameters": [
+          {
+            "name": "provider",
+            "type": "SignInProvider",
+            "isRequired": true
+          }
+        ],
+        "file": "lib/presentation/sign_up/registration_controller.dart",
+        "line": 55
+      },
+      {
+        "name": "advanceToNextStep",
+        "returnType": "void",
+        "file": "lib/presentation/sign_up/registration_controller.dart",
+        "line": 90
+      }
+    ]
+  },
   "testing": {
     "testFiles": [],
     "testDataFiles": [],

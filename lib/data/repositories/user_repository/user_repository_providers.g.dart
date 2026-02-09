@@ -48,7 +48,7 @@ final class UserRepositoryProvider
   }
 }
 
-String _$userRepositoryHash() => r'f0f56701cfe81ec45862030feb9ac9de30fdeb11';
+String _$userRepositoryHash() => r'bdf4310c5be00dffe1708c7743d45725b690456c';
 
 @ProviderFor(userData)
 const userDataProvider = UserDataFamily._();

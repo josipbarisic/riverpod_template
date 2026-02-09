@@ -4,8 +4,8 @@ import 'package:riverpod_template/core/utils/network/network_response.dart';
 abstract interface class UserRepositoryInterface {
   Future<User> fetchUserData(int id);
 
-  Future<Object> fetchSomeUsers();
+  Future<List<User>> fetchSomeUsers();
 
-  /// Sends the user data to the server.
-  Future<NetworkResponse> updateUserData(User user);
+  /// Sends user profile data to the server.
+  Future<NetworkResponse> updateUserData({required Map<String, dynamic> formData});
 }

@@ -22,6 +22,17 @@ _User _$UserFromJson(Map<String, dynamic> json) => _User(
   phoneNumber: json['phoneNumber'] as String?,
   gender: json['gender'] as String?,
   verified: json['verified'] as bool?,
+  bio: json['bio'] as String?,
+  companyName: json['companyName'] as String?,
+  title: json['title'] as String?,
+  profileImageUrl: json['profileImageUrl'] as String?,
+  primaryAddressCity: json['primaryAddressCity'] as String?,
+  primaryAddressState: json['primaryAddressState'] as String?,
+  primaryAddressCountry: json['primaryAddressCountry'] as String?,
+  primaryAddressStreetOne: json['primaryAddressStreetOne'] as String?,
+  primaryAddressStreetTwo: json['primaryAddressStreetTwo'] as String?,
+  primaryAddressZipCode: json['primaryAddressZipCode'] as String?,
+  newsletter: json['newsletter'] as bool?,
 );
 
 Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
@@ -36,4 +47,15 @@ Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
   'phoneNumber': instance.phoneNumber,
   'gender': instance.gender,
   'verified': instance.verified,
+  'bio': instance.bio,
+  'companyName': instance.companyName,
+  'title': instance.title,
+  'profileImageUrl': instance.profileImageUrl,
+  'primaryAddressCity': instance.primaryAddressCity,
+  'primaryAddressState': instance.primaryAddressState,
+  'primaryAddressCountry': instance.primaryAddressCountry,
+  'primaryAddressStreetOne': instance.primaryAddressStreetOne,
+  'primaryAddressStreetTwo': instance.primaryAddressStreetTwo,
+  'primaryAddressZipCode': instance.primaryAddressZipCode,
+  'newsletter': instance.newsletter,
 };

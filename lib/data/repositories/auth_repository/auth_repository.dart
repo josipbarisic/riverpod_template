@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:riverpod_template/core/utils/user_handler/user_handler.dart';
 import 'package:riverpod_template/data/repositories/auth_repository/auth_repository_interface.dart';
 import 'package:riverpod_template/models/user/user.dart' as domain;
 import 'package:riverpod_template/core/utils/app_strings.dart';
@@ -13,9 +16,18 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 class AuthRepository implements AuthRepositoryInterface {
   AuthRepository({
     required this.firebaseAuth,
+    required this.firebaseMessaging,
+    required this.userHandler,
+    this.onSignOutCallback,
   });
 
   final FirebaseAuth firebaseAuth;
+  final FirebaseMessaging firebaseMessaging;
+  final UserHandler userHandler;
+
+  /// Optional callback invoked after sign-out completes.
+  /// Use to invalidate providers, clear badges, etc.
+  final VoidCallback? onSignOutCallback;
 
   @override
   User? get currentUser => firebaseAuth.currentUser;
@@ -38,15 +50,17 @@ class AuthRepository implements AuthRepositoryInterface {
       final googleUser = await GoogleSignIn.instance.authenticate();
       final googleAuth = googleUser.authentication;
       final authorization = await googleUser.authorizationClient.authorizationForScopes([]);
-      
+
       final credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
         accessToken: authorization?.accessToken,
       );
-      
+
       final cred = await firebaseAuth.signInWithCredential(credential);
       final user = cred.user ?? (throw Exception(ErrorStrings.failedToAuthenticateUser));
-      return NetworkSuccessResponse(data: user.toDomainUser());
+      final domainUser = user.toDomainUser();
+      userHandler.setUser(domainUser);
+      return NetworkSuccessResponse(data: domainUser);
     } catch (error) {
       return NetworkErrorResponse(
         httpStatusCode: 401,
@@ -59,8 +73,11 @@ class AuthRepository implements AuthRepositoryInterface {
   Future<NetworkResponse> continueWithApple() => firebaseAuth
           .signInWithProvider(AppleAuthProvider()..addScope(AppleIDAuthorizationScopes.email.name))
           .then((cred) => cred.user ?? (throw Exception(ErrorStrings.failedToAuthenticateUser)))
-          .then<NetworkResponse>((user) => NetworkSuccessResponse(data: user.toDomainUser()))
-          .onError((error, _) {
+          .then<NetworkResponse>((user) {
+        final domainUser = user.toDomainUser();
+        userHandler.setUser(domainUser);
+        return NetworkSuccessResponse(data: domainUser);
+      }).onError((error, _) {
         log('Error with Apple sign in: $error');
         return NetworkErrorResponse(
           httpStatusCode: 401,
@@ -80,8 +97,11 @@ class AuthRepository implements AuthRepositoryInterface {
             return firebaseAuth.signInWithCredential(facebookAuthCredential);
           })
           .then((cred) => cred.user ?? (throw Exception(ErrorStrings.failedToAuthenticateUser)))
-          .then<NetworkResponse>((user) => NetworkSuccessResponse(data: user.toDomainUser()))
-          .onError((error, _) => NetworkErrorResponse(
+          .then<NetworkResponse>((user) {
+        final domainUser = user.toDomainUser();
+        userHandler.setUser(domainUser);
+        return NetworkSuccessResponse(data: domainUser);
+      }).onError((error, _) => NetworkErrorResponse(
                 httpStatusCode: 401,
                 message: error.toString(),
               ));
@@ -92,10 +112,11 @@ class AuthRepository implements AuthRepositoryInterface {
       firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password)
           .then((cred) => cred.user ?? (throw Exception(ErrorStrings.failedToCreateUser)))
-          .then<NetworkResponse>((user) => NetworkSuccessResponse(
-                data: user.toDomainUser(),
-              ))
-          .onError((error, _) => NetworkErrorResponse(
+          .then<NetworkResponse>((user) {
+        final domainUser = user.toDomainUser();
+        userHandler.setUser(domainUser);
+        return NetworkSuccessResponse(data: domainUser);
+      }).onError((error, _) => NetworkErrorResponse(
                 httpStatusCode: 401,
                 message: error.toString(),
               ));
@@ -104,14 +125,32 @@ class AuthRepository implements AuthRepositoryInterface {
   Future<NetworkResponse> signInWithEmailAndPassword(String email, String password) => firebaseAuth
       .signInWithEmailAndPassword(email: email, password: password)
       .then((cred) => cred.user ?? (throw Exception(ErrorStrings.failedToCreateUser)))
-      .then<NetworkResponse>((user) => NetworkSuccessResponse(
-            data: user.toDomainUser(),
-          ))
+      .then<NetworkResponse>((user) {
+        final domainUser = user.toDomainUser();
+        userHandler.setUser(domainUser);
+        return NetworkSuccessResponse(data: domainUser);
+      })
       .onError((error, _) => NetworkErrorResponse(
             httpStatusCode: 401,
             message: error.toString(),
           ));
 
+  // ---------------------------- Password Reset ----------------------------
+  @override
+  Future<NetworkResponse> sendPasswordResetEmail({required String email}) async {
+    try {
+      await firebaseAuth.sendPasswordResetEmail(email: email);
+      return NetworkSuccessResponse();
+    } catch (e) {
+      log('Error sending password reset email: $e');
+      return NetworkErrorResponse(
+        httpStatusCode: 400,
+        message: e.toString(),
+      );
+    }
+  }
+
+  // ---------------------------- Email Verification ----------------------------
   @override
   Future<NetworkResponse> initEmailVerification() => firebaseAuth.currentUser!
       .sendEmailVerification()
@@ -122,10 +161,17 @@ class AuthRepository implements AuthRepositoryInterface {
           ));
 
   @override
-  Future<NetworkResponse> verifyEmail(String code) {
-    // TODO: implement verifyEmail
-    throw UnimplementedError();
-  }
+  Future<NetworkResponse> verifyEmail(String code) =>
+      firebaseAuth
+          .applyActionCode(code)
+          .then((_) => firebaseAuth.currentUser!.reload())
+          .then<NetworkResponse>((_) => NetworkSuccessResponse(
+                data: firebaseAuth.currentUser!.emailVerified,
+              ))
+          .onError((error, _) => NetworkErrorResponse(
+                httpStatusCode: 400,
+                message: error.toString(),
+              ));
 
   @override
   Future<NetworkResponse> checkEmailVerificationStatus() => firebaseAuth.currentUser!
@@ -137,43 +183,70 @@ class AuthRepository implements AuthRepositoryInterface {
             message: error.toString(),
           ));
 
+  // ---------------------------- Phone Verification ----------------------------
   @override
-  Future<NetworkResponse> initPhoneNumberVerification(String phoneNumber) => firebaseAuth
-      .verifyPhoneNumber(
-        phoneNumber: phoneNumber,
-        verificationCompleted: (phoneAuthCredential) {
-          log('Phone verification completed: $phoneAuthCredential');
-        },
-        verificationFailed: (error) {
-          log('Phone verification failed: $error');
-        },
-        codeSent: (verificationId, resendToken) {
-          log('Phone verification code sent: $verificationId');
-        },
-        codeAutoRetrievalTimeout: (verificationId) {
-          log('Phone verification code auto retrieval timeout: $verificationId');
-        },
-      )
-      .then<NetworkResponse>((value) => NetworkSuccessResponse())
-      .onError((error, _) => NetworkErrorResponse(
-            httpStatusCode: 401,
-            message: error.toString(),
-          ));
+  Future<NetworkResponse> initPhoneNumberVerification(String phoneNumber) {
+    final completer = Completer<NetworkResponse>();
 
-  @override
-  Future<NetworkResponse> verifyPhoneNumber(String code) {
-    // TODO: implement verifyPhoneNumber
-    throw UnimplementedError();
+    firebaseAuth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (phoneAuthCredential) {
+        log('Phone verification completed: $phoneAuthCredential');
+      },
+      verificationFailed: (error) {
+        log('Phone verification failed: $error');
+        if (!completer.isCompleted) {
+          completer.complete(NetworkErrorResponse(
+            httpStatusCode: 400,
+            message: error.message ?? ErrorStrings.enterValidPhoneNumber,
+          ));
+        }
+      },
+      codeSent: (verificationId, resendToken) {
+        log('Phone verification code sent: $verificationId');
+        if (!completer.isCompleted) {
+          completer.complete(NetworkSuccessResponse(data: verificationId));
+        }
+      },
+      codeAutoRetrievalTimeout: (verificationId) {
+        log('Phone verification code auto retrieval timeout: $verificationId');
+        if (!completer.isCompleted) {
+          completer.complete(NetworkSuccessResponse(data: verificationId));
+        }
+      },
+    );
+
+    return completer.future;
   }
 
   @override
-  Future<NetworkResponse> signOut() =>
-      // TODO(Josip): Adjust the sign out method to include all providers
-      firebaseAuth.signOut().then((_) => GoogleSignIn.instance.signOut()).then<NetworkResponse>((_) {
-        log('User signed out');
-        return NetworkSuccessResponse();
-      }).catchError((e) => NetworkErrorResponse(
-            httpStatusCode: 401,
-            message: 'Failed to sign out.',
-          ));
+  Future<NetworkResponse> verifyPhoneNumber(String code) =>
+      // Override with actual verification logic when backend is ready.
+      // For Firebase-only auth, use PhoneAuthProvider.credential + signInWithCredential.
+      throw UnimplementedError(
+        'Implement phone verification with your backend or Firebase PhoneAuthProvider.',
+      );
+
+  // ---------------------------- Sign Out ----------------------------
+  @override
+  Future<NetworkResponse> signOut() async {
+    try {
+      await firebaseAuth.signOut();
+      await firebaseMessaging.deleteToken();
+      await GoogleSignIn.instance.signOut();
+      userHandler.setUser(null);
+      onSignOutCallback?.call();
+      log('User signed out');
+      return NetworkSuccessResponse();
+    } catch (e) {
+      log('Error signing out: $e');
+      return NetworkErrorResponse(
+        httpStatusCode: 401,
+        message: ErrorStrings.failedToSignOut,
+      );
+    }
+  }
 }
+
+/// Callback type for sign-out side effects.
+typedef VoidCallback = void Function();

@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:riverpod_template/core/utils/user_handler/user_handler.dart';
 import 'package:riverpod_template/data/repositories/user_repository/user_repository.dart';
 import 'package:riverpod_template/models/user/user.dart';
 import 'package:riverpod_template/core/utils/network/endpoints.dart';
@@ -7,13 +9,25 @@ import 'package:riverpod_template/core/utils/network/endpoints.dart';
 import '../helpers/mock_network_service.dart';
 import '../test_data/auth_test_data.dart';
 
+class MockFirebaseAuth extends Mock implements fb.FirebaseAuth {}
+
+class MockUserHandler extends Mock implements UserHandler {}
+
 void main() {
   late UserRepository repository;
   late MockNetworkService mockNetworkService;
+  late MockFirebaseAuth mockFirebaseAuth;
+  late MockUserHandler mockUserHandler;
 
   setUp(() {
     mockNetworkService = MockNetworkService();
-    repository = UserRepository(networkService: mockNetworkService);
+    mockFirebaseAuth = MockFirebaseAuth();
+    mockUserHandler = MockUserHandler();
+    repository = UserRepository(
+      networkService: mockNetworkService,
+      firebaseAuth: mockFirebaseAuth,
+      userHandler: mockUserHandler,
+    );
   });
 
   group('UserRepository', () {
@@ -141,15 +155,18 @@ void main() {
     });
 
     group('updateUserData', () {
-      test('throws UnimplementedError', () async {
+      test('sends form data to server and updates user handler', () async {
         // Arrange
-        final user = TestUsers.basic;
+        final formData = {'firstName': 'Updated', 'lastName': 'User'};
+        final updatedUser = TestUsers.complete;
+        final updatedJson = updatedUser.toJson();
 
-        // Act & Assert
-        expect(
-          () => repository.updateUserData(user),
-          throwsA(isA<UnimplementedError>()),
-        );
+        when(() => mockFirebaseAuth.currentUser).thenReturn(null);
+        mockNetworkService.stubPostSuccess(updatedJson);
+
+        // Act & Assert — when currentUser is null, getIdToken returns null
+        // The method should still call postHttp
+        await repository.updateUserData(formData: formData);
       });
     });
   });

@@ -21,7 +21,7 @@ final class AuthRepositoryProvider
         argument: null,
         retry: null,
         name: r'authRepositoryProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -48,4 +48,4 @@ final class AuthRepositoryProvider
   }
 }
 
-String _$authRepositoryHash() => r'1ff8b1793ceae5f79862d47bf555432b00656940';
+String _$authRepositoryHash() => r'd3ea7a4b30b17dcae6bfac11ea5af7dbd7c9a57d';

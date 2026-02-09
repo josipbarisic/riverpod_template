@@ -1,7 +1,7 @@
 import 'package:riverpod_template/core/utils/app_strings.dart';
 
 class InputValidator {
-  static String? validateEmail(String? value) {
+  static String? validateEmail(String? value, {bool isRequired = true}) {
     final regex = RegExp(r"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'"
         r'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-'
         r'\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*'
@@ -12,7 +12,9 @@ class InputValidator {
 
     return value != null && value.isNotEmpty && !regex.hasMatch(value)
         ? ErrorStrings.enterValidEmail
-        : null;
+        : isRequired
+            ? validateRequiredTextField(value)
+            : null;
   }
 
   static String? validatePassword(String? value) {
@@ -21,8 +23,11 @@ class InputValidator {
 
     return value != null && value.isNotEmpty && !regex.hasMatch(value)
         ? ErrorStrings.enterValidPassword
-        : null;
+        : validateRequiredTextField(value);
   }
+
+  static String? validateConfirmPassword(String? value, String? password) =>
+      value != password ? ErrorStrings.passwordsDontMatch : validateRequiredTextField(value);
 
   static String? validateRequiredTextField(String? value, {bool? extraCondition}) =>
       (value == null || value.isEmpty) && (extraCondition ?? true)

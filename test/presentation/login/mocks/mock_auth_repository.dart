@@ -83,6 +83,36 @@ class MockAuthRepository extends Mock implements AuthRepositoryInterface {
         .thenAnswer((_) async => NetworkSuccessResponse(data: user));
   }
 
+  /// Stub failed Apple sign in
+  void stubAppleSignInError(String message) {
+    when(() => continueWithApple())
+        .thenAnswer((_) async => NetworkErrorResponse(
+              httpStatusCode: 401,
+              message: message,
+            ));
+  }
+
+  /// Stub successful Facebook sign in
+  void stubFacebookSignInSuccess(User user) {
+    when(() => continueWithFacebook())
+        .thenAnswer((_) async => NetworkSuccessResponse(data: user));
+  }
+
+  /// Stub successful password reset
+  void stubSendPasswordResetSuccess() {
+    when(() => sendPasswordResetEmail(email: any(named: 'email')))
+        .thenAnswer((_) async => NetworkSuccessResponse());
+  }
+
+  /// Stub failed password reset
+  void stubSendPasswordResetError(String message) {
+    when(() => sendPasswordResetEmail(email: any(named: 'email')))
+        .thenAnswer((_) async => NetworkErrorResponse(
+              httpStatusCode: 400,
+              message: message,
+            ));
+  }
+
   /// Stub successful sign out
   void stubSignOutSuccess() {
     when(() => signOut()).thenAnswer((_) async => NetworkSuccessResponse());
@@ -107,6 +137,27 @@ class MockAuthRepository extends Mock implements AuthRepositoryInterface {
   void stubCheckEmailVerificationStatus(bool isVerified) {
     when(() => checkEmailVerificationStatus())
         .thenAnswer((_) async => NetworkSuccessResponse(data: isVerified));
+  }
+
+  /// Stub phone number verification
+  void stubInitPhoneVerificationSuccess(String verificationId) {
+    when(() => initPhoneNumberVerification(any()))
+        .thenAnswer((_) async => NetworkSuccessResponse(data: verificationId));
+  }
+
+  /// Stub phone number verification error
+  void stubInitPhoneVerificationError(String message) {
+    when(() => initPhoneNumberVerification(any()))
+        .thenAnswer((_) async => NetworkErrorResponse(
+              httpStatusCode: 400,
+              message: message,
+            ));
+  }
+
+  /// Stub email verification with code
+  void stubVerifyEmailSuccess() {
+    when(() => verifyEmail(any()))
+        .thenAnswer((_) async => NetworkSuccessResponse(data: true));
   }
 
   /// Clean up the controller when done

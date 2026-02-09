@@ -57,11 +57,13 @@ class AppStrings {
 
 class ErrorStrings {
   static const String requestFailed = 'Request failed';
+  static const String somethingWentWrong = 'Something went wrong. Please try again.';
   static const String inviteCodeInvalid = 'Invite code is invalid.';
   static const String enterEmailAndPassword = 'Please enter your email and password';
   static const String mandatoryField = 'This field is mandatory';
   static const String enterValidEmail = 'Please enter a valid email address';
   static const String enterValidPassword = 'Please enter a valid password';
+  static const String passwordsDontMatch = 'Passwords do not match';
   static const String enterValidFirstName = 'Please enter a valid first name';
   static const String enterValidLastName = 'Please enter a valid last name';
   static const String enterValidPhoneNumber = 'Please enter a valid phone number';
@@ -70,4 +72,7 @@ class ErrorStrings {
   static const String failedToAuthenticateUser =
       'Failed to authenticate the user. Please try again.';
   static const String failedToCreateUser = 'Failed to create a user. Please try again.';
+  static const String failedToSignOut = 'Failed to sign out. Please try again.';
+  static const String failedToSendPasswordReset =
+      'Failed to send password reset email. Please try again.';
 }

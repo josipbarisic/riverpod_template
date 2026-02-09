@@ -19,28 +19,47 @@ This document defines the architecture and conventions for projects started from
 ```
 lib/
 ├── core/                           # Shared infrastructure
+│   ├── config/                     # App configuration
+│   │   └── auth_config.dart        # Modular auth provider toggles
 │   ├── constants/                  # App-wide constants
+│   │   └── state_errors.dart       # Typed AsyncError constants
 │   ├── enums/                      # Enumerations
+│   │   ├── sign_in_provider_enum.dart     # Auth provider IDs (email, google, apple, phone)
+│   │   └── registration_step_enum.dart    # Multi-step registration tracking
 │   ├── extensions/                 # Dart extensions
 │   ├── mixins/                     # Reusable mixins
+│   │   ├── snackbar_mixin.dart     # Snackbar display
+│   │   └── dialog_mixin.dart       # Confirmation dialogs
 │   ├── routing/                    # GoRouter configuration
 │   │   ├── app_route.dart          # AppRoute class with route name constants
-│   │   └── router.dart             # GoRouter configuration and route definitions
-│   ├── services/                   # Core services (network, notifications)
+│   │   ├── router.dart             # GoRouter configuration and route definitions
+│   │   └── page_transitions.dart   # Custom page transitions (Reveal, ModalRise, GentleFade)
+│   ├── services/                   # Core services
+│   │   ├── language_service/       # Remote translations service
+│   │   ├── local_notifications_service/
+│   │   └── network_service/
 │   ├── theme/                      # Colors, text styles, theming
 │   └── utils/                      # Utilities and helpers
+│       ├── helpers/
+│       │   ├── firebase_error_helper.dart    # Firebase error message extraction
+│       │   ├── deeplink_helper.dart          # Deeplink parsing, auth-gated navigation
+│       │   └── screenshot_detection_hook.dart # Screenshot detection hook
+│       ├── input_formatters/
+│       │   └── phone_number_formatter.dart   # E.164 / US phone formatting
+│       ├── user_handler/
+│       │   └── user_handler.dart             # Global user state (Riverpod keepAlive)
 │       ├── network/                # Network config, endpoints, interceptors
 │       ├── notifications/          # Notification utilities
 │       └── shared_prefs/           # SharedPreferences utilities
 │
 ├── data/                           # Data layer
-│   ├── firebase/                   # Firebase API
+│   ├── firebase/                   # Firebase API (auth, messaging)
 │   └── repositories/               # Repository implementations
-│       ├── auth_repository/
-│       └── user_repository/
+│       ├── auth_repository/        # Auth (email, social, phone, password reset, sign out)
+│       └── user_repository/        # User CRUD (fetch, update with UserHandler)
 │
 ├── models/                         # Domain models (Freezed)
-│   ├── user/
+│   ├── user/                       # User model with extended profile fields
 │   ├── product/
 │   ├── order/
 │   └── ...
@@ -48,8 +67,9 @@ lib/
 ├── presentation/                   # UI by feature
 │   ├── splash/
 │   ├── onboarding/
-│   ├── login/
-│   ├── sign_up/
+│   ├── login/                      # Login + forgot password + email/phone verification
+│   ├── sign_up/                    # Registration with modular step flow
+│   ├── profile/                    # Profile viewing and editing
 │   ├── bottom_navigation/
 │   ├── home/
 │   └── widgets/                    # Shared presentation widgets
@@ -291,6 +311,77 @@ dart run scripts/generate_feature_manifests.dart
 
 ---
 
+## Authentication & User Management
+
+### Modular Auth Configuration
+
+Auth providers are controlled by `lib/core/config/auth_config.dart`:
+
+```dart
+class AuthConfig {
+  static const bool enableEmailAuth = true;
+  static const bool enablePhoneAuth = true;
+  static const bool enableGoogleAuth = true;
+  static const bool enableAppleAuth = true;
+  static const bool enableFacebookAuth = false;
+
+  static const bool enableForgotPassword = true;
+  static const bool requireEmailVerification = false;
+  static const bool requirePhoneVerification = false;
+  static const bool requireProfileCompletion = true;
+}
+```
+
+Toggle flags to `true`/`false` to enable/disable providers and registration steps. The `LoginController` and `RegistrationController` respect these flags automatically.
+
+### Auth Flow
+
+```
+LoginController.onSubmit(provider)
+  ├── checks AuthConfig.isProviderEnabled()
+  ├── routes to continueWithGoogle/Apple/Email/Phone
+  └── sets LoginState(isAuthSuccess: true) on success
+
+RegistrationController
+  ├── determines next step from AuthConfig (skips disabled steps)
+  ├── createAccountWithEmail() / createAccountWithSocial()
+  └── advanceToNextStep() → verifyEmail → verifyPhone → completeProfile → completed
+```
+
+### User State
+
+`UserHandler` (`@Riverpod(keepAlive: true)`) holds the current `User?` globally. Both `AuthRepository` and `UserRepository` update it automatically on successful operations. Access from any widget via:
+
+```dart
+final user = ref.watch(userHandlerProvider);
+```
+
+### Key Controllers
+
+| Controller | Purpose | Location |
+|-----------|---------|----------|
+| `LoginController` | All sign-in providers, respects AuthConfig | `lib/presentation/login/` |
+| `ForgotPasswordController` | Password reset emails | `lib/presentation/login/` |
+| `EmailVerificationController` | Send/verify email | `lib/presentation/login/` |
+| `PhoneVerificationController` | Send/verify SMS | `lib/presentation/login/` |
+| `RegistrationController` | Modular multi-step registration | `lib/presentation/sign_up/` |
+| `ProfileController` | View/edit user profile | `lib/presentation/profile/` |
+
+### Utilities
+
+| Utility | Purpose | Location |
+|---------|---------|----------|
+| `FirebaseErrorHelper` | User-friendly Firebase error messages | `lib/core/utils/helpers/` |
+| `DeeplinkHelper` | Parse deeplinks, auth-gated navigation, pending storage | `lib/core/utils/helpers/` |
+| `PhoneNumberFormatter` | E.164 and US display formatting | `lib/core/utils/input_formatters/` |
+| `InputValidator` | Email, password, confirm password, required fields | `lib/core/utils/` |
+| `DialogMixin` | Confirmation dialogs | `lib/core/mixins/` |
+| `ScreenshotDetectionHook` | Detect screenshots in sensitive screens | `lib/core/utils/helpers/` |
+| `LanguageService` | Remote translation fetching | `lib/core/services/language_service/` |
+| `PageTransitions` | RevealTransition, ModalRiseTransition, GentleFadeTransition | `lib/core/routing/` |
+
+---
+
 ## AI-First Setup (included in template)
 
 - **Rules:** `.cursor/rules/*.mdc` – Project context, workflow, discovery, Dart conventions
@@ -312,10 +403,12 @@ Riverpod Template uses **Clean Architecture** with:
 - **Direct imports**: Absolute package paths, no barrel exports
 - **Riverpod state management**: Code-generated providers
 - **Freezed models**: Immutable domain entities
+- **Modular auth**: Configurable providers (email, phone, Google, Apple) with toggleable registration steps
 
 This architecture provides:
 
-- ✅ Clear separation of concerns
-- ✅ Easy navigation and discovery
-- ✅ Maintainable and scalable codebase
-- ✅ Consistent patterns throughout
+- Clear separation of concerns
+- Easy navigation and discovery
+- Maintainable and scalable codebase
+- Consistent patterns throughout
+- Production-ready auth flows out of the box

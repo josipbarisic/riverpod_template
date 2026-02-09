@@ -6,6 +6,8 @@ part 'user.g.dart';
 // Run "dart run build_runner build -d" to start code generation
 @Freezed(copyWith: true, toJson: true, toStringOverride: true)
 abstract class User with _$User {
+  const User._();
+
   const factory User({
     required String id,
     required String email,
@@ -19,7 +21,22 @@ abstract class User with _$User {
     String? phoneNumber,
     String? gender,
     bool? verified,
+    // --- Extended profile fields ---
+    String? bio,
+    String? companyName,
+    String? title,
+    String? profileImageUrl,
+    String? primaryAddressCity,
+    String? primaryAddressState,
+    String? primaryAddressCountry,
+    String? primaryAddressStreetOne,
+    String? primaryAddressStreetTwo,
+    String? primaryAddressZipCode,
+    bool? newsletter,
   }) = _User;
 
   factory User.fromJson(Map<String, Object?> json) => _$UserFromJson(json);
+
+  /// User's full name.
+  String get fullName => '$firstName $lastName';
 }
