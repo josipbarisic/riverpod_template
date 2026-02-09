@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-05T16:25:30.712058Z",
+  "generatedAt": "2026-02-09T22:05:47.811172Z",
   "feature": "onboarding",
   "views": [
     "lib/presentation/onboarding/onboarding_view.dart"

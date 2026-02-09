@@ -73,7 +73,7 @@ lib/
 - **Constants**: App-wide constants (e.g., `network_constants.dart`)
 - **Enums**: Enumerations (e.g., `order_status_enum.dart`)
 - **Extensions**: Dart extensions (e.g., `theme_extensions.dart`)
-- **Mixins**: Reusable mixins (e.g., `firebase_auth_mixin.dart`)
+- **Mixins**: Reusable mixins (e.g., `snackbar_mixin.dart`)
 - **Routing**: GoRouter configuration
     - **Route Constants**: `AppRoute` class in `lib/core/routing/app_route.dart`
     - **Route Definitions**: GoRouter config in `lib/core/routing/router.dart`

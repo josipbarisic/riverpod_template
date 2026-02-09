@@ -1,0 +1,329 @@
+name: Validate AI-Forward Standards
+
+on:
+  pull_request:
+    paths:
+      - 'lib/presentation/**'
+      - 'lib/data/repositories/**'
+      - 'lib/models/**'
+      - 'lib/core/**'
+      - 'scripts/generate_feature_manifests.dart'
+      - 'lib/manifests/**'
+      - 'test/**'
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Create .env file
+        run: cp .env.example .env
+
+      - name: Run unit tests
+        run: |
+          echo "Running unit tests..."
+          flutter test --reporter expanded
+          if [ $? -ne 0 ]; then
+            echo "❌ Unit tests failed!"
+            echo ""
+            echo "Please fix failing tests before merging."
+            echo "If you modified:"
+            echo "  - Models: Update tests in test/models/"
+            echo "  - Repositories: Update tests in test/repositories/"
+            echo "  - Controllers: Update tests in test/presentation/"
+            exit 1
+          fi
+          echo "✅ All unit tests passed"
+
+  manifest-freshness:
+    name: Manifest Freshness Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Configure git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Generate manifests
+        run: |
+          echo "Generating feature manifests..."
+          dart run scripts/generate_feature_manifests.dart
+          if [ $? -ne 0 ]; then
+            echo "❌ Failed to generate manifests"
+            exit 1
+          fi
+          echo "✅ Manifest generation completed"
+
+      - name: Check for uncommitted manifest changes
+        id: check-manifests
+        run: |
+          # Ensure manifests directory exists
+          if [ ! -d "lib/manifests" ]; then
+            echo "❌ lib/manifests directory does not exist"
+            exit 1
+          fi
+          
+          # Install jq for JSON manipulation (to ignore timestamp differences)
+          sudo apt-get update && sudo apt-get install -y jq
+          
+          # After generating manifests, check if any manifest files differ from what's committed in the PR
+          # We compare the generated files against HEAD, ignoring the 'generatedAt' timestamp field
+          echo "Checking for manifest changes against HEAD (ignoring timestamp)..."
+          
+          # Find all manifest files and check each one
+          CHANGED_FILES=""
+          while IFS= read -r file; do
+            if [ -f "$file" ]; then
+              # Check if file is tracked in git
+              if git ls-files --error-unmatch "$file" >/dev/null 2>&1; then
+                # Compare files ignoring the 'generatedAt' timestamp field
+                # Get the committed version from HEAD
+                HEAD_CONTENT=$(git show HEAD:"$file" 2>/dev/null | jq 'del(.generatedAt)' 2>/dev/null)
+                CURRENT_CONTENT=$(cat "$file" | jq 'del(.generatedAt)' 2>/dev/null)
+          
+                # Compare normalized content (without timestamp)
+                if [ "$HEAD_CONTENT" != "$CURRENT_CONTENT" ]; then
+                  if [ -z "$CHANGED_FILES" ]; then
+                    CHANGED_FILES="$file"
+                  else
+                    CHANGED_FILES="$CHANGED_FILES"$'\n'"$file"
+                  fi
+                  # Show a sample diff for the first file to help debug
+                  if [ "$(echo "$CHANGED_FILES" | wc -l)" -eq 1 ]; then
+                    echo ""
+                    echo "Sample diff for $file (ignoring timestamp):"
+                    echo "--- HEAD version (without timestamp)"
+                    echo "$HEAD_CONTENT" | head -10
+                    echo "--- Current version (without timestamp)"
+                    echo "$CURRENT_CONTENT" | head -10
+                    echo ""
+                  fi
+                fi
+              else
+                # File is untracked (new file) - this is okay, manifests can be new
+                echo "  ℹ️  $file is a new file (untracked) - this is okay"
+              fi
+            fi
+          done < <(find lib/manifests -name "*.manifest.generated.json" -type f | sort)
+          
+          if [ -n "$CHANGED_FILES" ]; then
+            echo "❌ Manifests are out of date!"
+            echo ""
+            echo "The following manifest files differ from what's committed in this PR:"
+            echo "$CHANGED_FILES" | while IFS= read -r file; do
+              echo "  - $file"
+            done
+            echo ""
+            echo "This means the code structure changed but manifests weren't regenerated."
+            echo ""
+            echo "Please run: dart run scripts/generate_feature_manifests.dart"
+            echo "Then commit the updated manifests."
+            exit 1
+          else
+            echo "✅ All manifests are up to date"
+          fi
+
+  import-rules:
+    name: Import Rules Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for relative imports
+        id: check-imports
+        run: |
+          # Find relative imports, excluding generated files
+          # Check for both '../' and '../../' patterns with single or double quotes
+          RELATIVE_IMPORTS=$(grep -rE "import ['\"]\.\./" lib/ --include="*.dart" | grep -v ".g.dart" | grep -v ".freezed.dart" || true)
+          
+          if [ -n "$RELATIVE_IMPORTS" ]; then
+            echo "❌ Relative imports found!"
+            echo ""
+            echo "The following files contain relative imports (use absolute package imports instead):"
+            echo "$RELATIVE_IMPORTS" | while IFS= read -r line; do
+              echo "  - $line"
+            done
+            echo ""
+            echo "All imports must use absolute package paths: package:riverpod_template/..."
+            exit 1
+          else
+            echo "✅ No relative imports found"
+          fi
+
+  file-size:
+    name: File Size Guidelines
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check file sizes
+        id: check-sizes
+        run: |
+          VIOLATIONS=()
+          
+          # Check views (≤250 lines)
+          while IFS= read -r file; do
+            LINES=$(wc -l < "$file" | tr -d ' ')
+            if [ "$LINES" -gt 250 ]; then
+              VIOLATIONS+=("$file ($LINES lines) - exceeds 250 line limit")
+            fi
+          done < <(find lib/presentation -name "*_view.dart" -type f ! -name "*.g.dart" ! -name "*.freezed.dart")
+          
+          # Check controllers (≤150 lines)
+          while IFS= read -r file; do
+            LINES=$(wc -l < "$file" | tr -d ' ')
+            if [ "$LINES" -gt 150 ]; then
+              VIOLATIONS+=("$file ($LINES lines) - exceeds 150 line limit")
+            fi
+          done < <(find lib/presentation -name "*_controller.dart" -type f ! -name "*.g.dart" ! -name "*.freezed.dart")
+          
+          # Check repositories (≤200 lines)
+          while IFS= read -r file; do
+            LINES=$(wc -l < "$file" | tr -d ' ')
+            if [ "$LINES" -gt 200 ]; then
+              VIOLATIONS+=("$file ($LINES lines) - exceeds 200 line limit")
+            fi
+          done < <(find lib/data/repositories -name "*_repository.dart" -type f ! -name "*.g.dart" ! -name "*.freezed.dart")
+          
+          # Check widgets (≤100 lines)
+          while IFS= read -r file; do
+            LINES=$(wc -l < "$file" | tr -d ' ')
+            if [ "$LINES" -gt 100 ]; then
+              VIOLATIONS+=("$file ($LINES lines) - exceeds 100 line limit")
+            fi
+          done < <(find lib/presentation -name "*_widget.dart" -type f ! -name "*.g.dart" ! -name "*.freezed.dart")
+          
+          # Check models (≤100 lines)
+          while IFS= read -r file; do
+            LINES=$(wc -l < "$file" | tr -d ' ')
+            if [ "$LINES" -gt 100 ]; then
+              VIOLATIONS+=("$file ($LINES lines) - exceeds 100 line limit")
+            fi
+          done < <(find lib/models -name "*_model.dart" -type f ! -name "*.g.dart" ! -name "*.freezed.dart")
+          
+          if [ ${#VIOLATIONS[@]} -gt 0 ]; then
+            echo "⚠️  Found ${#VIOLATIONS[@]} file(s) exceeding size guidelines"
+            echo ""
+            for violation in "${VIOLATIONS[@]}"; do
+              echo "  - $violation"
+            done
+            echo ""
+            echo "Guidelines:"
+            echo "  - Views: ≤250 lines"
+            echo "  - Controllers: ≤150 lines"
+            echo "  - Repositories: ≤200 lines"
+            echo "  - Widgets/Models: ≤100 lines"
+          else
+            echo "✅ All files are within size guidelines"
+          fi
+
+  code-standards:
+    name: Code Standards Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for dynamic type usage
+        id: check-dynamic
+        run: |
+          # Find dynamic type usage, excluding generated files and test files
+          DYNAMIC_USAGE=$(grep -r ":\s*dynamic" lib/ --include="*.dart" | grep -v ".g.dart" | grep -v ".freezed.dart" | grep -v "/test/" || true)
+          
+          if [ -n "$DYNAMIC_USAGE" ]; then
+            echo "❌ 'dynamic' type usage found!"
+            echo ""
+            echo "The following files contain 'dynamic' types (use specific types instead):"
+            echo "$DYNAMIC_USAGE" | while IFS= read -r line; do
+              echo "  - $line"
+            done
+            echo ""
+            echo "Replace 'dynamic' with specific types for better type safety."
+            exit 1
+          else
+            echo "✅ No 'dynamic' type usage found"
+          fi
+
+      - name: Check for private _build methods
+        id: check-build-methods
+        run: |
+          # Find private _build methods, excluding generated files
+          BUILD_METHODS=$(grep -r "Widget _build" lib/presentation/ --include="*.dart" | grep -v ".g.dart" || true)
+          
+          if [ -n "$BUILD_METHODS" ]; then
+            echo "❌ Private _build methods found!"
+            echo ""
+            echo "The following files contain private _build methods (extract to separate widget classes):"
+            echo "$BUILD_METHODS" | while IFS= read -r line; do
+              echo "  - $line"
+            done
+            echo ""
+            echo "Extract these methods into separate widget classes instead of using same-file private methods."
+            exit 1
+          else
+            echo "✅ No private _build methods found"
+          fi
+
+  validation-summary:
+    name: Validation Summary
+    runs-on: ubuntu-latest
+    needs: [ unit-tests, manifest-freshness, import-rules, code-standards ]
+    if: always()
+
+    steps:
+      - name: Check validation results
+        run: |
+          if [ "${{ needs.unit-tests.result }}" != "success" ] || \
+             [ "${{ needs.manifest-freshness.result }}" != "success" ] || \
+             [ "${{ needs.import-rules.result }}" != "success" ] || \
+             [ "${{ needs.code-standards.result }}" != "success" ]; then
+            echo "❌ Some validation checks failed. Please review the errors above."
+            echo ""
+            echo "Results:"
+            echo "  - Unit Tests: ${{ needs.unit-tests.result }}"
+            echo "  - Manifest Freshness: ${{ needs.manifest-freshness.result }}"
+            echo "  - Import Rules: ${{ needs.import-rules.result }}"
+            echo "  - Code Standards: ${{ needs.code-standards.result }}"
+            exit 1
+          else
+            echo "✅ All blocking validation checks passed!"
+          fi

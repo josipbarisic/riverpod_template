@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:riverpod_template/data/firebase/firebase_api_providers.dart';
 import 'package:riverpod_template/core/routing/app_route.dart';
@@ -10,24 +11,61 @@ import 'package:riverpod_template/core/utils/network/endpoints.dart';
 
 class FirebaseApi {
   FirebaseApi({
+    FirebaseAuth? firebaseAuth,
+    FirebaseMessaging? firebaseMessaging,
     required this.networkService,
     required this.localNotificationsService,
     required this.hasRemoteMessage,
-  });
+  }) {
+    this.firebaseAuth = firebaseAuth ?? FirebaseAuth.instance;
+    this.firebaseMessaging = firebaseMessaging ?? FirebaseMessaging.instance;
+  }
 
+  late final FirebaseAuth firebaseAuth;
+  late final FirebaseMessaging firebaseMessaging;
   final NetworkService networkService;
   final LocalNotificationsService localNotificationsService;
   final HasRemoteMessage hasRemoteMessage;
 
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  // --------------------- Firebase Auth ---------------------
+
+  User? get currentUser => firebaseAuth.currentUser;
+
+  bool get isSignedIn => currentUser != null;
+
+  bool get isAnonymous => currentUser?.isAnonymous ?? true;
+
+  bool get isGoogleLogin => currentUser?.providerData[0].providerId == 'google.com';
+
+  bool get isAppleLogin => currentUser?.providerData[0].providerId == 'apple.com';
+
+  bool get isSocialLogin => isGoogleLogin || isAppleLogin;
+
+  String get userEmail =>
+      currentUser?.providerData[0].email ?? currentUser?.email ?? 'Email Hidden';
+
+  /// Sends a password reset email to the specified email address.
+  Future<void> sendPasswordResetEmail({required String email}) =>
+      firebaseAuth.sendPasswordResetEmail(email: email);
+
+  /// Signs in using the provided authentication credential.
+  Future<UserCredential> signInWithCredential(AuthCredential credential) =>
+      firebaseAuth.signInWithCredential(credential);
+
+  /// Signs out the current user.
+  Future<void> signOut() => firebaseAuth.signOut();
+
+  // -------------------- Firebase Messaging --------------------
+
+  Future<String?> getFcmToken() => firebaseMessaging.getToken();
 
   Future<void> initPushNotifications() async {
     log('Initializing push notifications');
     // Request permission for notifications
-    await _firebaseMessaging.requestPermission();
+    await firebaseMessaging.requestPermission();
 
     // Fetch the FCM token for the device
-    final fcmToken = await _firebaseMessaging.getToken();
+    final fcmToken = await firebaseMessaging.getToken();
 
     // Patch the FCM token to the backend
     if (fcmToken != null) {
@@ -51,7 +89,7 @@ class FirebaseApi {
   }
 
   Future<void> _initNotificationListeners() async {
-    _firebaseMessaging.getInitialMessage().then((message) {
+    firebaseMessaging.getInitialMessage().then((message) {
       if (message != null) {
         hasRemoteMessage.updateHasRemoteMessage(true);
         log('Handling initial message: ${message.notification?.body}');

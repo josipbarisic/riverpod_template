@@ -7,11 +7,18 @@ import 'package:riverpod_template/data/repositories/auth_repository/auth_reposit
 import 'package:riverpod_template/models/user/user.dart' as domain;
 import 'package:riverpod_template/core/utils/app_strings.dart';
 import 'package:riverpod_template/core/extensions/user_extensions.dart';
-import 'package:riverpod_template/core/mixins/firebase_auth_mixin.dart';
 import 'package:riverpod_template/core/utils/network/network_response.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
-class AuthRepository with FirebaseAuthMixin implements AuthRepositoryInterface {
+class AuthRepository implements AuthRepositoryInterface {
+  AuthRepository({
+    required this.firebaseAuth,
+  });
+
+  final FirebaseAuth firebaseAuth;
+
+  @override
+  User? get currentUser => firebaseAuth.currentUser;
 
   @override
   Stream<domain.User?> authStateChanges() =>

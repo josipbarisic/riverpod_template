@@ -1,10 +1,13 @@
-// import 'package:firebase_auth/firebase_auth.dart';
-import 'package:riverpod_template/models/user/user.dart';
+import 'package:firebase_auth/firebase_auth.dart' show User;
+import 'package:riverpod_template/models/user/user.dart' as domain;
 import 'package:riverpod_template/core/utils/network/network_response.dart';
 
 abstract class AuthRepositoryInterface {
+  /// The currently signed-in Firebase user, or null if not signed in.
+  User? get currentUser;
+
   /// Returns a stream that allows you to listen to the authentication state changes.
-  Stream<User?> authStateChanges();
+  Stream<domain.User?> authStateChanges();
 
   /// Creates a new user with the provided email and password.
   Future<NetworkResponse> createUserWithEmailAndPassword(String email, String password);

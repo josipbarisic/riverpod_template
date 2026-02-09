@@ -24,17 +24,20 @@ class SplashController extends _$SplashController {
   Future<void> _fetchInitialData() async {
     state = const AsyncLoading();
 
-    /// Initialize local notifications
+    // 1. Initialize local notifications
     ref.read(localNotificationsServiceProvider).init();
+    if (!ref.mounted) return;
 
-    // Initialize push notifications
-    ref.read(firebaseApiProvider).initPushNotifications();
+    // 2. Initialize push notifications
+    await ref.read(firebaseApiProvider).initPushNotifications();
+    if (!ref.mounted) return;
 
-    // ref.read(hasRemoteMessageProvider.notifier).updateHasRemoteMessage(true);
-
+    // 3. Test shared preferences
     await _sharedPrefs.setString(SharedPrefsKeys.test, 'testing shared prefs');
     log('FETCH ${SharedPrefsKeys.test} FROM PREFS ===> ${_sharedPrefs.get(SharedPrefsKeys.test)}');
+    if (!ref.mounted) return;
 
+    // 4. Set loaded state
     state = await AsyncValue.guard(() => Future.delayed(
           const Duration(seconds: 3),
           () => true,
