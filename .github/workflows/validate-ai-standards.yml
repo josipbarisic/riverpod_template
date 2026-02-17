@@ -10,12 +10,14 @@ on:
       - 'scripts/generate_feature_manifests.dart'
       - 'lib/manifests/**'
       - 'test/**'
+      - 'ios/**'
+      - 'android/**'
 
 jobs:
-  unit-tests:
-    name: Unit Tests
+  unit-and-widget-tests:
+    name: Unit & Widget Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout code
@@ -33,21 +35,22 @@ jobs:
       - name: Create .env file
         run: cp .env.example .env
 
-      - name: Run unit tests
+      - name: Run unit and widget tests
         run: |
-          echo "Running unit tests..."
+          echo "Running unit tests and widget tests..."
           flutter test --reporter expanded
           if [ $? -ne 0 ]; then
-            echo "❌ Unit tests failed!"
+            echo "❌ Unit or widget tests failed!"
             echo ""
             echo "Please fix failing tests before merging."
             echo "If you modified:"
             echo "  - Models: Update tests in test/models/"
             echo "  - Repositories: Update tests in test/repositories/"
             echo "  - Controllers: Update tests in test/presentation/"
+            echo "  - Views/Widgets: Update tests in test/presentation/ (e.g. *_view_test.dart, *_widget_test.dart)"
             exit 1
           fi
-          echo "✅ All unit tests passed"
+          echo "✅ All unit and widget tests passed"
 
   manifest-freshness:
     name: Manifest Freshness Check
@@ -303,26 +306,182 @@ jobs:
             echo "✅ No private _build methods found"
           fi
 
+  config-file-integrity:
+    name: Config File Integrity Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install validation tools
+        run: sudo apt-get update && sudo apt-get install -y libxml2-utils
+
+      - name: Validate iOS plist files
+        run: |
+          echo "Validating iOS plist files..."
+          ERRORS=""
+          CHECKED=0
+
+          while IFS= read -r file; do
+            CHECKED=$((CHECKED + 1))
+
+            # 1) XML well-formedness check via xmllint
+            XMLLINT_ERR=$(xmllint --noout "$file" 2>&1) || {
+              ERRORS="${ERRORS}❌ ${file} (XML syntax error):\n   ${XMLLINT_ERR}\n\n"
+              continue
+            }
+
+            # 2) Plist structure check via Python plistlib
+            PLIST_ERR=$(python3 -c "
+          import plistlib, sys
+          try:
+              with open(sys.argv[1], 'rb') as f:
+                  plistlib.load(f)
+          except Exception as e:
+              print(str(e), file=sys.stderr)
+              sys.exit(1)
+          " "$file" 2>&1) || {
+              ERRORS="${ERRORS}❌ ${file} (plist structure error):\n   ${PLIST_ERR}\n\n"
+            }
+          done < <(find ios -name "*.plist" -type f 2>/dev/null)
+
+          if [ "$CHECKED" -eq 0 ]; then
+            echo "⚠️  No plist files found in ios/ — skipping"
+            exit 0
+          fi
+
+          if [ -n "$ERRORS" ]; then
+            echo ""
+            echo "========================================="
+            echo "  PLIST VALIDATION FAILED"
+            echo "========================================="
+            echo ""
+            echo -e "$ERRORS"
+            echo "Common AI-introduced issues:"
+            echo "  - Stray line breaks inside <string>, <key>, or other XML tags"
+            echo "  - Accidental whitespace in tag values"
+            echo "  - Missing or mismatched closing tags"
+            echo "  - Invalid XML entities or characters"
+            echo ""
+            echo "To verify locally: xmllint --noout <file>"
+            echo "Or on macOS:       plutil -lint <file>"
+            exit 1
+          fi
+          echo "✅ All $CHECKED plist files are valid"
+
+      - name: Validate Android XML files
+        run: |
+          echo "Validating Android XML config files..."
+          ERRORS=""
+          CHECKED=0
+
+          # Validate AndroidManifest.xml files
+          while IFS= read -r file; do
+            CHECKED=$((CHECKED + 1))
+            XMLLINT_ERR=$(xmllint --noout "$file" 2>&1) || {
+              ERRORS="${ERRORS}❌ ${file}:\n   ${XMLLINT_ERR}\n\n"
+            }
+          done < <(find android -name "AndroidManifest.xml" -type f 2>/dev/null)
+
+          # Validate other Android XML resources that AI might touch
+          while IFS= read -r file; do
+            CHECKED=$((CHECKED + 1))
+            XMLLINT_ERR=$(xmllint --noout "$file" 2>&1) || {
+              ERRORS="${ERRORS}❌ ${file}:\n   ${XMLLINT_ERR}\n\n"
+            }
+          done < <(find android/app/src -name "*.xml" -path "*/res/*" -type f 2>/dev/null)
+
+          if [ "$CHECKED" -eq 0 ]; then
+            echo "⚠️  No Android XML files found — skipping"
+            exit 0
+          fi
+
+          if [ -n "$ERRORS" ]; then
+            echo ""
+            echo "========================================="
+            echo "  ANDROID XML VALIDATION FAILED"
+            echo "========================================="
+            echo ""
+            echo -e "$ERRORS"
+            echo "Common AI-introduced issues:"
+            echo "  - Stray line breaks inside XML attributes or tag values"
+            echo "  - Missing closing tags or self-closing syntax"
+            echo "  - Invalid XML entities or malformed namespace declarations"
+            echo ""
+            echo "To verify locally: xmllint --noout <file>"
+            exit 1
+          fi
+          echo "✅ All $CHECKED Android XML files are valid"
+
+      - name: Check for common AI corruption patterns
+        run: |
+          echo "Checking for common AI corruption patterns in config files..."
+          WARNINGS=""
+
+          # Check for line breaks inside XML tag attributes (common AI mistake)
+          # Pattern: an opening tag that spans multiple lines with broken attributes
+          while IFS= read -r file; do
+            # Check for broken string values in plist (line break inside <string>...</string>)
+            # A valid plist <string> should not contain raw newlines between open/close tags
+            # unless it's intentionally multiline content
+            BROKEN_STRINGS=$(python3 -c "
+          import re, sys
+          with open(sys.argv[1], 'r') as f:
+              content = f.read()
+          # Find <string> tags where the value contains a newline but the tag
+          # is clearly a single-value field (short content split across lines)
+          pattern = r'<string>([^<]*\n[^<]*)</string>'
+          matches = re.finditer(pattern, content)
+          for m in matches:
+              val = m.group(1).strip()
+              # Skip intentionally multiline values (very long content)
+              if len(val) < 200:
+                  line_num = content[:m.start()].count('\n') + 1
+                  print(f'  Line {line_num}: <string> value contains line break: \"{val[:80]}...\"')
+          " "$file" 2>/dev/null) || true
+
+            if [ -n "$BROKEN_STRINGS" ]; then
+              WARNINGS="${WARNINGS}⚠️  ${file} — possible broken string values:\n${BROKEN_STRINGS}\n\n"
+            fi
+          done < <(find ios -name "*.plist" -type f 2>/dev/null)
+
+          if [ -n "$WARNINGS" ]; then
+            echo ""
+            echo "========================================="
+            echo "  POTENTIAL CONFIG CORRUPTION DETECTED"
+            echo "========================================="
+            echo ""
+            echo -e "$WARNINGS"
+            echo "These may be false positives, but are worth reviewing."
+            echo "AI models sometimes split single-line values across multiple lines."
+            exit 1
+          fi
+          echo "✅ No common AI corruption patterns detected"
+
   validation-summary:
     name: Validation Summary
     runs-on: ubuntu-latest
-    needs: [ unit-tests, manifest-freshness, import-rules, code-standards ]
+    needs: [ unit-and-widget-tests, manifest-freshness, import-rules, code-standards, config-file-integrity ]
     if: always()
 
     steps:
       - name: Check validation results
         run: |
-          if [ "${{ needs.unit-tests.result }}" != "success" ] || \
+          if [ "${{ needs.unit-and-widget-tests.result }}" != "success" ] || \
              [ "${{ needs.manifest-freshness.result }}" != "success" ] || \
              [ "${{ needs.import-rules.result }}" != "success" ] || \
-             [ "${{ needs.code-standards.result }}" != "success" ]; then
+             [ "${{ needs.code-standards.result }}" != "success" ] || \
+             [ "${{ needs.config-file-integrity.result }}" != "success" ]; then
             echo "❌ Some validation checks failed. Please review the errors above."
             echo ""
             echo "Results:"
-            echo "  - Unit Tests: ${{ needs.unit-tests.result }}"
+            echo "  - Unit & Widget Tests: ${{ needs.unit-and-widget-tests.result }}"
             echo "  - Manifest Freshness: ${{ needs.manifest-freshness.result }}"
             echo "  - Import Rules: ${{ needs.import-rules.result }}"
             echo "  - Code Standards: ${{ needs.code-standards.result }}"
+            echo "  - Config File Integrity: ${{ needs.config-file-integrity.result }}"
             exit 1
           else
             echo "✅ All blocking validation checks passed!"

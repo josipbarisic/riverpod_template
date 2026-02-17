@@ -1,16 +1,31 @@
+---
+description: AI agent workflow - manifests, AGENTS.md, commands
+alwaysApply: true
+---
+
 # AI Workflow
 
 ## Before Writing Code
 
-1. **Read `lib/AGENTS.md`** - AI agent quick reference
-2. **Read feature manifest** - `lib/manifests/{feature}/{feature}.manifest.generated.json`
-3. **Check manifest staleness** - If files newer than `generatedAt`, regenerate first
+1. **Read `lib/AGENTS.md`** – AI agent quick reference
+2. **Read feature manifest** – `lib/manifests/{feature}.manifest.generated.json`
+3. **Check manifest staleness** – If any file in the manifest (views, controllers, widgets, repositories) is newer than `generatedAt`, regenerate first
 
 ## Feature Manifests
 
 Location: `lib/manifests/`
 
-Contains: exports, routes (AppRoute), providers, controllerMethods, apiEndpoints.
+Contains:
+
+- `views`, `controllers`, `widgets`, `models`, `repositories` – feature file lists
+- `routes` – navigation routes using `AppRoute` constants
+- `providers` – Riverpod provider definitions
+- `stateClasses` – state classes with fields
+- `controllerMethods` – method signatures and parameters
+- `apiEndpoints` – API endpoints with HTTP methods and usage
+- `coreServices` – internal services from `lib/core/services/`
+- `thirdPartyDependencies` – third-party package imports
+- `testing` – test files and run commands
 
 ## Regenerate Manifests
 
@@ -22,6 +37,24 @@ dart run scripts/generate_feature_manifests.dart
 
 ## Cursor Commands
 
-Type `/` in chat to see commands: add-feature, fix-bug, review, commit, regenerate-manifests, analyse, etc.
+Type `/` in chat to see commands:
 
-See `.cursor/commands/README.md` for usage.
+- `/fix-gh-issue` – Fix GitHub issues
+- `/add-feature` – Add new features (Tier 1/2/3)
+- `/refine-feature` – Refine existing feature
+- `/fix-bug` – Fix bugs with context
+- `/mobile-issue` – Debug mobile issues
+- `/update-route` – Add or update routes
+- `/review` – Pre-commit checklist
+- `/commit` – Create atomic commits
+- `/regenerate-manifests` – Regenerate manifests
+- `/analyse` – Analyse a feature (structured report)
+- `/remove` – Remove feature/widget/file and references
+- `/test` – Create tests
+- `/tdd` – Test-driven development
+- `/grind` – Batch operations
+- `/branch` – Create feature branch
+- `/pr` – Create PR description
+- `/enhance-prompt` – Enhance prompt with context
+
+See `.cursor/commands/README.md` for details.

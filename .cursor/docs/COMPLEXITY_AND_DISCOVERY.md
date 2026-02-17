@@ -18,9 +18,9 @@ The **user** assigns the complexity level at the start of the task. The AI may s
 
 | Tier | Name | Typical scope | When the user would pick this |
 |------|------|---------------|--------------------------------|
-| **1** | **Quick** | Single file, &lt;~30 lines, obvious change | "Fix this typo", "Change this color", "Add this one import" |
-| **2** | **Moderate** | 2–5 files, ~30–100 lines, clear scope | "Fix this bug in X and Y", "Add this widget to the existing screen" |
-| **3** | **Large** | New feature, many files, or ambiguous | "Add a new screen", "Refactor the auth flow" |
+| **1** | **Quick** | Single file, &lt;~30 lines, obvious change | "Fix this typo", "Change this color", "Add this one import", "Update this string" |
+| **2** | **Moderate** | 2–5 files, ~30–100 lines, clear scope | "Fix this bug in X and Y", "Add this widget to the existing screen", "Refactor this into two widgets" |
+| **3** | **Large** | New feature, many files, or ambiguous | "Add a new screen", "Refactor the auth flow", "We need to rethink this screen" |
 
 ### Tier 1 – Quick
 
@@ -29,12 +29,16 @@ The **user** assigns the complexity level at the start of the task. The AI may s
 - **Planning:** None; go straight to the change.
 - **Approval:** Execute immediately after minimal confirmation.
 
+**Example:** "Update the empty state copy on the login screen" → User says Tier 1 → Confirm which string → Edit → Done.
+
 ### Tier 2 – Moderate
 
 - **Scope:** A few files, clear goal, some alignment with existing patterns.
 - **Discovery:** Short discovery: what exactly, where, any constraints. 3–5 targeted questions.
 - **Planning:** Brief plan (what files, what changes). State it before coding.
 - **Approval:** User sees the plan; AI proceeds to implement (no formal "proceed" required unless user asks).
+
+**Example:** "Fix the bug where saving doesn't refresh the list" → User says Tier 2 → Ask: which screen, expected behavior → Plan: controller + view → Implement.
 
 ### Tier 3 – Large
 
@@ -43,11 +47,13 @@ The **user** assigns the complexity level at the start of the task. The AI may s
 - **Planning:** Written specification and implementation plan (files, steps, integrations). STATE what you read and what you'll do.
 - **Approval:** **WAIT for explicit approval** (e.g. "proceed", "approved", "go ahead") before implementing.
 
+**Example:** "Add a settings screen" → User says Tier 3 → Full discovery (where it lives, what toggles, API?) → Spec + plan → Wait for approval → Implement.
+
 ---
 
 ## Mandatory First Step for Relevant Commands
 
-For **add-feature**, **fix-bug**, **refine-feature**, and similar workflow commands:
+For **add-feature**, **fix-bug**, **refine-feature**, **fix-gh-issue**, **mobile-issue**, and similar workflow commands:
 
 ### Step 0: Assign Complexity
 
@@ -95,6 +101,7 @@ For **Tier 3**, discovery should produce a short **spec** (user-visible behavior
 
 - **Rules:** `.cursor/rules/discovery-first.mdc` – reminds the AI to ask complexity and follow this workflow.
 - **Commands:** Each relevant command has a **Step 0: Assign complexity** and ties its steps to Tier 1 / 2 / 3.
+- **Skills:** `feature-planning` aligns with Tier 3 discovery and planning.
 
 ---
 

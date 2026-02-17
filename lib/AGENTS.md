@@ -13,17 +13,23 @@ When working on a feature, read BOTH:
 
 Each manifest contains:
 
-- **`exports`** – views, controllers, widgets, models, states, repositories
-- **`routes`** – Navigation (AppRoute constant, path, view)
-- **`providers`** – Riverpod provider definitions
-- **`stateClasses`** – State classes and fields
-- **`controllerMethods`** – Controller method signatures
-- **`apiEndpoints`** – API endpoints and usage
-- **`dependencies`** – Other areas this feature depends on
+- **`views`** – View files in the feature
+- **`controllers`** – Controller files
+- **`widgets`** – Widget files (in feature subdirectories)
+- **`models`** – Model dependencies (from `lib/models/` imports)
+- **`repositories`** – Repository files
+- **`routes`** – Navigation routes using `AppRoute` class constants
+- **`providers`** – Riverpod provider definitions with types
+- **`stateClasses`** – State classes with field types and nullability
+- **`controllerMethods`** – Controller methods with full signatures and parameters
+- **`apiEndpoints`** – API endpoints with HTTP methods, paths, parameters, and usage locations
+- **`coreServices`** – Internal services used (from `lib/core/services/`)
+- **`thirdPartyDependencies`** – Third-party package imports
+- **`testing`** – Test files and run commands
 
 ### When the manifest looks wrong
 
-- **Stale:** If any file in `exports` is newer than `generatedAt`, regenerate:
+- **Stale:** If any file in the manifest (views, controllers, widgets, repositories) is newer than `generatedAt`, regenerate:
   ```bash
   dart run scripts/generate_feature_manifests.dart
   ```

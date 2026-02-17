@@ -7,7 +7,12 @@ Slash commands for standardized AI workflows. Type `/` in Cursor Chat to see the
 - **`/add-feature`** - Add a new feature/screen (complexity Tier 1/2/3; Tier 3 requires approval)
 - **`/refine-feature`** - Iteratively refine an existing feature (violations, integrations, code quality)
 - **`/fix-bug`** - Fix bugs with proper context and manifest usage
+- **`/fix-gh-issue`** - Fix a GitHub issue by number or URL (fetches via `gh` CLI)
+- **`/mobile-issue`** - Debug mobile-specific issues using manifest context
+- **`/update-route`** - Add or update routes (AppRoute + router)
 - **`/test`** - Create tests for features, files, methods, or widgets (unit, widget, or integration)
+- **`/tdd`** - Test-driven development (Red–Green–Refactor)
+- **`/grind`** - Batch operations (same change across many files)
 - **`/review`** - Pre-commit review (security, imports, NEVER rules, file size, **run tests**)
 - **`/commit`** - Create secure, atomic commits (security scan; untracked files confirmed before adding)
 - **`/regenerate-manifests`** - Regenerate feature manifests after structural changes
@@ -48,4 +53,4 @@ After adding views, controllers, routes, or repositories:
 dart run scripts/generate_feature_manifests.dart
 ```
 
-See `.cursor/docs/COMPLEXITY_AND_DISCOVERY.md` for discovery depth by tier.
+See `.cursor/docs/COMPLEXITY_AND_DISCOVERY.md` for discovery depth by tier. Quick reference: `CURSOR_COMMANDS_CHEATSHEET.md` (repo root).
