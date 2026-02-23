@@ -8,6 +8,7 @@ description: Review Flutter/Dart code for architecture violations, code quality,
 ## When This Skill Activates
 
 Trigger phrases:
+
 - "review this code"
 - "check for issues"
 - "before I commit"
@@ -46,7 +47,10 @@ grep -rn "new [A-Z]\|= [A-Z][a-zA-Z]*(" {path} --include="*.dart" | grep -v ".g.
 # 2. Hardcoded colors (use theme / app colors)
 grep -rn "Color(0x\|Colors\." {path} --include="*.dart" | grep -v ".g.dart" | grep -v "theme\|AppColors\|appColors"
 
-# 3. Raw numbers for spacing (use theme or extensions if project has .w, .h, .r)
+# 3. Hardcoded strings (should use l10n / string constants if project has them)
+grep -rn "Text(['\"][A-Z]" {path} --include="*.dart" | grep -v ".g.dart"
+
+# 4. Raw numbers for spacing (use theme or extensions if project has them)
 grep -rn "EdgeInsets\.\(all\|symmetric\|only\)([0-9]" {path} --include="*.dart" | grep -v ".g.dart"
 ```
 
@@ -54,11 +58,12 @@ grep -rn "EdgeInsets\.\(all\|symmetric\|only\)([0-9]" {path} --include="*.dart" 
 
 ### Architecture
 
-- [ ] **No private widget methods** - Extract to separate widget files
-- [ ] **No relative imports** - Use `package:riverpod_template/...` (or project package name)
-- [ ] **No dynamic types** - Use specific types
-- [ ] **Views have no business logic** - Move to controllers
-- **Routes** - Use `AppRoute.xxx` only (no string literals)
+- [ ] **No private widget methods** — Extract to separate widget files
+- [ ] **No relative imports** — Use `package:riverpod_template/...`
+- [ ] **No dynamic types** — Use specific types
+- [ ] **Views have no business logic** — Move to controllers
+- [ ] **Controllers handle state** — No direct API calls in views
+- [ ] **Routes** — Use `AppRoute.xxx` only (no string literals)
 
 ### Widget Structure
 
@@ -71,13 +76,34 @@ grep -rn "EdgeInsets\.\(all\|symmetric\|only\)([0-9]" {path} --include="*.dart" 
 
 - [ ] Colors from theme or app color constants (not hardcoded)
 - [ ] Spacing consistent (theme or extensions if project uses them)
-- [ ] Text from app strings / l10n if project has them
+- [ ] Text from l10n or string constants if project has them
 
 ### Code Quality
 
 - [ ] No commented-out code
+- [ ] No TODO/FIXME without issue reference
 - [ ] Error handling on async operations
 - [ ] Proper null safety
+
+### Testing
+
+- [ ] **Feature tests pass** — If feature has tests (check manifest `testing.hasTests`)
+- [ ] **Tests updated** — If behavior changed, tests reflect new behavior
+- [ ] **No test regressions** — Existing tests still pass
+
+## Run Feature Tests
+
+**Before approving code review, verify feature tests pass.**
+
+```bash
+# 1. Check if feature has tests
+cat lib/manifests/{feature}.manifest.generated.json | grep -A 5 '"testing"'
+
+# 2. If hasTests: true, run them
+flutter test test/presentation/{feature}/
+
+# 3. All tests must pass before approval
+```
 
 ## Report Format
 
@@ -85,21 +111,32 @@ grep -rn "EdgeInsets\.\(all\|symmetric\|only\)([0-9]" {path} --include="*.dart" 
 ## Code Review: {file/feature}
 
 ### Critical (Must Fix)
-- `file.dart:42` - Private widget method `_buildCard()` → Extract to `card_widget.dart`
-- `file.dart:15` - Relative import → Use absolute import
+
+- `file.dart:42` — Private widget method `_buildCard()` → Extract to `card_widget.dart`
+- `file.dart:15` — Relative import → Use absolute import
 
 ### Warnings
-- `file.dart:78` - Hardcoded color → Use theme / app colors
-- `file.dart:92` - Raw spacing value → Use theme or extensions
+
+- `file.dart:78` — Hardcoded color → Use theme / app colors
+- `file.dart:92` — Raw spacing value → Use theme or extensions
 
 ### Good Patterns Found
+
 - Proper use of `const` constructors
 - State management follows Riverpod patterns
 - Clean separation of concerns
 
+### Testing
+
+- Feature has tests: Yes/No
+- Tests passing: All pass / X failures
+- Test command: `flutter test test/presentation/{feature}/`
+
 ### Summary
+
 - Critical: X issues
 - Warnings: Y issues
+- Tests: Passing / Failing
 - Recommendation: [Fix critical issues before commit / Ready to commit]
 ```
 

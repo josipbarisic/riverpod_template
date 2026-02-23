@@ -33,6 +33,8 @@ Each manifest contains:
   ```bash
   dart run scripts/generate_feature_manifests.dart
   ```
+- **Wrong view/controller name:** The generator scans `lib/presentation/{feature}/` for `*_view.dart` and `*_controller.dart`. If a file was renamed or the manifest shows the wrong name, regenerate. If the issue persists, the generator's feature detection may need updating.
+- **Wrong or missing API endpoint:** Endpoints are extracted from repository files by scanning for HTTP method calls (`get`, `post`, `put`, `delete`, `patch`). If an endpoint is missing or incorrect, check the repository file, then regenerate. If the endpoint uses a constant from an `Endpoints` class, the generator resolves it automatically.
 - **Never edit** `lib/manifests/*.manifest.generated.json` by hand. Change the generator or code, then regenerate.
 
 ### Feature areas (template)
@@ -151,13 +153,23 @@ dart run scripts/generate_feature_manifests.dart
 
 Type `/` in Cursor Chat:
 
-- **`/add-feature`** – Add a new feature/screen (complexity Tier 1/2/3)
+- **`/add-feature`** – Add a new feature/screen (complexity Tier 1/2/3; dev approach TDD/Impl First/Only)
+- **`/refine-feature`** – Iteratively refine an existing feature
 - **`/fix-bug`** – Fix bugs with manifest context
-- **`/review`** – Pre-commit review
-- **`/commit`** – Secure, atomic commits
-- **`/test`** – Create tests for features
-- **`/regenerate-manifests`** – Regenerate manifests
-- **`/analyse`** – Analyse a feature (manifest-based report)
+- **`/fix-gh-issue`** – Fix a GitHub issue by number or URL
+- **`/mobile-issue`** – Debug mobile-specific issues
+- **`/update-route`** – Add or update routes (AppRoute + GoRoute)
+- **`/test`** – Create tests (unit, widget, or integration)
+- **`/tdd`** – Test-driven development (Red–Green–Refactor)
+- **`/grind`** – Batch operations across many files
+- **`/review`** – Pre-commit review (security, imports, anti-drift, tests)
+- **`/commit`** – Secure, atomic commits with security scanning
+- **`/regenerate-manifests`** – Regenerate feature manifests
+- **`/analyse`** – Analyse a feature (manifest-based structured report)
+- **`/remove`** – Remove feature/widget/file with impact analysis
+- **`/enhance-prompt`** – Enhance prompts with context and structure
+- **`/branch`** – Create feature branch with naming conventions
+- **`/pr`** – Create pull request description
 
 See `.cursor/commands/README.md` for details.
 

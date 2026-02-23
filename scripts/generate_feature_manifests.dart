@@ -740,6 +740,248 @@ List<MethodParameter> _parseMethodParameters(String paramsStr) {
   return params;
 }
 
+/// Extract Endpoints constants from endpoints.dart with string interpolation resolution
+Map<String, String> extractEndpointsConstants(String endpointsContent) {
+  final constants = <String, String>{};
+
+  final constRegexSingle = RegExp(r"static\s+const\s+String\s+(\w+)\s*=\s*'([^']+)';");
+  final constRegexDouble = RegExp(r'static\s+const\s+String\s+(\w+)\s*=\s*"([^"]+)";');
+
+  for (final match in constRegexSingle.allMatches(endpointsContent)) {
+    constants[match.group(1)!] = match.group(2)!;
+  }
+  for (final match in constRegexDouble.allMatches(endpointsContent)) {
+    constants[match.group(1)!] = match.group(2)!;
+  }
+
+  // Resolve string interpolation (e.g., '$auth/logout' -> '/auth/logout')
+  final resolvedConstants = <String, String>{};
+  for (final entry in constants.entries) {
+    String resolved = entry.value;
+    final interpolationRegex = RegExp(r'\$(\w+)');
+    int iterations = 0;
+    while (interpolationRegex.hasMatch(resolved) && iterations < 10) {
+      final before = resolved;
+      resolved = resolved.replaceAllMapped(interpolationRegex, (match) {
+        final varName = match.group(1)!;
+        return constants[varName] ?? match.group(0)!;
+      });
+      if (resolved == before) break;
+      iterations++;
+    }
+    resolvedConstants[entry.key] = resolved;
+  }
+
+  // Also handle static method-based endpoints: static String xxx(param) => 'path/$param';
+  final methodRegexSingle = RegExp(r"static\s+String\s+(\w+)\s*\([^)]+\)\s*=>\s*'([^']+)'");
+  final methodRegexDouble = RegExp(r'static\s+String\s+(\w+)\s*\([^)]+\)\s*=>\s*"([^"]+)"');
+
+  for (final regex in [methodRegexSingle, methodRegexDouble]) {
+    for (final match in regex.allMatches(endpointsContent)) {
+      final methodName = match.group(1)!;
+      var methodPath = match.group(2)!;
+      final interpolationRegex = RegExp(r'\$(\w+)');
+      int iterations = 0;
+      while (interpolationRegex.hasMatch(methodPath) && iterations < 10) {
+        final before = methodPath;
+        methodPath = methodPath.replaceAllMapped(interpolationRegex, (match) {
+          final varName = match.group(1)!;
+          return resolvedConstants[varName] ?? match.group(0)!;
+        });
+        if (methodPath == before) break;
+        iterations++;
+      }
+      resolvedConstants[methodName] = methodPath;
+    }
+  }
+
+  return resolvedConstants;
+}
+
+/// Resolve Endpoints reference to actual path
+String? resolveEndpoint(String endpointRef, Map<String, String> endpointsConstants) {
+  final match = RegExp(r'Endpoints\.(\w+)(?:\([^)]*\))?').firstMatch(endpointRef);
+  if (match == null) return null;
+
+  final constantName = match.group(1)!;
+  final resolved = endpointsConstants[constantName];
+
+  final methodCallMatch = RegExp(r'Endpoints\.\w+\(([^)]+)\)').firstMatch(endpointRef);
+  if (methodCallMatch != null && resolved != null) {
+    final param = methodCallMatch.group(1)!;
+    return resolved.replaceAll(RegExp(r'\$\{?\w+\}?'), param);
+  }
+
+  return resolved;
+}
+
+/// Extract path parameters from endpoint (e.g., '/booking/$id' -> ['id'])
+List<String> extractPathParams(String endpoint) {
+  final pathParams = <String>[];
+  final regex = RegExp(r'\$(\w+)');
+  for (final match in regex.allMatches(endpoint)) {
+    pathParams.add(match.group(1)!);
+  }
+  return pathParams;
+}
+
+/// Extract body parameters from networkService call
+Map<String, dynamic>? extractBodyParams(String networkCallBlock) {
+  final bodyStart = networkCallBlock.indexOf('body:');
+  if (bodyStart == -1) return null;
+
+  int braceStart = networkCallBlock.indexOf('{', bodyStart);
+  if (braceStart == -1) return null;
+
+  int depth = 0;
+  int braceEnd = braceStart;
+  for (int i = braceStart; i < networkCallBlock.length; i++) {
+    if (networkCallBlock[i] == '{') depth++;
+    if (networkCallBlock[i] == '}') {
+      depth--;
+      if (depth == 0) {
+        braceEnd = i;
+        break;
+      }
+    }
+  }
+
+  if (braceEnd == braceStart) return null;
+
+  final bodyContent = networkCallBlock.substring(braceStart + 1, braceEnd);
+  final bodyParams = <String, dynamic>{};
+
+  final kvRegex = RegExp(r'''['"](\w+)['"]\s*:\s*([^,}\n]+)''', multiLine: true);
+  for (final kvMatch in kvRegex.allMatches(bodyContent)) {
+    final key = kvMatch.group(1)!;
+    var value = kvMatch.group(2)!.trim().replaceAll(RegExp(r',$'), '');
+    bodyParams[key] = value;
+  }
+
+  return bodyParams.isEmpty ? null : bodyParams;
+}
+
+/// Find all usages of a repository method across the codebase
+List<String> findRepositoryMethodUsages(
+  String repositoryMethodName,
+  String repositoryFilePath,
+  List<String> allDartFiles,
+) {
+  final usages = <String>[];
+  final repositoryRelativePath = getRelativePath(repositoryFilePath);
+  final escapedMethodName = RegExp.escape(repositoryMethodName);
+
+  final usagePatterns = [
+    RegExp('\\.$escapedMethodName\\s*\\('),
+    RegExp('ref\\.(?:read|watch)\\([^)]+\\)\\.$escapedMethodName\\s*\\('),
+    RegExp('\\w+RepositoryProvider\\)\\.$escapedMethodName\\s*\\('),
+    RegExp('${escapedMethodName}Provider\\s*\\('),
+  ];
+
+  final declarationPattern = RegExp(
+    r'(?:@override\s+)?(?:Future(?:<[^>]+>)?|void|bool|int|String|List<[^>]+>|Map<[^>]+>|\w+)\s+' +
+        escapedMethodName +
+        r'\s*\(',
+  );
+
+  final allLibFiles = <String>[];
+  final libDir = Directory('lib');
+  if (libDir.existsSync()) {
+    allLibFiles.addAll(listDartFilesRecursive(libDir));
+  }
+  allLibFiles.addAll(allDartFiles);
+
+  final seenFiles = <String>{};
+  for (final filePath in allLibFiles) {
+    final content = readFileSafe(filePath);
+    if (content.isEmpty) continue;
+
+    final relativePath = getRelativePath(filePath);
+    if (relativePath == repositoryRelativePath) continue;
+    if (relativePath.endsWith('_interface.dart')) continue;
+    if (seenFiles.contains(relativePath)) continue;
+    if (declarationPattern.hasMatch(content)) continue;
+
+    bool foundUsage = false;
+    for (final pattern in usagePatterns) {
+      if (pattern.hasMatch(content)) {
+        foundUsage = true;
+        break;
+      }
+    }
+
+    if (foundUsage) {
+      usages.add(relativePath);
+      seenFiles.add(relativePath);
+    }
+  }
+
+  return usages..sort();
+}
+
+/// Extract method parameters from method signature
+List<MethodParameter> extractRepoMethodParameters(String methodSignature) {
+  final params = <MethodParameter>[];
+
+  final paramMatch = RegExp(r'\(([^)]*)\)').firstMatch(methodSignature);
+  if (paramMatch == null) return params;
+
+  final paramsStr = paramMatch.group(1)!;
+  if (paramsStr.trim().isEmpty) return params;
+
+  final paramStrings = <String>[];
+  int depth = 0;
+  String currentParam = '';
+
+  for (int i = 0; i < paramsStr.length; i++) {
+    final char = paramsStr[i];
+    if (char == '<') {
+      depth++;
+    } else if (char == '>') {
+      depth--;
+    } else if (char == ',' && depth == 0) {
+      paramStrings.add(currentParam.trim());
+      currentParam = '';
+      continue;
+    }
+    currentParam += char;
+  }
+  if (currentParam.trim().isNotEmpty) {
+    paramStrings.add(currentParam.trim());
+  }
+
+  for (final paramStr in paramStrings) {
+    final trimmed = paramStr.trim();
+    if (trimmed.isEmpty) continue;
+
+    final requiredMatch = RegExp(r'required\s+(.+?)\s+(\w+)(?:\s*=\s*(.+))?').firstMatch(trimmed);
+    final optionalMatch = RegExp(r'(.+?)\s+(\w+)(?:\s*=\s*(.+))?').firstMatch(trimmed);
+
+    Match? match;
+    bool isRequired = false;
+
+    if (requiredMatch != null) {
+      match = requiredMatch;
+      isRequired = true;
+    } else if (optionalMatch != null) {
+      match = optionalMatch;
+      isRequired = !trimmed.contains('?');
+    }
+
+    if (match != null) {
+      final type = match.group(1)!.trim();
+      final name = match.group(2)!.trim();
+      final defaultValue = match.group(3)?.trim();
+
+      params.add(
+        MethodParameter(name: name, type: type, isRequired: isRequired, defaultValue: defaultValue),
+      );
+    }
+  }
+
+  return params;
+}
+
 List<ApiEndpoint> extractApiEndpoints(
   String content,
   String fileName,
@@ -747,15 +989,10 @@ List<ApiEndpoint> extractApiEndpoints(
   List<String> allDartFiles,
 ) {
   final endpoints = <ApiEndpoint>[];
+  final endpointsConstants = extractEndpointsConstants(endpointsContent);
 
   final methodRegex = RegExp(
-    r'(?:@override\s+)?Future(?:<[^>]+>)?\s+(\w+)\s*\([^)]*\)\s*(?:async\s*)?(?:=>|{)',
-    multiLine: true,
-    dotAll: true,
-  );
-
-  final networkServiceStartRegex = RegExp(
-    r'networkService\.(getHttp|postHttp|putHttp|deleteHttp)\s*\(',
+    r'(?:@override\s+)?Future(?:<(?:[^<>]+|<[^>]*>)*>)?\s+(\w+)\s*\([^)]*\)\s*(?:async\s*)?(?:=>|{)',
     multiLine: true,
     dotAll: true,
   );
@@ -772,24 +1009,75 @@ List<ApiEndpoint> extractApiEndpoints(
 
     final methodBody = content.substring(methodStart, methodEnd);
 
+    // Extract full method signature for parameter extraction
+    final signatureMatch = RegExp(
+      r'(?:@override\s+)?Future(?:<(?:[^<>]+|<[^>]*>)*>)?\s+\w+\s*\([^)]*\)',
+      multiLine: true,
+      dotAll: true,
+    ).firstMatch(methodBody);
+
+    final methodParameters = signatureMatch != null
+        ? extractRepoMethodParameters(signatureMatch.group(0)!)
+        : <MethodParameter>[];
+
+    final networkServiceStartRegex = RegExp(
+      r'networkService\.(getHttp|postHttp|putHttp|deleteHttp)\s*\(',
+      multiLine: true,
+      dotAll: true,
+    );
+
     for (final networkMatch in networkServiceStartRegex.allMatches(methodBody)) {
+      // Skip commented-out API calls
+      final lineStart = methodBody.lastIndexOf('\n', networkMatch.start) + 1;
+      final lineUpToMatch = methodBody.substring(lineStart, networkMatch.start);
+      if (lineUpToMatch.trimLeft().startsWith('//')) continue;
+
       final httpMethodName = networkMatch.group(1)!;
+      final callStart = networkMatch.end;
+
+      // Find matching closing parenthesis
+      int depth = 1;
+      int callEnd = callStart;
+      for (int i = callStart; i < methodBody.length; i++) {
+        if (methodBody[i] == '(') depth++;
+        if (methodBody[i] == ')') {
+          depth--;
+          if (depth == 0) {
+            callEnd = i;
+            break;
+          }
+        }
+      }
+
+      if (callEnd == callStart) continue;
+
+      final networkCallBlock = methodBody.substring(callStart, callEnd);
       final httpMethod = httpMethodName.replaceAll('Http', '').toUpperCase();
 
       // Extract endpoint
+      String? endpoint;
       final endpointMatch = RegExp(
         r'''endpoint:\s*(Endpoints\.\w+(?:\([^)]*\))?|['"]([^'"]+)['"])''',
         multiLine: true,
         dotAll: true,
-      ).firstMatch(methodBody);
+      ).firstMatch(networkCallBlock);
 
-      String? endpoint;
       if (endpointMatch != null) {
         final endpointRef = endpointMatch.group(1) ?? endpointMatch.group(2);
-        endpoint = endpointRef;
+        if (endpointRef != null) {
+          if (endpointRef.startsWith('Endpoints.')) {
+            endpoint = resolveEndpoint(endpointRef, endpointsConstants) ?? endpointRef;
+          } else {
+            endpoint = endpointRef;
+          }
+        }
       }
 
       if (endpoint == null) continue;
+
+      final pathParams = extractPathParams(endpoint);
+      final bodyParams = extractBodyParams(networkCallBlock);
+      final usages = findRepositoryMethodUsages(methodName, fileName, allDartFiles);
 
       endpoints.add(
         ApiEndpoint(
@@ -797,9 +1085,10 @@ List<ApiEndpoint> extractApiEndpoints(
           endpoint: endpoint,
           repository: fileName,
           method: methodName,
-          methodParameters: [],
-          endpointPathParams: [],
-          usedIn: [fileName],
+          methodParameters: methodParameters,
+          endpointPathParams: pathParams,
+          endpointBody: bodyParams,
+          usedIn: usages,
         ),
       );
     }
@@ -848,7 +1137,7 @@ TestingInfo extractTestsForFeature(String featureName, String featurePath) {
   }
 
   final runCommand =
-      testFiles.isNotEmpty ? 'fvm flutter test $testDirPath/' : 'fvm flutter test test/presentation/$featurePath/';
+      testFiles.isNotEmpty ? 'flutter test $testDirPath/' : 'flutter test test/presentation/$featurePath/';
 
   return TestingInfo(
     testDirectory: testDirectory,
@@ -1064,6 +1353,7 @@ void generateAllManifests() {
     ('onboarding', 'onboarding'),
     ('login', 'login'),
     ('sign_up', 'sign_up'),
+    ('profile', 'profile'),
     ('bottom_navigation', 'bottom_navigation'),
     ('home', 'home'),
   ];

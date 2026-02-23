@@ -1,23 +1,41 @@
+---
+description: Before implementation, ask task complexity and run discovery per level. Planning and specification first.
+alwaysApply: true
+---
+
 # Discovery-First Workflow
 
 ## Before Writing Code
 
-For add-feature, fix-bug, refine-feature, and similar tasks:
+For **add-feature**, **fix-bug**, **refine-feature**, **fix-gh-issue**, **mobile-issue**, and similar workflow tasks:
 
 1. **Ask complexity** (if not already stated):
-   - **Tier 1 – Quick:** Single file, small change → 0–1 questions → execute
-   - **Tier 2 – Moderate:** A few files, clear scope → short discovery + plan → then execute
-   - **Tier 3 – Large:** New feature or big change → full discovery + spec + plan → **wait for approval** → then execute
+   - **Tier 1 – Quick:** Single file, small change → 0–1 questions → execute.
+   - **Tier 2 – Moderate:** A few files, clear scope → short discovery + plan → then execute.
+   - **Tier 3 – Large:** New feature or big change → full discovery + spec + plan → **wait for approval** → then execute.
 
 2. **Do not** start implementation until:
-   - Tier 1: You have enough to make the small change
-   - Tier 2: You have stated a brief plan
-   - Tier 3: You have a spec/plan and **explicit user approval**
+   - Tier 1: You have enough to make the small change.
+   - Tier 2: You have stated a brief plan.
+   - Tier 3: You have a spec/plan and **explicit user approval**.
 
-3. **Tier 2–3, existing feature:** Run **`/analyse`** first; use the report to inform your plan.
+3. **Tier 2–3, existing feature:** For the feature (or a related one) you're changing, run **`/analyse`** first. Use the report (purpose, architecture, controllers, API, gaps) to inform your plan.
+
+## Reference
+
+Full scale and workflow: `.cursor/docs/COMPLEXITY_AND_DISCOVERY.md`
+
+## Transition Guard
+
+When transitioning from analysis/reading to implementation — regardless of which command was used — if complexity tier has not been defined yet, **ask before writing code**. This applies to:
+
+- Following up on `/analyse` recommendations
+- Any prompt that requests code changes after a read-only command
+- Free-form prompts that imply implementation ("fix this", "add", "change", "implement")
 
 ## Rule
 
 - **Tier 3** = Never implement before approval. State plan, then say "Waiting for approval" and stop.
 - **Tier 2** = State plan before coding; no mandatory wait unless the user asks.
 - **Tier 1** = Minimal discovery; proceed once the change is clear.
+- **No tier defined** = Ask before implementing. Do not assume.

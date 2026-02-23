@@ -14,7 +14,7 @@ git diff --staged --name-only
 git diff --name-only
 ```
 
-### Step 1b: Untracked Files – ALWAYS CONFIRM Before Adding
+### Step 1b: Untracked Files — ALWAYS CONFIRM Before Adding
 
 **If `git status` shows any untracked (non-added) files:**
 
@@ -33,43 +33,129 @@ git diff --name-only
 
 ### Step 2: SECURITY SCAN (CRITICAL)
 
-**BLOCK the commit if found:**
+**BLOCK the commit if ANY of these are found:**
 
-- Staged: `.env`, `.env.local`, `*.keystore`, `*.jks`, `*.p12`, or any file in `.gitignore`
-- Content: `API_KEY=`, `SECRET=`, `client_secret`, `FIREBASE_.*=`, `-----BEGIN RSA PRIVATE KEY-----`, `sk-`, `sk_live_`, `sk_test_`, credentials in URLs
+#### Forbidden Files (NEVER commit):
+
+- `.env`, `.env.local`, `.env.production`
+- `*.keystore`, `*.jks` (Android signing keys)
+- `*.p12`, `*.mobileprovision` (iOS signing)
+- Any file in `.gitignore` that got staged
+
+#### Forbidden Patterns in Content:
+
+Scan staged files for these patterns — **ABORT if found**:
+
+- `API_KEY=`, `APIKEY=`, `api_key:`
+- `SECRET=`, `SECRET_KEY=`
+- `client_secret`
+- `FIREBASE_.*=` (with actual values)
+- `-----BEGIN RSA PRIVATE KEY-----`
+- `sk-` (OpenAI keys), `sk_live_`, `sk_test_` (Stripe keys)
+- Hardcoded URLs with credentials: `https://user:pass@`
 
 ```bash
 git diff --staged | grep -iE "(API_KEY|SECRET|client_secret|FIREBASE_|PRIVATE_KEY|sk-|sk_live|sk_test)" && echo "SECURITY ALERT" && exit 1
 ```
 
-If secrets found: report them, recommend removal/rotation, and do not commit.
+**If security issues found:**
+
+```markdown
+**SECURITY ALERT — COMMIT BLOCKED**
+
+Found sensitive data in staged changes:
+- [file]: [pattern found]
+
+**Action Required:**
+1. Remove sensitive data from the file
+2. If already committed elsewhere, rotate the credential immediately
+3. Add file to `.gitignore` if it should never be committed
+4. Use environment variables or secure storage instead
+```
 
 ### Step 3: Analyze Changes for Commit Message
 
-Group by type. You may use either:
+Group changes by type. You may use either:
 
 - **Conventional:** `feat`, `fix`, `refactor`, `test`, `style`, `chore`, `docs` → `type(scope): description`
-- **Prefix format:** `Add:`, `Update:`, `Fix:`, `Remove:`, `Refactor:`, `Style:`, `Docs:`, `Chore:` → `Prefix: Short description` (max 72 chars, capitalize, no period at end)
+- **Prefix format:** `Add:`, `Update:`, `Fix:`, `Remove:`, `Refactor:`, `Style:`, `Docs:`, `Chore:`, `Test:`, `WiP:` → `Prefix: Short description` (max 72 chars, capitalize, no period at end)
 
 Identify affected feature(s) from `lib/presentation/{feature}/`.
 
+**If multiple logical changes exist:**
+Ask user: "I see changes to [X] and [Y]. Should I commit these separately for atomic history?"
+
 ### Step 4: Write Atomic Commit
 
-- One logical change per commit
-- **Conventional:** `type(scope): description` (e.g. `feat(auth): add login screen`)
-- **Prefix:** `Prefix: Description` (e.g. `Add: Login screen`, `Fix: Token refresh on 401`, `Chore: Regenerate feature manifests`)
+**Good examples:**
 
-### Step 5: Stage and Commit
+- `Add: User profile screen`
+- `feat(auth): add login validation`
+- `Fix: Null check on empty user list`
+- `Refactor: Extract date picker widget`
+- `Style: Card shadows and spacing`
+- `Chore: Regenerate feature manifests`
 
-**Staging:** If there were untracked files, use only the paths the user confirmed in Step 1b. Otherwise you may use `git add -A` or `git add <paths>` for the files that belong to this commit.
+**Bad examples:**
+
+- `Updated stuff` (no prefix, vague)
+- `fix: the bug in login` (lowercase, not descriptive)
+- `WIP` (no description)
+
+### Step 5: Execute Commit
+
+**Staging:** If there were untracked files, use only the paths the user confirmed in Step 1b.
+Otherwise you may use `git add -A` or `git add <paths>` for the files that belong to this commit.
+
+**Single commit (use heredoc for multi-line messages):**
 
 ```bash
 git add [paths or -A if no untracked files / user confirmed]
-git commit -m "Prefix: Short description"
-# or
-git commit -m "type(scope): description"
+git commit -m "$(cat <<'EOF'
+Prefix: Short description
+
+Optional body with more context.
+EOF
+)"
 ```
 
-### Success
+**Multiple atomic commits:**
 
-Commit is atomic, conventional, and free of secrets.
+```bash
+git add [specific files]
+git commit -m "Prefix: First logical change"
+git add [other files]
+git commit -m "Prefix: Second logical change"
+```
+
+### Step 6: Confirm Success
+
+```markdown
+**Commit Created**
+- Hash: [short hash]
+- Message: `Prefix: Description`
+- Files: [count] files changed
+- Security: No secrets detected
+```
+
+---
+
+## Do NOT Commit
+
+These files should never be committed:
+
+- `.env`, `.env.*`
+- `*.keystore`, `*.jks`, `*.p12`, `*.mobileprovision`
+- Files in `.gitignore`
+- Generated files (`*.g.dart`, `*.freezed.dart`) unless intentionally tracked
+
+## Quick Reference
+
+| Rule | Value |
+|------|-------|
+| Subject line max | 72 chars |
+| Body line max | 72 chars |
+| Format | `Prefix: Description` or `type(scope): description` |
+| One commit = | One logical change |
+
+**Common scopes:** `auth`, `home`, `profile`, `core`, `routing`, `theme`, `data`, `models`, `onboarding`

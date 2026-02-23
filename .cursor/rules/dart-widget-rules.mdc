@@ -1,35 +1,74 @@
+---
+description: Widget structure — separate files, one class per file, hooks usage
+globs: **/*.dart
+alwaysApply: false
+---
+
 # Widget Rules
 
 ## Base Classes
 
-| Need       | Use                |
-|-----------|--------------------|
-| Riverpod only | ConsumerWidget   |
-| Hooks only    | HookWidget       |
-| Both          | HookConsumerWidget |
-| Neither       | StatelessWidget  |
+| Need | Use |
+|------|-----|
+| Riverpod only | `ConsumerWidget` |
+| Hooks only | `HookWidget` |
+| Both | `HookConsumerWidget` |
+| Neither | `StatelessWidget` |
 
-## FORBIDDEN - Private Widget Classes
-
-```dart
-// NEVER - private widget class
-class _MyPrivateWidget extends StatelessWidget { ... }
-
-// GOOD - separate file
-// my_widget.dart
-class MyWidget extends StatelessWidget { ... }
-```
-
-## FORBIDDEN - Private Widget Methods
+## Widget Structure
 
 ```dart
-// NEVER - method returning Widget
-Widget _buildBody() { ... }
+class FeatureView extends HookConsumerWidget {
+  const FeatureView({super.key});
 
-// GOOD - separate widget class in its own file
-class BodyContent extends StatelessWidget { ... }
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 1. Hooks
+    final controller = useAnimationController();
+    // 2. Providers
+    final state = ref.watch(featureControllerProvider);
+    // 3. Listeners
+    ref.listen(featureControllerProvider, (prev, next) { /* side effects */ });
+    // 4. Return widget tree — use separate widget classes for complex sections
+    return Scaffold(
+      body: const FeatureContent(),  // separate file: widgets/feature_content.dart
+    );
+  }
+}
 ```
 
 ## One Class Per File
 
-Each widget class must be in its own file.
+Every widget class lives in its own `.dart` file. When a section of the build tree
+is complex, extract it:
+
+```dart
+// widgets/feature_content.dart
+class FeatureContent extends ConsumerWidget {
+  const FeatureContent({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => Container();
+}
+```
+
+## FORBIDDEN — Private Widget Classes
+
+```dart
+// NEVER — private widget class
+class _MyPrivateWidget extends StatelessWidget { ... }
+
+// GOOD — separate file
+// my_widget.dart
+class MyWidget extends StatelessWidget { ... }
+```
+
+## FORBIDDEN — Private Widget Methods
+
+```dart
+// NEVER — method returning Widget
+Widget _buildBody() { ... }
+
+// GOOD — separate widget class in its own file
+class BodyContent extends StatelessWidget { ... }
+```

@@ -18,7 +18,7 @@ The **user** assigns the complexity level at the start of the task. The AI may s
 
 | Tier | Name | Typical scope | When the user would pick this |
 |------|------|---------------|--------------------------------|
-| **1** | **Quick** | Single file, &lt;~30 lines, obvious change | "Fix this typo", "Change this color", "Add this one import", "Update this string" |
+| **1** | **Quick** | Single file, <~30 lines, obvious change | "Fix this typo", "Change this color", "Add this one import", "Update this string" |
 | **2** | **Moderate** | 2–5 files, ~30–100 lines, clear scope | "Fix this bug in X and Y", "Add this widget to the existing screen", "Refactor this into two widgets" |
 | **3** | **Large** | New feature, many files, or ambiguous | "Add a new screen", "Refactor the auth flow", "We need to rethink this screen" |
 
@@ -31,6 +31,8 @@ The **user** assigns the complexity level at the start of the task. The AI may s
 
 **Example:** "Update the empty state copy on the login screen" → User says Tier 1 → Confirm which string → Edit → Done.
 
+---
+
 ### Tier 2 – Moderate
 
 - **Scope:** A few files, clear goal, some alignment with existing patterns.
@@ -40,10 +42,12 @@ The **user** assigns the complexity level at the start of the task. The AI may s
 
 **Example:** "Fix the bug where saving doesn't refresh the list" → User says Tier 2 → Ask: which screen, expected behavior → Plan: controller + view → Implement.
 
+---
+
 ### Tier 3 – Large
 
 - **Scope:** New feature, big refactor, many touchpoints, or unclear requirements.
-- **Discovery:** Full discovery: purpose, screens, data, integration points, options.
+- **Discovery:** Full discovery: purpose, screens, data, integration points, options. Use AskQuestion tool where helpful.
 - **Planning:** Written specification and implementation plan (files, steps, integrations). STATE what you read and what you'll do.
 - **Approval:** **WAIT for explicit approval** (e.g. "proceed", "approved", "go ahead") before implementing.
 
@@ -57,7 +61,7 @@ For **add-feature**, **fix-bug**, **refine-feature**, **fix-gh-issue**, **mobile
 
 ### Step 0: Assign Complexity
 
-**The AI must ask:**
+**The AI must ask (e.g. via AskQuestion tool if available):**
 
 ```
 "What complexity do you assign to this task?"
@@ -112,3 +116,5 @@ For **Tier 3**, discovery should produce a short **spec** (user-visible behavior
 3. **Tier 1:** Minimal questions → implement.
 4. **Tier 2:** Short discovery → brief plan → implement.
 5. **Tier 3:** Full discovery → spec + plan → **wait for approval** → implement.
+
+This keeps the first iteration as good as possible given the information we have, without requiring perfection.

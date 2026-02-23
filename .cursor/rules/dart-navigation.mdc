@@ -1,8 +1,14 @@
+---
+description: GoRouter navigation patterns and AppRoute usage
+globs: **/*.dart
+alwaysApply: false
+---
+
 # Navigation Patterns
 
 ## Route Constants
 
-Routes are defined in `lib/core/routing/router.dart`:
+Defined in `lib/core/routing/router.dart`:
 
 ```dart
 class AppRoute {
@@ -16,13 +22,46 @@ class AppRoute {
 
 ## Navigation Methods
 
+Always use `AppRoute` constants — never string literals.
+
 ```dart
-// Go to route
+// Go to route (replaces current)
 context.go(AppRoute.login);
+
+// Push route (adds to stack)
 context.push(AppRoute.signUp);
+
+// With path parameters
+context.push('${AppRoute.userDetail}/$userId');
+
+// With extra data
+context.push(AppRoute.editProfile, extra: userProfile);
 
 // Go back
 context.pop();
+```
+
+## Route Definitions
+
+Configured in `lib/core/routing/router.dart`:
+
+```dart
+// Standard route
+GoRoute(
+  path: AppRoute.login,
+  builder: (context, state) => const LoginView(),
+),
+
+// Route with custom transition
+GoRoute(
+  path: AppRoute.onboarding,
+  pageBuilder: (context, state) => CustomTransitionPage(
+    key: state.pageKey,
+    child: const OnboardingView(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+        FadeTransition(opacity: animation, child: child),
+  ),
+),
 ```
 
 ## NEVER Use String Literals

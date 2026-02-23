@@ -1,3 +1,9 @@
+---
+description: Riverpod state management patterns and code generation
+globs: **/*.dart
+alwaysApply: false
+---
+
 # Riverpod Patterns
 
 ## State Class (Freezed)
@@ -13,32 +19,47 @@ abstract class UserState with _$UserState {
 }
 ```
 
+Many controllers skip dedicated state classes and use `AsyncValue<SimpleType>` directly.
+
 ## Controller (Riverpod Codegen)
 
 ```dart
+// Simple return type
 @riverpod
 class UserController extends _$UserController {
   @override
-  FutureOr<UserState> build() async => const UserState();
-
-  Future<void> fetchUser() async {
-    state = const AsyncLoading();
-    try {
-      final user = await ref.read(userRepositoryProvider).fetchUser();
-      state = AsyncData(UserState(user: user));
-    } catch (e, stack) {
-      state = AsyncError(e, stack);
-    }
+  FutureOr<List<User>> build() async {
+    return ref.read(userRepositoryProvider).getUsers();
   }
+}
+
+// With state class
+@riverpod
+class ProfileController extends _$ProfileController {
+  @override
+  FutureOr<ProfileState> build() async => const ProfileState();
 }
 ```
 
+Common `build()` return types: `FutureOr<bool>`, `FutureOr<List<T>>`, `FutureOr<T?>`, `FutureOr<String?>`.
+
+## `@Riverpod(keepAlive: true)`
+
+Use for controllers/providers that must survive navigation (not auto-disposed):
+- Repository providers, service providers
+- Global state controllers (e.g. auth, user session)
+
 ## State Access
 
-- `ref.watch()` - Reactive state (rebuilds on change)
-- `ref.read()` - One-time access (in callbacks)
-- `ref.listen()` - Side effects (snackbars, navigation)
+| Method | Use Case |
+|--------|----------|
+| `ref.watch()` | Reactive state (rebuilds on change) |
+| `ref.read()` | One-time access (in callbacks) |
+| `ref.listen()` | Side effects (snackbars, navigation) |
 
 ## AsyncValue
 
-Use AsyncValue for async operations: AsyncData, AsyncLoading, AsyncError.
+Use `AsyncValue` for async operations:
+- `AsyncData` — success state
+- `AsyncLoading` — loading state
+- `AsyncError` — error state

@@ -8,6 +8,7 @@ description: Create well-formatted git commits with conventional or prefix-style
 ## When This Skill Activates
 
 Trigger phrases:
+
 - "commit"
 - "commit this"
 - "commit and push"
@@ -33,18 +34,18 @@ Prefix: Short description
 
 **Allowed Prefixes:**
 
-| Prefix    | When to Use                    | Example                          |
-|-----------|--------------------------------|----------------------------------|
-| `Add:`    | New feature, file, capability  | `Add: Login screen`              |
-| `Update:` | Modify existing functionality  | `Update: Home view`              |
-| `Fix:`    | Bug fix                        | `Fix: Token refresh crash`       |
-| `Remove:` | Delete feature, file, or code  | `Remove: Deprecated auth flow`   |
-| `Refactor:`| Code restructure, no behavior | `Refactor: Extract booking widgets` |
-| `Style:`  | UI/styling only                | `Style: Card shadows`             |
-| `Docs:`   | Documentation                  | `Docs: Update README`            |
-| `WiP:`    | Work in progress (incomplete)   | `WiP: Auth flow`                 |
-| `Chore:`  | Maintenance, deps, config       | `Chore: Regenerate manifests`    |
-| `Test:`   | Adding/updating tests           | `Test: Auth flow coverage`       |
+| Prefix      | When to Use                          | Example                             |
+|-------------|--------------------------------------|-------------------------------------|
+| `Add:`      | New feature, file, or capability     | `Add: User profile screen`          |
+| `Update:`   | Modify existing functionality        | `Update: Home view layout`          |
+| `Fix:`      | Bug fix                              | `Fix: Null check on empty list`     |
+| `Remove:`   | Delete feature, file, or code        | `Remove: Deprecated auth flow`      |
+| `Refactor:` | Code restructure, no behavior change | `Refactor: Extract form widgets`    |
+| `Style:`    | UI/styling only                      | `Style: Card shadows and spacing`   |
+| `Docs:`     | Documentation changes                | `Docs: Update README`               |
+| `WiP:`      | Work in progress (incomplete)        | `WiP: Onboarding flow`             |
+| `Chore:`    | Maintenance, deps, config            | `Chore: Regenerate manifests`       |
+| `Test:`     | Adding/updating tests                | `Test: Auth controller coverage`    |
 
 ### Conventional Format
 
@@ -52,7 +53,27 @@ Prefix: Short description
 type(scope): description
 ```
 
-Examples: `feat(auth): add login`, `fix(home): crash on load`, `chore(manifests): regenerate`.
+Examples: `feat(auth): add login screen`, `fix(home): crash on load`, `chore(manifests): regenerate`.
+
+### Good Examples
+
+```
+Add: Login screen with validation
+Update: Profile view styling
+Fix: Token refresh on 401 response
+Refactor: Extract date picker widget
+Chore: Regenerate feature manifests
+Test: Home controller unit tests
+```
+
+### Bad Examples
+
+```
+Updated files                    # No prefix, too vague
+fixed the bug                    # Lowercase, no prefix
+WIP                              # No description
+Add: Added new feature           # Redundant "Added"
+```
 
 ## Workflow
 
@@ -61,13 +82,13 @@ Examples: `feat(auth): add login`, `fix(home): crash on load`, `chore(manifests)
 **Before any commit, run the test suite:**
 
 ```bash
-fvm flutter test
+flutter test
 ```
 
 **If tests fail:**
 
 ```markdown
-⛔ **COMMIT BLOCKED - TESTS FAILING**
+**COMMIT BLOCKED — TESTS FAILING**
 
 Found failing tests:
 - {test file}: {failure description}
@@ -77,7 +98,7 @@ Found failing tests:
 2. If you modified a model, update its test in `test/models/`
 3. If you modified a repository, update its test in `test/repositories/`
 4. If you modified a controller, update its test in `test/presentation/`
-5. Re-run `fvm flutter test` until all pass
+5. Re-run `flutter test` until all pass
 ```
 
 **Test update guidelines:**
@@ -97,7 +118,7 @@ git diff --stat
 git log --oneline -5
 ```
 
-### Step 2: Untracked Files – Confirm Before Adding
+### Step 2: Untracked Files — Confirm Before Adding
 
 If there are untracked files, list them and ask: add all / only some / none. Do not run `git add -A` or `git add .` until the user confirms.
 
@@ -109,11 +130,34 @@ If there are untracked files, list them and ask: add all / only some / none. Do 
 git diff --staged | grep -iE "(API_KEY|SECRET|PASSWORD|TOKEN|PRIVATE_KEY|sk-|sk_live)" && echo "SECRETS DETECTED" || echo "No secrets"
 ```
 
-**Forbidden:** API_KEY, SECRET, PASSWORD, private keys, `.env` files, signing keys. If secrets are found, report them and do not commit until removed.
+**Forbidden:** API_KEY, SECRET, PASSWORD, private keys, `.env` files, signing keys.
+
+**If secrets found:**
+
+```markdown
+**SECURITY ALERT — COMMIT BLOCKED**
+
+Found sensitive data in staged changes:
+- {file}: {pattern found}
+
+**Action Required:**
+1. Remove the secret from the file
+2. If already committed elsewhere, rotate the credential immediately
+3. Add file to `.gitignore` if it should never be committed
+4. Use environment variables or secure storage instead
+```
 
 ### Step 4: Determine Commit Strategy
 
 If there are multiple logical changes, ask whether to create separate commits for atomic history.
+
+```markdown
+I see changes to:
+- {Area 1} ({N} files)
+- {Area 2} ({N} files)
+
+Should I create separate commits for atomic history?
+```
 
 ### Step 5: Generate Message
 
@@ -121,33 +165,67 @@ Choose prefix or conventional form, derive scope from paths (e.g. `lib/presentat
 
 ### Step 6: Execute Commit
 
-Use only the paths the user confirmed (or `git add <paths>` for this change). Then:
+Use only the paths the user confirmed. Use heredoc for multi-line messages:
 
 ```bash
 git add [paths]
-git commit -m "Prefix: Short description"
+git commit -m "$(cat <<'EOF'
+Prefix: Short description
+
+Optional body explaining why (wrap at 72 chars).
+EOF
+)"
+```
+
+**Multiple atomic commits:**
+
+```bash
+git add lib/presentation/feature1/
+git commit -m "Add: Feature one screen"
+
+git add lib/presentation/feature2/
+git commit -m "Fix: Feature two null check"
 ```
 
 ### Step 7: Push (if requested)
 
-Only push if the user explicitly asked. Verify branch name and that you are not pushing directly to main/master.
+Only push if the user explicitly asked. Verify before pushing:
+
+- [ ] Branch name is correct
+- [ ] Not pushing to main/master directly
+- [ ] All commits have proper messages
+
+```bash
+git push -u origin HEAD
+```
 
 ### Step 8: Confirmation
 
 ```markdown
-✅ **Commit Created**
+**Commit Created**
 
 - **Hash**: `abc1234`
-- **Message**: `Add: Login screen`
+- **Message**: `Add: User profile screen`
 - **Files**: 5 files changed, +120 -45
-- **Tests**: ✅ All tests passing
-- **Security**: ✅ No secrets detected
+- **Tests**: All tests passing
+- **Security**: No secrets detected
 - **Pushed**: Yes/No
 ```
 
 ## Do NOT Commit
 
 - `.env` files
-- `*.keystore`, `*.jks`
-- Production `google-services.json` / `GoogleService-Info.plist`
+- `*.keystore`, `*.jks`, `*.p12`, `*.mobileprovision`
 - Any file listed in `.gitignore`
+- Generated files (`*.g.dart`, `*.freezed.dart`) unless intentionally tracked
+
+## Quick Reference
+
+| Rule | Value |
+|------|-------|
+| Subject line max | 72 chars |
+| Body line max | 72 chars |
+| Format | `Prefix: Description` or `type(scope): description` |
+| One commit = | One logical change |
+
+**Common scopes:** `auth`, `home`, `profile`, `core`, `routing`, `theme`, `data`, `models`, `onboarding`
