@@ -1,10 +1,18 @@
 ---
-description: Add a new feature/screen following template architecture
+description: Add a new feature/screen following layer-based architecture patterns
 ---
 
 ## Add New Feature
 
-### Step 0: Complexity (MANDATORY)
+### Step 0: Log Usage
+
+```bash
+mkdir -p .cursor/usage && echo '{"command":"/add-feature","timestamp":"'$(date -u +%Y-%m-%dT%H:%M:%S)'"}' >> .cursor/usage/command-log.jsonl
+```
+
+---
+
+### Step 0a: Complexity (MANDATORY)
 
 Ask the user if not stated:
 
@@ -12,7 +20,7 @@ Ask the user if not stated:
 - **Tier 2 – Moderate:** Few files, clear scope → short discovery + plan → execute
 - **Tier 3 – Large:** New feature, multiple screens → full discovery + plan → **wait for approval**
 
-### Step 0.5: Development Approach
+### Step 0b: Development Approach
 
 Ask the user:
 

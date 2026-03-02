@@ -151,27 +151,31 @@ dart run scripts/generate_feature_manifests.dart
 
 ## Cursor Commands
 
-Type `/` in Cursor Chat:
+Type `/` in Cursor Chat. **9 core commands** (+ `/start-new-project` for this template). Every command logs usage to `.cursor/usage/command-log.jsonl` as Step 0.
 
-- **`/add-feature`** – Add a new feature/screen (complexity Tier 1/2/3; dev approach TDD/Impl First/Only)
+- **`/fix`** – Fix any issue (GitHub issue, bug report, or other); unified from fix-bug, fix-gh-issue, mobile-issue
+- **`/add-feature`** – Add a new feature/screen (complexity Tier 1/2/3; TDD/Impl First/Only)
 - **`/refine-feature`** – Iteratively refine an existing feature
-- **`/fix-bug`** – Fix bugs with manifest context
-- **`/fix-gh-issue`** – Fix a GitHub issue by number or URL
-- **`/mobile-issue`** – Debug mobile-specific issues
-- **`/update-route`** – Add or update routes (AppRoute + GoRoute)
-- **`/test`** – Create tests (unit, widget, or integration)
-- **`/tdd`** – Test-driven development (Red–Green–Refactor)
-- **`/grind`** – Batch operations across many files
-- **`/review`** – Pre-commit review (security, imports, anti-drift, tests)
-- **`/commit`** – Secure, atomic commits with security scanning
-- **`/regenerate-manifests`** – Regenerate feature manifests
+- **`/commit`** – Pre-commit review + secure, atomic commit (review steps built in)
 - **`/analyse`** – Analyse a feature (manifest-based structured report)
+- **`/test`** – Create tests (unit, widget, or integration); Standard or TDD mode
 - **`/remove`** – Remove feature/widget/file with impact analysis
 - **`/enhance-prompt`** – Enhance prompts with context and structure
-- **`/branch`** – Create feature branch with naming conventions
-- **`/pr`** – Create pull request description
+- **`/review-learnings`** – Review accumulated learning notes (heatmap, themes, gaps, focus)
+- **`/start-new-project`** – Initialize a new project from this template (template-only)
 
-See `.cursor/commands/README.md` for details.
+See `.cursor/commands/README.md` for details and removed/merged commands.
+
+---
+
+## Learning System
+
+After completing implementation tasks (Tier 2+, or complex Tier 1), the AI appends a **Supervisor's Briefing** inline in chat with key insights (patterns, concepts, tradeoffs, pitfalls). Selected items are persisted to `.cursor/docs/LEARNING_LOG.md` organized by category.
+
+- **Rule:** `.cursor/rules/post-task-learning.mdc` (triggers automatically)
+- **Skill:** `.cursor/skills/post-task-learning/SKILL.md` (handles log persistence)
+- **Log:** `.cursor/docs/LEARNING_LOG.md` (accumulated insights)
+- **Review:** `/review-learnings` command (periodic review with heatmap, gaps, focus areas)
 
 ---
 

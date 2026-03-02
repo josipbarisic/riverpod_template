@@ -10,6 +10,14 @@ description: Logically remove a feature, widget, or file and all references with
 
 ---
 
+### Step 0: Log Usage
+
+```bash
+mkdir -p .cursor/usage && echo '{"command":"/remove","timestamp":"'$(date -u +%Y-%m-%dT%H:%M:%S)'"}' >> .cursor/usage/command-log.jsonl
+```
+
+---
+
 ### Step 1: Identify the Target (MANDATORY)
 
 **Ask the user if not clear:**

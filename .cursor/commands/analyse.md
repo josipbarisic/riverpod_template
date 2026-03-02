@@ -11,6 +11,14 @@ strengths, gaps, and recommendations. Use this to onboard, refactor, or document
 
 ---
 
+### Step 0: Log Usage
+
+```bash
+mkdir -p .cursor/usage && echo '{"command":"/analyse","timestamp":"'$(date -u +%Y-%m-%dT%H:%M:%S)'"}' >> .cursor/usage/command-log.jsonl
+```
+
+---
+
 ### Step 1: Identify the Feature
 
 **If the user did not specify a feature:**

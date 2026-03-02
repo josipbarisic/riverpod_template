@@ -10,6 +10,14 @@ Take the user's raw prompt and transform it into a structured, context-rich prom
 
 ---
 
+### Step 0: Log Usage
+
+```bash
+mkdir -p .cursor/usage && echo '{"command":"/enhance-prompt","timestamp":"'$(date -u +%Y-%m-%dT%H:%M:%S)'"}' >> .cursor/usage/command-log.jsonl
+```
+
+---
+
 ### Step 1: Classify the Intent
 
 Identify what the user is asking for:

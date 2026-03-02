@@ -1,22 +1,28 @@
 ---
-description: Create tests for features, files, methods, or widgets (unit, widget, or integration)
+description: Create tests (unit, widget, or integration) — standard or TDD mode
 ---
 
 ## Create Tests
 
-### Step 1: Determine What to Test
+### Step 0: Log Usage
+
+```bash
+mkdir -p .cursor/usage && echo '{"command":"/test","timestamp":"'$(date -u +%Y-%m-%dT%H:%M:%S)'"}' >> .cursor/usage/command-log.jsonl
+```
+
+---
+
+### Step 1: Determine Scope & Mode
 
 **Ask user:**
 
-- What do you want to test?
-    - **Feature** (e.g., `login`)
-    - **File** (e.g., `login_controller.dart`)
-    - **Method** (e.g., `LoginController.onSubmit()`)
-    - **Widget** (e.g., `LoginView`)
-    - **Repository** (e.g., `AuthRepository.signInWithEmailAndPassword()`)
-    - **Other** (specify)
+- **What to test:** feature, file, method, widget, repository
+- **Test type:** unit (controllers, repos, utils), widget (views, UI), integration (full flows)
+- **Mode:**
+  - **Standard** — write tests for existing code
+  - **TDD** — Red-Green-Refactor cycle (write failing tests first, then implement)
 
-### Step 2: Determine Test Type
+### Step 2: Determine Test Type (if not already clear)
 
 **Ask user:**
 
@@ -31,7 +37,7 @@ description: Create tests for features, files, methods, or widgets (unit, widget
 - **Widget test**: For views, widgets, UI components
 - **Integration test**: For complete user flows, API integration
 
-### Step 3: STEP 0 - Mandatory Reads
+### Step 3: Mandatory Reads
 
 1. Read `ARCHITECTURE.md` (testing patterns, structure)
 2. Read `lib/AGENTS.md` (test infrastructure section)
@@ -106,7 +112,11 @@ description: Create tests for features, files, methods, or widgets (unit, widget
 - `test/presentation/{feature}/mocks/`
 - `test/helpers/`
 
-### Step 7: Create Test Structure
+### Step 7: Create Test Structure / Write Tests
+
+**If TDD mode:** Use Red-Green-Refactor. Write a failing test first, run it (`flutter test test/presentation/{feature}/`), then implement minimal code to pass, then refactor. Repeat for each behavior.
+
+**If Standard mode:** Use the templates below.
 
 #### Unit Test Template
 

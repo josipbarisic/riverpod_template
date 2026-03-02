@@ -1,79 +1,44 @@
 # Cursor Commands Cheat Sheet
 
-Quick reference for when to use each Cursor command (Riverpod Template).
+Quick reference for when to use each Cursor command (Riverpod Template). **9 core commands** + `/start-new-project`.
 
 ---
 
-## Getting Started
+## Core (Daily Use)
 
-| Command                 | When to Use                                        |
-|-------------------------|----------------------------------------------------|
-| `/branch`               | Starting new work – create a feature/fix branch   |
-| `/regenerate-manifests` | Before/after structural changes (routes, features) |
-
----
-
-## Bug Fixing
-
-| Command         | When to Use                    |
-|-----------------|--------------------------------|
-| `/fix-bug`      | Fixing any bug in the codebase  |
-| `/fix-gh-issue` | Fixing a specific GitHub issue |
-| `/mobile-issue` | Debugging mobile-specific issues |
+| Command           | When to Use                                      |
+|-------------------|--------------------------------------------------|
+| `/fix`            | Fix any issue — GitHub issue #, URL, or describe the bug |
+| `/add-feature`    | Add new screens/features (complexity + dev approach)     |
+| `/refine-feature` | Refine existing feature (violations, integrations)       |
+| `/commit`         | Pre-commit review + secure, atomic commit                 |
+| `/analyse`        | Analyse a feature (manifest-based report)                |
 
 ---
 
-## Adding Features
+## Specialized
 
-| Command         | When to Use                 |
-|-----------------|-----------------------------|
-| `/add-feature`  | Adding new screens/features |
-| `/refine-feature` | Refining an existing feature (violations, integrations) |
-| `/update-route` | Adding or modifying a route |
-
----
-
-## Testing
-
-| Command | When to Use                              |
-|---------|------------------------------------------|
-| `/test` | Creating tests (unit/widget/integration) |
-| `/tdd`  | Following Test-Driven Development        |
-
----
-
-## Code Maintenance
-
-| Command  | When to Use                          |
-|----------|--------------------------------------|
-| `/grind` | Making same change across many files |
-
----
-
-## Code Quality
-
-| Command   | When to Use                          |
-|-----------|--------------------------------------|
-| `/review` | Before committing – check for issues |
-| `/commit` | Creating secure, atomic commits      |
-
----
-
-## Collaboration
-
-| Command | When to Use                       |
-|---------|-----------------------------------|
-| `/pr`   | Creating pull request description |
-
----
-
-## Discovery & Analysis
-
-| Command   | When to Use                                  |
-|-----------|----------------------------------------------|
-| `/analyse` | Analyse a feature (manifest-based report)   |
-| `/enhance-prompt` | Enhance a prompt with context and structure |
+| Command   | When to Use                                              |
+|-----------|----------------------------------------------------------|
+| `/test`   | Create tests (unit/widget/integration); Standard or TDD mode |
 | `/remove` | Remove feature/widget/file and all references (impact analysis) |
+
+---
+
+## Meta / Learning
+
+| Command            | When to Use                                  |
+|--------------------|----------------------------------------------|
+| `/enhance-prompt`  | Enhance a prompt with context and structure  |
+| `/review-learnings`| Review learning log (heatmap, themes, gaps)  |
+
+---
+
+## Template-Only
+
+| Command             | When to Use                          |
+|---------------------|--------------------------------------|
+| `/start-new-project`| Initialize a new project from template |
 
 ---
 
@@ -82,27 +47,21 @@ Quick reference for when to use each Cursor command (Riverpod Template).
 ```
 Starting new work?
 ├─ New feature? → /add-feature
-├─ Bug fix? → /fix-bug
-└─ Need branch? → /branch
+└─ Bug fix or issue? → /fix
 
 Found a bug?
-├─ Has GitHub issue? → /fix-gh-issue [number]
-├─ Mobile-specific? → /mobile-issue
-└─ General bug? → /fix-bug
+├─ Has GitHub issue? → /fix #123 or /fix https://...
+└─ Describe it → /fix
 
 Before committing?
-├─ Check code quality → /review
-└─ Create commit → /commit
+└─ Review + commit → /commit
 
 Need tests?
-├─ TDD approach? → /tdd
-└─ Add tests? → /test
+├─ TDD approach? → /test (choose TDD mode)
+└─ Add tests? → /test (Standard mode)
 
-Batch operations?
-└─ Same change in many files? → /grind
-
-Creating PR?
-└─ Generate description → /pr
+Review what you've learned?
+└─ /review-learnings
 ```
 
 ---
@@ -113,3 +72,4 @@ Creating PR?
 - **Architecture:** `ARCHITECTURE.md` (if present) or `lib/AGENTS.md`
 - **AI agent guide:** `lib/AGENTS.md`
 - **Complexity scale:** `.cursor/docs/COMPLEXITY_AND_DISCOVERY.md`
+- **Learning log:** `.cursor/docs/LEARNING_LOG.md`

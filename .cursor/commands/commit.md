@@ -1,12 +1,22 @@
 ---
-description: Create secure, atomic commits with security scanning
+description: Review changes and create secure, atomic commits
 ---
 
-## Secure Commit
+## Review & Commit
 
-Ensure commits are atomic, well-described, and **security-safe**.
+Pre-commit review + secure, atomic commit in one flow.
 
-### Step 1: Check Changed Files
+---
+
+### Step 0: Log Usage
+
+```bash
+mkdir -p .cursor/usage && echo '{"command":"/commit","timestamp":"'$(date -u +%Y-%m-%dT%H:%M:%S)'"}' >> .cursor/usage/command-log.jsonl
+```
+
+---
+
+### Step 1: Gather All Changes
 
 ```bash
 git status

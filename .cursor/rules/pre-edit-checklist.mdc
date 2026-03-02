@@ -44,6 +44,6 @@ Before EVERY code edit, mentally verify:
 - [ ] Did I modify a model in `lib/models/`? → **UPDATE** its test in `test/models/` and run tests
 - [ ] Did I modify a repository in `lib/data/repositories/`? → **UPDATE** its test in `test/repositories/` and run tests
 - [ ] Did I modify a controller? → **UPDATE** its test in `test/presentation/` and run tests
-- [ ] Before committing → **RUN** `fvm flutter test` and ensure all tests pass
+- [ ] Before committing → **RUN** `flutter test` and ensure all tests pass
 
 ## If ANY check fails, fix BEFORE proceeding.

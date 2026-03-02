@@ -1,0 +1,49 @@
+---
+description: After completing any task (fix, feature, refine, etc.), append inline learning notes and persist to log. Triggers the post-task-learning skill.
+alwaysApply: true
+---
+
+# Post-Task Learning Notes
+
+## When to Trigger
+
+After completing **any implementation task** (fix, add-feature, refine-feature, etc.):
+
+- **Tier 2–3**: Always include learning notes.
+- **Tier 1**: Include only if the change touches a complex area (multiple layers, non-obvious pattern, or area the user hasn't worked in recently).
+
+## What to Include (Inline in Chat)
+
+Append a `---` separator after the task report, then a **Supervisor's Briefing** section with 2–5 bullet points. Each bullet is one of:
+
+| Tag | Purpose |
+|-----|---------|
+| **Pattern** | What architectural/code pattern was used and why it fits here |
+| **Concept** | A Dart/Flutter/Riverpod concept worth understanding deeper |
+| **Tradeoff** | Why X was chosen over Y (and when Y would be better) |
+| **Pitfall** | A common mistake in this area and how to spot it |
+| **Debugging** | How the root cause was found — the reasoning chain |
+| **Tooling** | A build/test/CLI tool detail worth remembering |
+
+## Depth Rules
+
+- Match explanation length to concept complexity. Simple = 1–2 sentences. Multi-layered = short paragraph.
+- Assume the reader is a **senior Flutter developer (5+ years)** who knows Dart, Flutter widgets, state management concepts, and basic architecture — but may not know the *specific* implementation detail or the *why* behind a choice.
+- Skip things the reader obviously knows. Focus on the non-obvious.
+- Never pad. If 2 bullets cover it, don't write 5.
+
+## Persistence
+
+After writing inline notes, invoke the **post-task-learning** skill to append key items to `.cursor/docs/LEARNING_LOG.md`.
+
+## Format Example
+
+```markdown
+---
+
+### Supervisor's Briefing
+
+- **Pattern**: `@Riverpod(keepAlive: true)` was used here because the provider caches data across tab switches. Without `keepAlive`, navigating away disposes the provider and triggers a re-fetch on return.
+- **Concept**: `ref.invalidate()` vs `ref.refresh()` — invalidate marks the provider as dirty (rebuilds lazily on next read), while refresh forces an immediate rebuild and returns the new value. Use invalidate when you don't need the result inline.
+- **Pitfall**: Calling `ref.read(provider.notifier).someMethod()` inside `build()` is a common mistake. It works once but won't react to state changes. Always `ref.watch()` in build, `ref.read()` in callbacks.
+```

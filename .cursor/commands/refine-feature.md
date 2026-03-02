@@ -16,7 +16,15 @@ Use this when:
 
 ---
 
-### Step 0: Assign Complexity (MANDATORY FIRST)
+### Step 0: Log Usage
+
+```bash
+mkdir -p .cursor/usage && echo '{"command":"/refine-feature","timestamp":"'$(date -u +%Y-%m-%dT%H:%M:%S)'"}' >> .cursor/usage/command-log.jsonl
+```
+
+---
+
+### Step 0a: Assign Complexity (MANDATORY)
 
 Ask the user if not already stated:
 
