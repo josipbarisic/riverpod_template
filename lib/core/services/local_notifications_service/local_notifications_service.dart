@@ -1,0 +1,168 @@
+import 'dart:developer';
+
+import 'package:collection/collection.dart';
+import 'package:firebase_messaging_platform_interface/src/remote_message.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:riverpod_template/core/theme/colors/light_app_colors.dart';
+import 'package:riverpod_template/core/utils/notifications/app_notification.dart';
+import 'package:riverpod_template/core/utils/notifications/notification_category.dart';
+import 'package:riverpod_template/core/utils/notifications/notification_status.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
+class LocalNotificationsService {
+  LocalNotificationsService(this.sharedPrefs);
+
+  final SharedPreferences sharedPrefs;
+
+  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  int _remoteNotificationId = 0;
+
+  Future<void> init() async {
+    await _configureLocalTimeZone();
+
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('notification_icon');
+
+    final DarwinInitializationSettings initializationSettingsDarwin =
+        DarwinInitializationSettings(
+            requestAlertPermission: false,
+            requestBadgePermission: false,
+            requestSoundPermission: false);
+
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsDarwin,
+    );
+
+    await _flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onDidReceiveNotificationResponse: (payload) async {});
+  }
+
+  Future<NotificationStatus> requestPermission() async {
+    try {
+      final disabledByUser = getDisabledByUser();
+      if (disabledByUser) {
+        log("this should not have been called");
+        return NotificationStatus(
+            await Permission.notification.status, disabledByUser);
+      }
+      final status = await Permission.notification.request();
+
+      return NotificationStatus(status, disabledByUser);
+    } catch (e) {
+      log("Notification Service Request Permission Error: $e");
+      return const NotificationStatus(PermissionStatus.denied, false);
+    }
+  }
+
+  Future<void> scheduleNotifications(
+      List<AppNotification> notifications) async {
+    await cancelAll();
+    bool isDisabled = getDisabledByUser();
+    if (isDisabled) {
+      return;
+    }
+    await Future.wait(notifications.mapIndexed(_schedule));
+  }
+
+  Future<List<ActiveNotification>> getActiveNotifications() =>
+      _flutterLocalNotificationsPlugin.getActiveNotifications();
+
+  Future<List<PendingNotificationRequest>> getPendingNotifications() =>
+      _flutterLocalNotificationsPlugin.pendingNotificationRequests();
+
+  Future<void> cancelAll({bool leaveActiveNotifications = true}) async {
+    List<ActiveNotification> activeNotifications =
+        await getActiveNotifications();
+    List<int> activeNotificationsIDs =
+        activeNotifications.map((e) => e.id ?? -1).toList();
+    List<PendingNotificationRequest> pendingNotifications =
+        await getPendingNotifications();
+
+    if (leaveActiveNotifications) {
+      await Future.wait(pendingNotifications
+          .whereNot((pn) => activeNotificationsIDs.contains(pn.id))
+          .map((e) => _flutterLocalNotificationsPlugin.cancel(e.id)));
+    } else {
+      await _flutterLocalNotificationsPlugin.cancelAll();
+    }
+  }
+
+  Future<void> _configureLocalTimeZone() async {
+    tz.initializeTimeZones();
+    final timeZoneInfo = await FlutterTimezone.getLocalTimezone();
+    tz.setLocalLocation(tz.getLocation(timeZoneInfo.identifier));
+  }
+
+  Future<void> _schedule(int index, AppNotification element) async {
+    final date = tz.TZDateTime.from(element.scheduledDate, tz.local);
+
+    if (date.isBefore(DateTime.now())) return;
+
+    await _flutterLocalNotificationsPlugin.zonedSchedule(
+      index + 1,
+      element.title,
+      element.description,
+      date,
+      NotificationDetails(
+        /// Adding channelId and channelName prevents notifications scheduling exception from being thrown.
+        /// If necessary, change the id and the name parameter to match the rest of the config.
+        android: AndroidNotificationDetails(
+          'channel_id',
+          'notifications_channel',
+          color: lightAppColors.primary100,
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.dateAndTime,
+    );
+  }
+
+  Future<PermissionStatus> getPermission() async {
+    return await Permission.notification.status;
+  }
+
+  bool getDisabledByUser() => sharedPrefs.getBool('disabledByUser') ?? false;
+
+  Future<void> setDisabledByUser(bool value) =>
+      sharedPrefs.setBool('disabledByUser', value);
+
+  Future<void> showRemoteNotification(
+    RemoteMessage message, {
+    NotificationCategory notificationCategory = NotificationCategory.general,
+  }) async {
+    final androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      notificationCategory.channelId,
+      notificationCategory.channelName,
+      channelDescription: notificationCategory.description,
+      importance: Importance.defaultImportance,
+      priority: Priority.high,
+    );
+    final iOSPlatformChannelSpecifics = DarwinNotificationDetails(
+      categoryIdentifier: notificationCategory.channelId,
+      interruptionLevel: InterruptionLevel.active,
+    );
+
+    final platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+      iOS: iOSPlatformChannelSpecifics,
+    );
+    await _flutterLocalNotificationsPlugin
+        .show(
+          _remoteNotificationId,
+          message.notification!.title,
+          message.notification!.body,
+          platformChannelSpecifics,
+        )
+        .then((value) => _remoteNotificationId += 1);
+  }
+}

@@ -1,0 +1,26 @@
+# After changing flavors config, run "dart run flutter_flavorizr"
+# IMPORTANT: Running the command above changes several important files, including main.dart and
+# adds a new app.dart. Don't run if not strictly necessary. Use default "processors" set to specify
+# which things you want to change: https://pub.dev/packages/flutter_flavorizr#default-processors-set
+# TODO(Developer): Change according to your app's needs.
+# TODO(Developer): Do not forget to change the app bundle id.
+flavors:
+  dev:
+    app:
+      name: "DEV Riverpod Template"
+    android:
+      applicationId: "com.example.riverpod_template"
+    ios:
+      bundleId: "com.example.riverpod_template"
+    instructions:
+
+  prod:
+    app:
+      name: "Riverpod Template"
+    android:
+      applicationId: "com.example.riverpod_template"
+    ios:
+      bundleId: "com.example.riverpod_template"
+    instructions:
+
+

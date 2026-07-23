@@ -1,0 +1,49 @@
+---
+description: Mandatory checklist to verify BEFORE every code edit to prevent architecture violations
+alwaysApply: true
+---
+
+# Pre-Edit Checklist (MANDATORY)
+
+Before EVERY code edit, mentally verify:
+
+## Widget Edits
+
+- [ ] Am I creating a private `Widget _build*()` method? → **STOP** - Create separate widget file
+- [ ] Am I creating a private `_show*()` or `_display*()` method? → **STOP** - Create separate widget file
+- [ ] Is this view file getting >250 lines? → **STOP** - Extract widgets first
+
+## Imports
+
+- [ ] Am I using a relative import (`../`)? → **STOP** - Use `package:riverpod_template/...`
+
+## Types
+
+- [ ] Am I using `dynamic`? → **STOP** - Use specific type
+
+## Logic Placement
+
+- [ ] Am I adding business logic to a view? → **STOP** - Move to controller
+- [ ] Am I adding API calls to a view? → **STOP** - Move to repository via controller
+
+## Styling
+
+- [ ] Am I hardcoding a color value? → **STOP** - Use theme / app colors
+- [ ] Am I using raw spacing numbers? → **STOP** - Use consistent spacing constants
+
+## Routes
+
+- [ ] Am I using string literals for routes? → **STOP** - Use `AppRoute.xxx`
+
+## Feedback (Snackbars / Toasts)
+
+- [ ] Am I showing a snackbar or toast? → **STOP** - Use `SnackbarMixin` and `showInfoSnackbar(context, message)` (not `ScaffoldMessenger.of(context).showSnackBar`)
+
+## Testing (After Edits)
+
+- [ ] Did I modify a model in `lib/models/`? → **UPDATE** its test in `test/models/` and run tests
+- [ ] Did I modify a repository in `lib/data/repositories/`? → **UPDATE** its test in `test/repositories/` and run tests
+- [ ] Did I modify a controller? → **UPDATE** its test in `test/presentation/` and run tests
+- [ ] Before committing → **RUN** `flutter test` and ensure all tests pass
+
+## If ANY check fails, fix BEFORE proceeding.

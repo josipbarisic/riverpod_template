@@ -1,0 +1,49 @@
+{
+  "generatedAt": "2026-07-23T17:03:53.404125Z",
+  "feature": "onboarding",
+  "views": [
+    "lib/presentation/onboarding/onboarding_view.dart"
+  ],
+  "controllers": [],
+  "widgets": [],
+  "models": [],
+  "repositories": [],
+  "providers": [],
+  "stateClasses": [],
+  "routes": [],
+  "apiEndpoints": [],
+  "coreServices": [],
+  "thirdPartyDependencies": [
+    {
+      "package": "flutter_hooks",
+      "usedIn": [
+        "lib/presentation/onboarding/onboarding_view.dart"
+      ]
+    },
+    {
+      "package": "go_router",
+      "usedIn": [
+        "lib/presentation/onboarding/onboarding_view.dart"
+      ]
+    },
+    {
+      "package": "hooks_riverpod",
+      "usedIn": [
+        "lib/presentation/onboarding/onboarding_view.dart"
+      ]
+    },
+    {
+      "package": "smooth_page_indicator",
+      "usedIn": [
+        "lib/presentation/onboarding/onboarding_view.dart"
+      ]
+    }
+  ],
+  "controllerMethods": {},
+  "testing": {
+    "testFiles": [],
+    "testDataFiles": [],
+    "runCommand": "flutter test test/presentation/onboarding/",
+    "hasTests": false
+  }
+}

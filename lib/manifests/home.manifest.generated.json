@@ -1,0 +1,33 @@
+{
+  "generatedAt": "2026-07-23T17:03:53.426077Z",
+  "feature": "home",
+  "views": [
+    "lib/presentation/home/home_view.dart"
+  ],
+  "controllers": [
+    "lib/presentation/home/home_controller.dart"
+  ],
+  "widgets": [],
+  "models": [],
+  "repositories": [],
+  "providers": [],
+  "stateClasses": [],
+  "routes": [],
+  "apiEndpoints": [],
+  "coreServices": [],
+  "thirdPartyDependencies": [
+    {
+      "package": "flutter_riverpod",
+      "usedIn": [
+        "lib/presentation/home/home_view.dart"
+      ]
+    }
+  ],
+  "controllerMethods": {},
+  "testing": {
+    "testFiles": [],
+    "testDataFiles": [],
+    "runCommand": "flutter test test/presentation/home/",
+    "hasTests": false
+  }
+}

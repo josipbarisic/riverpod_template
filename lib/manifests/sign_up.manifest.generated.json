@@ -1,0 +1,97 @@
+{
+  "generatedAt": "2026-07-23T17:03:53.420532Z",
+  "feature": "sign_up",
+  "views": [
+    "lib/presentation/sign_up/sign_up_view.dart"
+  ],
+  "controllers": [
+    "lib/presentation/sign_up/registration_controller.dart",
+    "lib/presentation/sign_up/sign_up_controller.dart"
+  ],
+  "widgets": [],
+  "models": [],
+  "repositories": [
+    "lib/data/repositories/auth_repository/auth_repository.dart"
+  ],
+  "providers": [
+    {
+      "name": "registrationControllerProvider",
+      "type": "Notifier",
+      "returnType": "RegistrationController",
+      "file": "lib/presentation/sign_up/registration_controller.dart"
+    }
+  ],
+  "stateClasses": [],
+  "routes": [],
+  "apiEndpoints": [],
+  "coreServices": [],
+  "thirdPartyDependencies": [
+    {
+      "package": "firebase_messaging",
+      "usedIn": [
+        "lib/presentation/sign_up/sign_up_view.dart"
+      ]
+    },
+    {
+      "package": "flutter_riverpod",
+      "usedIn": [
+        "lib/presentation/sign_up/sign_up_view.dart"
+      ]
+    },
+    {
+      "package": "go_router",
+      "usedIn": [
+        "lib/presentation/sign_up/sign_up_view.dart"
+      ]
+    }
+  ],
+  "controllerMethods": {
+    "RegistrationController": [
+      {
+        "name": "createAccountWithEmail",
+        "returnType": "Future<void>",
+        "params": "({ required String email, required String password, })",
+        "parameters": [
+          {
+            "name": "email",
+            "type": "String",
+            "isRequired": true
+          },
+          {
+            "name": "password",
+            "type": "String",
+            "isRequired": true
+          }
+        ],
+        "file": "lib/presentation/sign_up/registration_controller.dart",
+        "line": 31
+      },
+      {
+        "name": "createAccountWithSocial",
+        "returnType": "Future<void>",
+        "params": "(SignInProvider provider)",
+        "parameters": [
+          {
+            "name": "provider",
+            "type": "SignInProvider",
+            "isRequired": true
+          }
+        ],
+        "file": "lib/presentation/sign_up/registration_controller.dart",
+        "line": 55
+      },
+      {
+        "name": "advanceToNextStep",
+        "returnType": "void",
+        "file": "lib/presentation/sign_up/registration_controller.dart",
+        "line": 90
+      }
+    ]
+  },
+  "testing": {
+    "testFiles": [],
+    "testDataFiles": [],
+    "runCommand": "flutter test test/presentation/sign_up/",
+    "hasTests": false
+  }
+}

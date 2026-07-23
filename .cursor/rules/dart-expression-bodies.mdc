@@ -1,0 +1,62 @@
+---
+description: Use expression bodies (arrow syntax) for single-return methods in Dart
+globs: **/*.dart
+alwaysApply: false
+---
+
+# Expression Bodies for Single-Return Methods
+
+Use expression body syntax (`=>`) for methods and functions that only return a value.
+
+## Widget build() Methods
+
+```dart
+// BAD - unnecessary braces and return keyword
+@override
+Widget build(BuildContext context) {
+  return Container();
+}
+
+// GOOD - expression body
+@override
+Widget build(BuildContext context) => Container();
+```
+
+## Getters
+
+```dart
+// BAD
+String get fullName {
+  return '$firstName $lastName';
+}
+
+// GOOD
+String get fullName => '$firstName $lastName';
+```
+
+## Simple Methods
+
+```dart
+// BAD
+int calculateTotal() {
+  return price * quantity;
+}
+
+// GOOD
+int calculateTotal() => price * quantity;
+```
+
+## When NOT to Use Expression Bodies
+
+Use block bodies when:
+- Method has multiple statements
+- Method needs local variables
+- Logic is complex enough to benefit from multi-line formatting
+
+```dart
+// Block body is appropriate here
+Future<void> fetchData() async {
+  final response = await api.get('/data');
+  state = AsyncData(response.data);
+}
+```

@@ -1,0 +1,234 @@
+{
+  "generatedAt": "2026-07-23T17:03:53.413716Z",
+  "feature": "login",
+  "views": [
+    "lib/presentation/login/login_view.dart"
+  ],
+  "controllers": [
+    "lib/presentation/login/email_verification_controller.dart",
+    "lib/presentation/login/forgot_password_controller.dart",
+    "lib/presentation/login/login_controller.dart",
+    "lib/presentation/login/phone_verification_controller.dart"
+  ],
+  "widgets": [],
+  "models": [],
+  "repositories": [
+    "lib/data/repositories/auth_repository/auth_repository.dart"
+  ],
+  "providers": [
+    {
+      "name": "emailVerificationControllerProvider",
+      "type": "Notifier",
+      "returnType": "EmailVerificationController",
+      "file": "lib/presentation/login/email_verification_controller.dart"
+    },
+    {
+      "name": "forgotPasswordControllerProvider",
+      "type": "Notifier",
+      "returnType": "ForgotPasswordController",
+      "file": "lib/presentation/login/forgot_password_controller.dart"
+    },
+    {
+      "name": "loginControllerProvider",
+      "type": "Notifier",
+      "returnType": "LoginController",
+      "file": "lib/presentation/login/login_controller.dart"
+    },
+    {
+      "name": "phoneVerificationControllerProvider",
+      "type": "Notifier",
+      "returnType": "PhoneVerificationController",
+      "file": "lib/presentation/login/phone_verification_controller.dart"
+    }
+  ],
+  "stateClasses": [
+    {
+      "name": "LoginState",
+      "fields": [
+        "SignInProvider? selectedProvider",
+        "RegistrationStep? registrationStep",
+        "bool isAuthSuccess"
+      ],
+      "file": "lib/presentation/login/login_state.dart"
+    }
+  ],
+  "routes": [],
+  "apiEndpoints": [],
+  "coreServices": [],
+  "thirdPartyDependencies": [
+    {
+      "package": "equatable",
+      "usedIn": [
+        "lib/presentation/login/login_state.dart"
+      ]
+    },
+    {
+      "package": "flutter_riverpod",
+      "usedIn": [
+        "lib/presentation/login/login_view.dart"
+      ]
+    }
+  ],
+  "controllerMethods": {
+    "EmailVerificationController": [
+      {
+        "name": "sendVerificationEmail",
+        "returnType": "Future<void>",
+        "file": "lib/presentation/login/email_verification_controller.dart",
+        "line": 22
+      },
+      {
+        "name": "checkVerificationStatus",
+        "returnType": "Future<void>",
+        "file": "lib/presentation/login/email_verification_controller.dart",
+        "line": 38
+      },
+      {
+        "name": "verifyWithCode",
+        "returnType": "Future<void>",
+        "params": "(String code)",
+        "parameters": [
+          {
+            "name": "code",
+            "type": "String",
+            "isRequired": true
+          }
+        ],
+        "file": "lib/presentation/login/email_verification_controller.dart",
+        "line": 53
+      }
+    ],
+    "ForgotPasswordController": [
+      {
+        "name": "sendResetEmail",
+        "returnType": "Future<void>",
+        "params": "(String email)",
+        "parameters": [
+          {
+            "name": "email",
+            "type": "String",
+            "isRequired": true
+          }
+        ],
+        "file": "lib/presentation/login/forgot_password_controller.dart",
+        "line": 22
+      }
+    ],
+    "LoginController": [
+      {
+        "name": "reset",
+        "returnType": "void",
+        "file": "lib/presentation/login/login_controller.dart",
+        "line": 36
+      },
+      {
+        "name": "onSubmit",
+        "returnType": "Future<void>",
+        "params": "({ required SignInProvider provider, String? email, String? password, })",
+        "parameters": [
+          {
+            "name": "provider",
+            "type": "SignInProvider",
+            "isRequired": true
+          },
+          {
+            "name": "email",
+            "type": "String",
+            "isRequired": false
+          },
+          {
+            "name": "password",
+            "type": "String",
+            "isRequired": false
+          }
+        ],
+        "file": "lib/presentation/login/login_controller.dart",
+        "line": 43
+      },
+      {
+        "name": "continueWithPhoneNumber",
+        "returnType": "Future<String?>",
+        "params": "({required String phoneNumber})",
+        "parameters": [
+          {
+            "name": "phoneNumber",
+            "type": "String",
+            "isRequired": true
+          }
+        ],
+        "file": "lib/presentation/login/login_controller.dart",
+        "line": 74
+      },
+      {
+        "name": "continueWithGoogle",
+        "returnType": "Future<void>",
+        "file": "lib/presentation/login/login_controller.dart",
+        "line": 89
+      },
+      {
+        "name": "continueWithApple",
+        "returnType": "Future<void>",
+        "file": "lib/presentation/login/login_controller.dart",
+        "line": 98
+      },
+      {
+        "name": "continueWithEmailAndPassword",
+        "returnType": "Future<void>",
+        "params": "({ required String email, required String password, })",
+        "parameters": [
+          {
+            "name": "email",
+            "type": "String",
+            "isRequired": true
+          },
+          {
+            "name": "password",
+            "type": "String",
+            "isRequired": true
+          }
+        ],
+        "file": "lib/presentation/login/login_controller.dart",
+        "line": 107
+      }
+    ],
+    "PhoneVerificationController": [
+      {
+        "name": "sendVerificationCode",
+        "returnType": "Future<void>",
+        "params": "(String phoneNumber)",
+        "parameters": [
+          {
+            "name": "phoneNumber",
+            "type": "String",
+            "isRequired": true
+          }
+        ],
+        "file": "lib/presentation/login/phone_verification_controller.dart",
+        "line": 24
+      },
+      {
+        "name": "verifyCode",
+        "returnType": "Future<void>",
+        "params": "(String code)",
+        "parameters": [
+          {
+            "name": "code",
+            "type": "String",
+            "isRequired": true
+          }
+        ],
+        "file": "lib/presentation/login/phone_verification_controller.dart",
+        "line": 45
+      }
+    ]
+  },
+  "testing": {
+    "testDirectory": "test/presentation/login",
+    "testFiles": [
+      "test/presentation/login/login_controller_test.dart"
+    ],
+    "testDataFiles": [],
+    "runCommand": "flutter test test/presentation/login/",
+    "hasTests": true
+  }
+}

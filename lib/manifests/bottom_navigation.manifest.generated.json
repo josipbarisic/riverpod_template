@@ -1,0 +1,80 @@
+{
+  "generatedAt": "2026-07-23T17:03:53.425107Z",
+  "feature": "bottom_navigation",
+  "views": [
+    "lib/presentation/bottom_navigation/bottom_navigation_view.dart"
+  ],
+  "controllers": [
+    "lib/presentation/bottom_navigation/bottom_navigation_controller.dart"
+  ],
+  "widgets": [],
+  "models": [],
+  "repositories": [],
+  "providers": [
+    {
+      "name": "bottomNavigationControllerProvider",
+      "type": "Notifier",
+      "returnType": "BottomNavigationController",
+      "file": "lib/presentation/bottom_navigation/bottom_navigation_controller.dart"
+    }
+  ],
+  "stateClasses": [
+    {
+      "name": "BottomNavigationState",
+      "fields": [
+        "SelectedBottomNavigationPage page"
+      ],
+      "file": "lib/presentation/bottom_navigation/bottom_navigation_state.dart"
+    }
+  ],
+  "routes": [],
+  "apiEndpoints": [],
+  "coreServices": [],
+  "thirdPartyDependencies": [
+    {
+      "package": "equatable",
+      "usedIn": [
+        "lib/presentation/bottom_navigation/bottom_navigation_state.dart"
+      ]
+    },
+    {
+      "package": "flutter_lazy_indexed_stack",
+      "usedIn": [
+        "lib/presentation/bottom_navigation/bottom_navigation_view.dart"
+      ]
+    },
+    {
+      "package": "hooks_riverpod",
+      "usedIn": [
+        "lib/presentation/bottom_navigation/bottom_navigation_view.dart"
+      ]
+    }
+  ],
+  "controllerMethods": {
+    "BottomNavigationController": [
+      {
+        "name": "selectPage",
+        "returnType": "void",
+        "params": "(SelectedBottomNavigationPage page)",
+        "parameters": [
+          {
+            "name": "page",
+            "type": "SelectedBottomNavigationPage",
+            "isRequired": true
+          }
+        ],
+        "file": "lib/presentation/bottom_navigation/bottom_navigation_controller.dart",
+        "line": 12
+      }
+    ]
+  },
+  "testing": {
+    "testDirectory": "test/presentation/bottom_navigation",
+    "testFiles": [
+      "test/presentation/bottom_navigation/bottom_navigation_controller_test.dart"
+    ],
+    "testDataFiles": [],
+    "runCommand": "flutter test test/presentation/bottom_navigation/",
+    "hasTests": true
+  }
+}

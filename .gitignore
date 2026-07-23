@@ -3,6 +3,7 @@
 *.log
 *.pyc
 *.swp
+*.env
 .DS_Store
 .atom/
 .buildlog/
@@ -41,3 +42,9 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Coverage reports
+coverage/
+
+# Cursor AI runtime artifacts (written by the stop hook each session)
+.cursor/last-session-status.json

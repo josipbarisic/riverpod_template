@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2026-07-23T17:03:53.397416Z",
+  "feature": "splash",
+  "views": [
+    "lib/presentation/splash/splash_view.dart"
+  ],
+  "controllers": [
+    "lib/presentation/splash/splash_controller.dart"
+  ],
+  "widgets": [],
+  "models": [],
+  "repositories": [],
+  "providers": [
+    {
+      "name": "splashControllerProvider",
+      "type": "Notifier",
+      "returnType": "SplashController",
+      "file": "lib/presentation/splash/splash_controller.dart"
+    }
+  ],
+  "stateClasses": [],
+  "routes": [],
+  "apiEndpoints": [],
+  "coreServices": [
+    {
+      "name": "local_notifications_service",
+      "path": "lib/core/services/local_notifications_service",
+      "usedIn": [
+        "lib/presentation/splash/splash_controller.dart"
+      ]
+    }
+  ],
+  "thirdPartyDependencies": [
+    {
+      "package": "flutter_riverpod",
+      "usedIn": [
+        "lib/presentation/splash/splash_view.dart"
+      ]
+    },
+    {
+      "package": "go_router",
+      "usedIn": [
+        "lib/presentation/splash/splash_view.dart"
+      ]
+    },
+    {
+      "package": "shared_preferences",
+      "usedIn": [
+        "lib/presentation/splash/splash_controller.dart"
+      ]
+    }
+  ],
+  "controllerMethods": {},
+  "testing": {
+    "testDirectory": "test/presentation/splash",
+    "testFiles": [
+      "test/presentation/splash/splash_controller_test.dart"
+    ],
+    "testDataFiles": [],
+    "runCommand": "flutter test test/presentation/splash/",
+    "hasTests": true
+  }
+}

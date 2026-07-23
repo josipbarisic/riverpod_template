@@ -1,0 +1,65 @@
+---
+description: Riverpod state management patterns and code generation
+globs: **/*.dart
+alwaysApply: false
+---
+
+# Riverpod Patterns
+
+## State Class (Freezed)
+
+```dart
+@freezed
+abstract class UserState with _$UserState {
+  const factory UserState({
+    @Default(false) bool isLoading,
+    @Default(null) User? user,
+    @Default(null) String? error,
+  }) = _UserState;
+}
+```
+
+Many controllers skip dedicated state classes and use `AsyncValue<SimpleType>` directly.
+
+## Controller (Riverpod Codegen)
+
+```dart
+// Simple return type
+@riverpod
+class UserController extends _$UserController {
+  @override
+  FutureOr<List<User>> build() async {
+    return ref.read(userRepositoryProvider).getUsers();
+  }
+}
+
+// With state class
+@riverpod
+class ProfileController extends _$ProfileController {
+  @override
+  FutureOr<ProfileState> build() async => const ProfileState();
+}
+```
+
+Common `build()` return types: `FutureOr<bool>`, `FutureOr<List<T>>`, `FutureOr<T?>`, `FutureOr<String?>`.
+
+## `@Riverpod(keepAlive: true)`
+
+Use for controllers/providers that must survive navigation (not auto-disposed):
+- Repository providers, service providers
+- Global state controllers (e.g. auth, user session)
+
+## State Access
+
+| Method | Use Case |
+|--------|----------|
+| `ref.watch()` | Reactive state (rebuilds on change) |
+| `ref.read()` | One-time access (in callbacks) |
+| `ref.listen()` | Side effects (snackbars, navigation) |
+
+## AsyncValue
+
+Use `AsyncValue` for async operations:
+- `AsyncData` — success state
+- `AsyncLoading` — loading state
+- `AsyncError` — error state

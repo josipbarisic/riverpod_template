@@ -1,0 +1,41 @@
+---
+description: Absolute package imports only, ordered by category
+globs: **/*.dart
+alwaysApply: false
+---
+
+# Import Rules
+
+## Always Use Absolute Package Imports
+
+```dart
+// GOOD — absolute package imports
+import 'package:riverpod_template/presentation/login/login_view.dart';
+import 'package:riverpod_template/data/repositories/auth_repository/auth_repository.dart';
+
+// NEVER — relative imports
+import '../login/login_view.dart';
+import './auth_repository.dart';
+```
+
+## Import Order
+
+```dart
+// 1. Dart core
+import 'dart:async';
+
+// 2. Flutter
+import 'package:flutter/material.dart';
+
+// 3. Third-party packages
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+// 4. Project (absolute only)
+import 'package:riverpod_template/core/routing/router.dart';
+import 'package:riverpod_template/domain/user/user.dart';
+```
+
+## No Barrel Exports
+
+Import each file directly. Do not create re-export files.

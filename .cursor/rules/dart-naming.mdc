@@ -1,0 +1,31 @@
+---
+description: Dart naming conventions for files, classes, variables
+globs: **/*.dart
+alwaysApply: false
+---
+
+# Dart Naming Conventions
+
+## Files
+Use `snake_case`: `user_controller.dart`, `flight_booking_view.dart`
+
+## Classes
+Use `PascalCase`: `UserController`, `FlightBookingView`
+
+## Variables & Methods
+Use `camelCase`: `userName`, `fetchUserData()`
+
+## Constants
+Use `SCREAMING_SNAKE_CASE` for global constants
+
+## Private Members
+Use `_` prefix: `_handleUserTap()`, `_isLoading`
+
+## Riverpod Naming
+
+| Type | Pattern | Example |
+|------|---------|---------|
+| State class | `{Name}State` | `UserState` |
+| Controller | `{Name}Controller` | `UserController` |
+| Provider | `{name}Provider` | `userProvider` |
+| Repository | `{name}RepositoryProvider` | `userRepositoryProvider` |
