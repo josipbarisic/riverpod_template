@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-09T23:38:42.564627Z",
+  "generatedAt": "2026-07-23T17:03:53.426077Z",
   "feature": "home",
   "views": [
     "lib/presentation/home/home_view.dart"
@@ -27,7 +27,7 @@
   "testing": {
     "testFiles": [],
     "testDataFiles": [],
-    "runCommand": "fvm flutter test test/presentation/home/",
+    "runCommand": "flutter test test/presentation/home/",
     "hasTests": false
   }
 }

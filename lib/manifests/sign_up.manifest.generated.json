@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-09T23:38:42.561159Z",
+  "generatedAt": "2026-07-23T17:03:53.420532Z",
   "feature": "sign_up",
   "views": [
     "lib/presentation/sign_up/sign_up_view.dart"
@@ -91,7 +91,7 @@
   "testing": {
     "testFiles": [],
     "testDataFiles": [],
-    "runCommand": "fvm flutter test test/presentation/sign_up/",
+    "runCommand": "flutter test test/presentation/sign_up/",
     "hasTests": false
   }
 }

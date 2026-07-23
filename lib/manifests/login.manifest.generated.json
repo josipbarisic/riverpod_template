@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-09T23:38:42.554966Z",
+  "generatedAt": "2026-07-23T17:03:53.413716Z",
   "feature": "login",
   "views": [
     "lib/presentation/login/login_view.dart"
@@ -224,9 +224,11 @@
   },
   "testing": {
     "testDirectory": "test/presentation/login",
-    "testFiles": [],
+    "testFiles": [
+      "test/presentation/login/login_controller_test.dart"
+    ],
     "testDataFiles": [],
-    "runCommand": "fvm flutter test test/presentation/login/",
-    "hasTests": false
+    "runCommand": "flutter test test/presentation/login/",
+    "hasTests": true
   }
 }

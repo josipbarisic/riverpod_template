@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-09T23:38:42.537774Z",
+  "generatedAt": "2026-07-23T17:03:53.404125Z",
   "feature": "onboarding",
   "views": [
     "lib/presentation/onboarding/onboarding_view.dart"
@@ -43,7 +43,7 @@
   "testing": {
     "testFiles": [],
     "testDataFiles": [],
-    "runCommand": "fvm flutter test test/presentation/onboarding/",
+    "runCommand": "flutter test test/presentation/onboarding/",
     "hasTests": false
   }
 }
