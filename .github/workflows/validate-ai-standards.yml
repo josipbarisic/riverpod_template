@@ -13,6 +13,10 @@ on:
       - 'ios/**'
       - 'android/**'
 
+concurrency:
+  group: ai-standards-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   unit-and-widget-tests:
     name: Unit & Widget Tests
@@ -156,20 +160,30 @@ jobs:
             echo "✅ All manifests are up to date"
           fi
 
-  import-rules:
-    name: Import Rules Check
+  # Consolidated static checks. These were previously four separate jobs
+  # (import-rules, file-size, code-standards, config-file-integrity). Each did
+  # only seconds of grep/find/xmllint work but paid a full runner spin-up +
+  # checkout + rounded-up billed minute. Merged into one job to cut ~3 runner
+  # starts and ~3 billed job-minutes per PR. Every check keeps its own step id
+  # and runs via `if: always()` so all failures are still surfaced in one run
+  # (no fail-fast), and the trailing gate step preserves the original blocking
+  # behavior — file-size stays advisory (never contributes to the gate).
+  static-checks:
+    name: Static Checks
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install validation tools
+        run: sudo apt-get update && sudo apt-get install -y libxml2-utils
+
       - name: Check for relative imports
-        id: check-imports
+        id: imports
+        if: always()
         run: |
-          # Find relative imports, excluding generated files
-          # Check for both '../' and '../../' patterns with single or double quotes
           RELATIVE_IMPORTS=$(grep -rE "import ['\"]\.\./" lib/ --include="*.dart" | grep -v ".g.dart" | grep -v ".freezed.dart" || true)
           
           if [ -n "$RELATIVE_IMPORTS" ]; then
@@ -186,22 +200,54 @@ jobs:
             echo "✅ No relative imports found"
           fi
 
-  file-size:
-    name: File Size Guidelines
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    timeout-minutes: 5
+      - name: Check for dynamic type usage
+        id: dynamic
+        if: always()
+        run: |
+          DYNAMIC_USAGE=$(grep -r ":\s*dynamic" lib/ --include="*.dart" | grep -v ".g.dart" | grep -v ".freezed.dart" | grep -v "/test/" || true)
+          
+          if [ -n "$DYNAMIC_USAGE" ]; then
+            echo "❌ 'dynamic' type usage found!"
+            echo ""
+            echo "The following files contain 'dynamic' types (use specific types instead):"
+            echo "$DYNAMIC_USAGE" | while IFS= read -r line; do
+              echo "  - $line"
+            done
+            echo ""
+            echo "Replace 'dynamic' with specific types for better type safety."
+            exit 1
+          else
+            echo "✅ No 'dynamic' type usage found"
+          fi
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Check for private _build methods
+        id: build-methods
+        if: always()
+        run: |
+          BUILD_METHODS=$(grep -r "Widget _build" lib/presentation/ --include="*.dart" | grep -v ".g.dart" || true)
+          
+          if [ -n "$BUILD_METHODS" ]; then
+            echo "❌ Private _build methods found!"
+            echo ""
+            echo "The following files contain private _build methods (extract to separate widget classes):"
+            echo "$BUILD_METHODS" | while IFS= read -r line; do
+              echo "  - $line"
+            done
+            echo ""
+            echo "Extract these methods into separate widget classes instead of using same-file private methods."
+            exit 1
+          else
+            echo "✅ No private _build methods found"
+          fi
 
-      - name: Check file sizes
-        id: check-sizes
+      # Advisory only (matches the previous job's `continue-on-error: true`):
+      # never exits non-zero and is excluded from the gate below.
+      - name: Check file sizes (advisory)
+        id: file-size
+        if: always()
         run: |
           VIOLATIONS=()
           
-          # Check views (≤250 lines)
           while IFS= read -r file; do
             LINES=$(wc -l < "$file" | tr -d ' ')
             if [ "$LINES" -gt 250 ]; then
@@ -209,7 +255,6 @@ jobs:
             fi
           done < <(find lib/presentation -name "*_view.dart" -type f ! -name "*.g.dart" ! -name "*.freezed.dart")
           
-          # Check controllers (≤150 lines)
           while IFS= read -r file; do
             LINES=$(wc -l < "$file" | tr -d ' ')
             if [ "$LINES" -gt 150 ]; then
@@ -217,7 +262,6 @@ jobs:
             fi
           done < <(find lib/presentation -name "*_controller.dart" -type f ! -name "*.g.dart" ! -name "*.freezed.dart")
           
-          # Check repositories (≤200 lines)
           while IFS= read -r file; do
             LINES=$(wc -l < "$file" | tr -d ' ')
             if [ "$LINES" -gt 200 ]; then
@@ -225,7 +269,6 @@ jobs:
             fi
           done < <(find lib/data/repositories -name "*_repository.dart" -type f ! -name "*.g.dart" ! -name "*.freezed.dart")
           
-          # Check widgets (≤100 lines)
           while IFS= read -r file; do
             LINES=$(wc -l < "$file" | tr -d ' ')
             if [ "$LINES" -gt 100 ]; then
@@ -233,7 +276,6 @@ jobs:
             fi
           done < <(find lib/presentation -name "*_widget.dart" -type f ! -name "*.g.dart" ! -name "*.freezed.dart")
           
-          # Check models (≤100 lines)
           while IFS= read -r file; do
             LINES=$(wc -l < "$file" | tr -d ' ')
             if [ "$LINES" -gt 100 ]; then
@@ -257,68 +299,9 @@ jobs:
             echo "✅ All files are within size guidelines"
           fi
 
-  code-standards:
-    name: Code Standards Check
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Check for dynamic type usage
-        id: check-dynamic
-        run: |
-          # Find dynamic type usage, excluding generated files and test files
-          DYNAMIC_USAGE=$(grep -r ":\s*dynamic" lib/ --include="*.dart" | grep -v ".g.dart" | grep -v ".freezed.dart" | grep -v "/test/" || true)
-          
-          if [ -n "$DYNAMIC_USAGE" ]; then
-            echo "❌ 'dynamic' type usage found!"
-            echo ""
-            echo "The following files contain 'dynamic' types (use specific types instead):"
-            echo "$DYNAMIC_USAGE" | while IFS= read -r line; do
-              echo "  - $line"
-            done
-            echo ""
-            echo "Replace 'dynamic' with specific types for better type safety."
-            exit 1
-          else
-            echo "✅ No 'dynamic' type usage found"
-          fi
-
-      - name: Check for private _build methods
-        id: check-build-methods
-        run: |
-          # Find private _build methods, excluding generated files
-          BUILD_METHODS=$(grep -r "Widget _build" lib/presentation/ --include="*.dart" | grep -v ".g.dart" || true)
-          
-          if [ -n "$BUILD_METHODS" ]; then
-            echo "❌ Private _build methods found!"
-            echo ""
-            echo "The following files contain private _build methods (extract to separate widget classes):"
-            echo "$BUILD_METHODS" | while IFS= read -r line; do
-              echo "  - $line"
-            done
-            echo ""
-            echo "Extract these methods into separate widget classes instead of using same-file private methods."
-            exit 1
-          else
-            echo "✅ No private _build methods found"
-          fi
-
-  config-file-integrity:
-    name: Config File Integrity Check
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install validation tools
-        run: sudo apt-get update && sudo apt-get install -y libxml2-utils
-
       - name: Validate iOS plist files
+        id: plist
+        if: always()
         run: |
           echo "Validating iOS plist files..."
           ERRORS=""
@@ -327,13 +310,11 @@ jobs:
           while IFS= read -r file; do
             CHECKED=$((CHECKED + 1))
 
-            # 1) XML well-formedness check via xmllint
             XMLLINT_ERR=$(xmllint --noout "$file" 2>&1) || {
               ERRORS="${ERRORS}❌ ${file} (XML syntax error):\n   ${XMLLINT_ERR}\n\n"
               continue
             }
 
-            # 2) Plist structure check via Python plistlib
             PLIST_ERR=$(python3 -c "
           import plistlib, sys
           try:
@@ -359,12 +340,6 @@ jobs:
             echo "========================================="
             echo ""
             echo -e "$ERRORS"
-            echo "Common AI-introduced issues:"
-            echo "  - Stray line breaks inside <string>, <key>, or other XML tags"
-            echo "  - Accidental whitespace in tag values"
-            echo "  - Missing or mismatched closing tags"
-            echo "  - Invalid XML entities or characters"
-            echo ""
             echo "To verify locally: xmllint --noout <file>"
             echo "Or on macOS:       plutil -lint <file>"
             exit 1
@@ -372,12 +347,13 @@ jobs:
           echo "✅ All $CHECKED plist files are valid"
 
       - name: Validate Android XML files
+        id: android-xml
+        if: always()
         run: |
           echo "Validating Android XML config files..."
           ERRORS=""
           CHECKED=0
 
-          # Validate AndroidManifest.xml files
           while IFS= read -r file; do
             CHECKED=$((CHECKED + 1))
             XMLLINT_ERR=$(xmllint --noout "$file" 2>&1) || {
@@ -385,7 +361,6 @@ jobs:
             }
           done < <(find android -name "AndroidManifest.xml" -type f 2>/dev/null)
 
-          # Validate other Android XML resources that AI might touch
           while IFS= read -r file; do
             CHECKED=$((CHECKED + 1))
             XMLLINT_ERR=$(xmllint --noout "$file" 2>&1) || {
@@ -405,38 +380,27 @@ jobs:
             echo "========================================="
             echo ""
             echo -e "$ERRORS"
-            echo "Common AI-introduced issues:"
-            echo "  - Stray line breaks inside XML attributes or tag values"
-            echo "  - Missing closing tags or self-closing syntax"
-            echo "  - Invalid XML entities or malformed namespace declarations"
-            echo ""
             echo "To verify locally: xmllint --noout <file>"
             exit 1
           fi
           echo "✅ All $CHECKED Android XML files are valid"
 
-      - name: Check for common AI corruption patterns
+      - name: Check for common config corruption patterns
+        id: corruption
+        if: always()
         run: |
-          echo "Checking for common AI corruption patterns in config files..."
+          echo "Checking for common corruption patterns in config files..."
           WARNINGS=""
 
-          # Check for line breaks inside XML tag attributes (common AI mistake)
-          # Pattern: an opening tag that spans multiple lines with broken attributes
           while IFS= read -r file; do
-            # Check for broken string values in plist (line break inside <string>...</string>)
-            # A valid plist <string> should not contain raw newlines between open/close tags
-            # unless it's intentionally multiline content
             BROKEN_STRINGS=$(python3 -c "
           import re, sys
           with open(sys.argv[1], 'r') as f:
               content = f.read()
-          # Find <string> tags where the value contains a newline but the tag
-          # is clearly a single-value field (short content split across lines)
           pattern = r'<string>([^<]*\n[^<]*)</string>'
           matches = re.finditer(pattern, content)
           for m in matches:
               val = m.group(1).strip()
-              # Skip intentionally multiline values (very long content)
               if len(val) < 200:
                   line_num = content[:m.start()].count('\n') + 1
                   print(f'  Line {line_num}: <string> value contains line break: \"{val[:80]}...\"')
@@ -455,15 +419,34 @@ jobs:
             echo ""
             echo -e "$WARNINGS"
             echo "These may be false positives, but are worth reviewing."
-            echo "AI models sometimes split single-line values across multiple lines."
             exit 1
           fi
-          echo "✅ No common AI corruption patterns detected"
+          echo "✅ No common config corruption patterns detected"
+
+      # Gate: fail the job if any blocking check failed, while still having run
+      # them all above. File-size is advisory and intentionally excluded.
+      - name: Static checks gate
+        if: always()
+        run: |
+          FAILED=""
+          [ "${{ steps.imports.outcome }}" = "failure" ] && FAILED="${FAILED} import-rules"
+          [ "${{ steps.dynamic.outcome }}" = "failure" ] && FAILED="${FAILED} dynamic-types"
+          [ "${{ steps.build-methods.outcome }}" = "failure" ] && FAILED="${FAILED} build-methods"
+          [ "${{ steps.plist.outcome }}" = "failure" ] && FAILED="${FAILED} plist"
+          [ "${{ steps.android-xml.outcome }}" = "failure" ] && FAILED="${FAILED} android-xml"
+          [ "${{ steps.corruption.outcome }}" = "failure" ] && FAILED="${FAILED} config-corruption"
+
+          if [ -n "$FAILED" ]; then
+            echo "❌ Static checks failed:${FAILED}"
+            echo "Review the failing step(s) above."
+            exit 1
+          fi
+          echo "✅ All blocking static checks passed (file-size is advisory)"
 
   validation-summary:
     name: Validation Summary
     runs-on: ubuntu-latest
-    needs: [ unit-and-widget-tests, manifest-freshness, import-rules, code-standards, config-file-integrity ]
+    needs: [ unit-and-widget-tests, manifest-freshness, static-checks ]
     if: always()
 
     steps:
@@ -471,18 +454,14 @@ jobs:
         run: |
           if [ "${{ needs.unit-and-widget-tests.result }}" != "success" ] || \
              [ "${{ needs.manifest-freshness.result }}" != "success" ] || \
-             [ "${{ needs.import-rules.result }}" != "success" ] || \
-             [ "${{ needs.code-standards.result }}" != "success" ] || \
-             [ "${{ needs.config-file-integrity.result }}" != "success" ]; then
+             [ "${{ needs.static-checks.result }}" != "success" ]; then
             echo "❌ Some validation checks failed. Please review the errors above."
             echo ""
             echo "Results:"
             echo "  - Unit & Widget Tests: ${{ needs.unit-and-widget-tests.result }}"
             echo "  - Manifest Freshness: ${{ needs.manifest-freshness.result }}"
-            echo "  - Import Rules: ${{ needs.import-rules.result }}"
-            echo "  - Code Standards: ${{ needs.code-standards.result }}"
-            echo "  - Config File Integrity: ${{ needs.config-file-integrity.result }}"
+            echo "  - Static Checks: ${{ needs.static-checks.result }}"
             exit 1
           else
-            echo "✅ All blocking validation checks passed!"
+            echo "✅ All AI-forward standards checks passed!"
           fi

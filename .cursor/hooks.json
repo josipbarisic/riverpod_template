@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "node .cursor/hooks/session-start.mjs"
+      }
+    ],
+    "preToolUse": [
+      {
+        "command": "node .cursor/hooks/block-generated-files.mjs",
+        "matcher": "Write|StrReplace"
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": "node .cursor/hooks/post-tool-use-codegen-reminder.mjs",
+        "matcher": "Write|StrReplace"
+      }
+    ],
+    "stop": [
+      {
+        "command": "node .cursor/hooks/stop.mjs"
+      }
+    ]
+  }
+}

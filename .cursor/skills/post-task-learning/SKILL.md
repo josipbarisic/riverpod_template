@@ -1,87 +1,94 @@
 ---
 name: post-task-learning
-description: Persist learning notes to the learning log after task completion. Use after any implementation task when the post-task-learning rule triggers, or when the user asks to "log this", "save learning", or "add to learning log".
+description: Persist every distinct bullet from the inline Supervisor's Briefing to .cursor/docs/LEARNING_LOG.md. Use after any implementation task triggered by the post-task-learning rule, or when the user says "log this", "save learning", or "add to learning log". Be permissive — capture wide, prune later.
 ---
 
-# Post-Task Learning
+# Post-Task Learning (Persistence)
 
-Persist key insights from completed tasks to `.cursor/docs/LEARNING_LOG.md`.
+This skill is the only writer to `.cursor/docs/LEARNING_LOG.md`. It runs after
+the inline `Supervisor's Briefing` and persists each distinct bullet so that
+nothing transferable is lost in chat history.
+
+**Principle:** capture wide, prune later. Filtering happens during
+`/review-learnings`, not here.
 
 ## When This Skill Activates
 
-- Automatically after the inline Supervisor's Briefing (triggered by the `post-task-learning` rule)
-- Manually when the user says "log this learning" or similar
+- Automatically after every Supervisor's Briefing (the rule
+  `.cursor/rules/post-task-learning.mdc` mandates invocation for Tier 2–3
+  and Tier 1 tasks with ≥ 1 non-trivial bullet)
+- Manually when the user says: "log this", "save this learning",
+  "add to learning log", "persist that insight"
 
 ## Workflow
 
-### Step 1: Read the Current Log
+### Step 1 — Read the Current Log
 
 ```bash
 cat .cursor/docs/LEARNING_LOG.md
 ```
 
-If the file doesn't exist, create it using the template in Step 4.
+If the file does not exist, create it with the structure in Step 4.
 
-### Step 2: Select Items to Log
+### Step 2 — Select Items (Permissive Default)
 
-From the inline briefing, pick items that have **durable learning value** — things worth reviewing later. Skip items that are:
+Take **every bullet** from the inline briefing and persist it. Skip an item
+only if it satisfies **all three** of these strict conditions:
 
-- Trivially obvious to a senior Flutter developer
-- Hyper-specific to one file with no transferable insight
-- Already logged (check existing entries to avoid duplicates)
+1. An entry with the **same concept** (not just same words) already exists.
+2. The new bullet adds **zero new nuance** (no new context, no new pitfall,
+   no new file/feature link).
+3. The new bullet would not be useful for `/review-learnings` to surface as a
+   pattern across tasks.
 
-Typically 1–3 items per task. Sometimes zero if the task was routine.
+If any of the three is unmet, write the new entry. When in doubt, write.
 
-### Step 3: Categorize Each Item
+You may merge a near-duplicate as a sub-bullet under the existing entry
+rather than create a new top-level entry — but err on the side of writing.
 
-Assign exactly one category:
+### Step 3 — Categorize
 
-| Category | What belongs here |
-|----------|-------------------|
-| `Architecture` | Layer decisions, separation of concerns, when to split files |
-| `Riverpod` | Provider patterns, state management, ref usage, code-gen |
-| `Dart` | Language features, null safety, generics, async patterns |
-| `Flutter` | Widget lifecycle, rendering, platform-specific behavior |
-| `Navigation` | GoRouter, route guards, deep linking, transitions |
-| `API & Data` | Repository patterns, serialization, error handling, contracts |
-| `Testing` | Test patterns, mocking, coverage, test architecture |
-| `Tooling` | Build runner, CI/CD, analyzer, scripts |
-| `Debugging` | Root cause analysis techniques, common failure patterns |
-| `Performance` | Optimization patterns, rebuild prevention, lazy loading |
+Assign exactly **one** category per item. If the item could fit two, pick the
+primary one; add a sub-bullet cross-reference if needed.
 
-### Step 4: Append to Log
+| Category       | What belongs here                                                       |
+|----------------|-------------------------------------------------------------------------|
+| `Architecture` | Layer decisions, separation of concerns, when to split files            |
+| `Riverpod`     | Provider patterns, state, ref usage, code-gen, keepAlive                |
+| `Dart`         | Language features, null safety, generics, async, sealed/pattern         |
+| `Flutter`      | Widget lifecycle, rendering, animations, platform-specific behavior     |
+| `Navigation`   | GoRouter, route guards, deep linking, transitions                       |
+| `API & Data`   | Repository patterns, serialization, error format, contracts             |
+| `Testing`      | Widget, controller, integration test patterns, mocking, fixtures        |
+| `Tooling`      | Build runner, CI/CD, analyzer, scripts, manifests, hooks                |
+| `Debugging`    | Root cause analysis techniques, log strategies, repro patterns          |
+| `Performance`  | Rebuild prevention, dispose timing, lazy loading, frame budget          |
 
-Append each item to the appropriate category section in `.cursor/docs/LEARNING_LOG.md`.
+If a bullet truly does not fit, add it under the closest match and flag in
+the sub-bullet `Context:` line — do not invent a new category at write time.
 
-**Entry format:**
+### Step 4 — Entry Format
 
 ```markdown
-- **[{date}]** {concise title} — {explanation, same depth rules as inline briefing}
-  - *Context: {task/issue that triggered this, e.g. "Fix #42" or "Add profile screen"}*
+- **[YYYY-MM-DD]** {concise title — one line} — {explanation, same depth as the inline bullet}
+  - *Context: {trigger — e.g. "#123" or short task name} / Tier {1|2|3} / {1–3 most relevant file paths, optional}*
 ```
 
-**Date format:** `YYYY-MM-DD`
+The trailing `Tier` and file paths are required when known; omit if the task
+was a pure read-only exercise or there is no associated ticket.
 
-If the category section doesn't exist yet, create it following the file structure.
+### Step 5 — File Structure
 
-**Log file structure:**
+`.cursor/docs/LEARNING_LOG.md` always has these top-level sections, in order:
 
 ```markdown
 # Learning Log
 
-> Accumulated insights from development sessions. Organized by category for review.
-> Use `/review-learnings` to get a summary and identify gaps.
+> Accumulated insights from development sessions. Organized by category.
+> Use `/review-learnings` for periodic summarisation, heatmaps, and pruning.
 
 ## Architecture
-
-- **[2025-06-15]** Extract widgets over 250 lines — ...
-  - *Context: Refine profile view*
-
 ## Riverpod
-
-- **[2025-06-15]** keepAlive prevents disposal on tab switch — ...
-  - *Context: Fix #98*
-
 ## Dart
 ## Flutter
 ## Navigation
@@ -92,35 +99,54 @@ If the category section doesn't exist yet, create it following the file structur
 ## Performance
 ```
 
-### Step 5: Confirm
+Append new entries to the **top** of the relevant section so the most recent
+context surfaces first.
 
-After appending, state briefly what was logged:
+### Step 6 — Confirm
+
+After appending, state briefly what was logged. One line per entry is enough:
 
 ```
-Logged to LEARNING_LOG.md: "keepAlive prevents disposal on tab switch" (Riverpod)
+Logged to LEARNING_LOG.md:
+- "keepAlive prevents disposal on tab switch" → Riverpod
+- "ref.invalidate vs ref.refresh" → Riverpod
+- "ref.read in build() won't react" → Riverpod (sub-bullet under existing "Provider reactivity")
 ```
 
-No verbose confirmation needed. One line is enough.
+No verbose confirmation needed.
+
+## Anti-Duplication (Loose)
+
+Scan the relevant category for items with the **same concept**. If found and
+the new bullet adds nuance, append as a sub-bullet:
+
+```markdown
+- **[2026-03-15]** keepAlive prevents disposal on tab switch — original explanation …
+  - **[2026-05-21]** Combined with an auth-state watch in `build()` to also clear cross-account state on logout. *Context: #137*
+```
+
+If the new bullet adds no nuance, skip it (the only legitimate skip case).
 
 ## Depth Calibration
 
-The user is a **senior Flutter developer (5+ years)**. Calibrate accordingly:
+The reader is a senior Flutter developer (5+ years). Calibrate accordingly:
 
-- **Skip**: What `StatelessWidget` is, what `async/await` does, basic Dart syntax
-- **Brief**: Standard Riverpod patterns, common GoRouter usage, typical Freezed setup
-- **Explain**: Why a specific pattern was chosen over alternatives, non-obvious side effects, framework internals that affect behavior, tradeoffs that depend on context
-
-## Anti-Duplication
-
-Before appending, scan the log for:
-
-1. Same concept already explained (even if worded differently)
-2. Same context/task already logged
-
-If a duplicate exists but the new entry adds meaningful nuance, append it as a sub-bullet under the original entry rather than creating a new one.
+- **Skip**: definitions of basic Dart/Flutter primitives.
+- **Brief**: standard Riverpod patterns, common GoRouter usage, typical
+  Freezed setup.
+- **Explain**: why a specific pattern was chosen over alternatives, non-obvious
+  side effects, framework internals that affect behavior, tradeoffs that
+  depend on context.
 
 ## Edge Cases
 
-- **No items worth logging**: Skip persistence entirely. Don't log for the sake of logging.
-- **Item spans multiple categories**: Pick the primary category. Don't duplicate across sections.
-- **User asks to log something specific**: Log exactly what they ask, categorized appropriately.
+- **All bullets are sub-bullets under existing entries**: still write them.
+  Sub-bullets are the dedupe path — they're not skips.
+- **User asks to log something specific**: log exactly what they ask, in the
+  appropriate category, even if it doesn't follow from a recent task.
+- **The inline briefing was 1 bullet**: still persist it. One-bullet briefings
+  are usually the most pattern-establishing.
+- **The task only changed docs / comments / config**: still persist any
+  tooling, debugging, or process insight that emerged.
+- **Category section missing**: create it in the right place (matching the
+  fixed order in Step 5). Do not reorder existing sections.

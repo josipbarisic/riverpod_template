@@ -2,7 +2,9 @@
 
 This directory contains Cursor IDE slash commands for standardized AI workflows.
 
-**Consolidated to 9 core commands (+ 1 template-only)** for clarity and reduced maintenance.
+**Focused command set** for clarity and reduced maintenance. Committing is handled
+by the `git-commit` skill (routed automatically from natural-language commit
+intent by `.cursor/rules/commit-intent-routing.mdc`), not a slash command.
 
 ## Available Commands
 
@@ -23,27 +25,24 @@ This directory contains Cursor IDE slash commands for standardized AI workflows.
    - Fix violations, add integrations, improve code quality
    - Asks complexity (Tier 1/2/3); Tier 3 requires approval
 
-4. **`/commit`** — Pre-commit review + secure, atomic commit
-   - Security scanning (blocks secrets)
-   - Import validation, NEVER rules check, file size check, anti-drift check
-   - Feature test verification
-   - Prefix or conventional commit format with atomic enforcement
-   - Merged from: `/review` + `/commit`
-
-5. **`/analyse`** — Analyse a feature with manifest-based discovery
+4. **`/analyse`** — Analyse a feature with manifest-based discovery
    - Structured report: purpose, architecture, controllers, API, UI/UX, strengths, gaps
    - Reads AGENTS.md and feature manifest; checks staleness
 
 ### Specialized Commands (Periodic Use)
 
-6. **`/test`** — Create tests (unit, widget, or integration)
+5. **`/test`** — Create tests (unit, widget, or integration)
    - Standard mode: write tests for existing code
    - TDD mode: Red-Green-Refactor cycle
    - Merged from: `/test` + `/tdd`
 
-7. **`/remove`** — Remove a feature, widget, or file and all references
+6. **`/remove`** — Remove a feature, widget, or file and all references
    - Impact analysis with safety warnings
    - Requires explicit confirmation when removal affects other features
+
+7. **`/review-pr-v2`** — Review the current branch by dispatching specialised reviewers
+   - Detects changed file kinds and runs matching auditor skills
+   - Aggregates findings into one severity-grouped report (read-only)
 
 ### Meta / Learning Commands
 
@@ -66,7 +65,7 @@ Every command logs its invocation to `.cursor/usage/command-log.jsonl` as Step 0
 
 ```json
 {"command":"/fix","timestamp":"2026-03-02T14:30:00","input":"#45"}
-{"command":"/commit","timestamp":"2026-03-02T16:00:00"}
+{"command":"/review-pr-v2","timestamp":"2026-03-02T16:00:00"}
 ```
 
 **Location:** `.cursor/usage/command-log.jsonl`
@@ -82,9 +81,10 @@ The following commands were removed during consolidation. Their functionality is
 | `/fix-gh-issue` | `/fix` (merged) |
 | `/fix-bug` | `/fix` (merged) |
 | `/mobile-issue` | `/fix` (merged) |
-| `/review` | `/commit` (pre-commit review built in) |
+| `/commit` | `git-commit` skill + `commit-intent-routing` rule |
+| `/review` | `git-commit` skill (pre-commit review) / `/review-pr-v2` (branch review) |
 | `/tdd` | `/test` (TDD mode option) |
-| `/regenerate-manifests` | Inline step in `/fix`, `/add-feature`, `/refine-feature`, `/commit` |
+| `/regenerate-manifests` | Inline step in `/fix`, `/add-feature`, `/refine-feature` |
 | `/branch` | Removed — use git directly |
 | `/pr` | Removed — use `gh pr create` or ask AI for description |
 | `/update-route` | Covered by `/add-feature` (route steps) |
@@ -146,7 +146,15 @@ Commands are adapted for **layer-based architecture**:
 
 ## Skills
 
-Optional deeper workflows in `.cursor/skills/`: **flutter-code-review**, **flutter-ui-refinement**, **git-commit**, **feature-planning**, **post-task-learning** (persist learning notes to LEARNING_LOG.md).
+Deeper workflows in `.cursor/skills/` (see `.cursor/skills/README.md` for the full index):
+
+- **git-commit** — secure, atomic commits (canonical commit path)
+- **pr-no-cursor-references** — no-tool-attribution validation for PR/commit text
+- **feature-planning** — phased, planning-only feature design
+- **flutter-code-review** / **flutter-ui-refinement** — code + UI review
+- **flutter-ios-transition-freeze** — iOS freeze / phantom-tap debugging
+- **riverpod-pattern-auditor** / **route-integrity-auditor** / **widget-placement-auditor** / **manifest-freshness-checker** — read-only PR auditors dispatched by `/review-pr-v2`
+- **post-task-learning** — persist learning notes to `LEARNING_LOG.md`
 
 ## Related Documentation
 
