@@ -1,0 +1,38 @@
+---
+description: Route plain commit intents to the git-commit skill
+alwaysApply: true
+---
+
+# Commit Intent Routing
+
+When the user expresses commit intent in natural language, always run the full
+`git-commit` skill workflow (`.cursor/skills/git-commit/SKILL.md`).
+
+The `git-commit` skill is the single canonical commit path — it covers
+untracked-file confirmation, security scanning, test verification, and atomic
+commit guidance. Do not fall back to a shortened `git commit` that skips those
+safety steps.
+
+## Trigger Phrases
+
+Treat any of these as a commit intent:
+
+- `commit`
+- `commit this`
+- `commit and push`
+- `push this` / `push to remote`
+- `save changes` / `save this`
+- `finalize changes`
+
+## Required Behavior
+
+- Run the `git-commit` skill end-to-end. Do not use a shortened `git commit`
+  path that skips the skill's safety steps.
+- Keep all safeguards (untracked-file confirm, secret scan, test run, atomic
+  commit, no tool-attribution footer).
+
+## Example
+
+- User: `commit and push`
+- Assistant: execute the `git-commit` skill workflow (Steps 0–8) before any
+  commit/push.
