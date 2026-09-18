@@ -1,125 +1,120 @@
-// Session-Stop integrity check for the Cursor stop hook.
-//
-// Imported by .cursor/hooks/stop.mjs so the agent loop verifies two invariants
-// when it ends:
-//   1. Codegen integrity — a changed .dart source carrying @riverpod/@freezed
-//      whose generated partner (.g.dart/.freezed.dart) is missing or older than
-//      the source (build_runner has not been re-run since the edit).
-//   2. Manifest freshness — a presentation source newer than its generated
-//      manifest (reused from session_status to avoid drift).
-//
-// Everything is local (git + fs) and scoped to git-changed files so it stays
-// fast enough to run on every agent stop. Non-blocking by design: the caller
-// reports the result, it never forces the loop to continue.
+// Shared Stop-time policy for both editor adapters. It is advisory and local:
+// adapters may surface or persist the result, but never force another turn.
 
-import { execSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
-import { dirname } from 'node:path';
-import { staleManifests } from './session_status.mjs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import {
+  BUILD_RUNNER_COMMAND,
+  MANIFEST_COMMAND,
+  changedFiles,
+  pendingCodegen,
+  staleManifests,
+} from './session_status.mjs';
 
-// mtime jitter tolerance (ms) so a git checkout that rewrites both files in the
-// same instant doesn't get flagged as stale.
-const TOLERANCE_MS = 2000;
+const INSTRUCTION_FILE =
+  /^(?:AGENTS\.md|CLAUDE\.md|ARCHITECTURE\.md|README\.md|lib\/AGENTS\.md|docs\/.+\.md|\.claude\/(?:rules|skills|agents)\/.+\.md|\.cursor\/(?:rules|commands)\/.+\.(?:md|mdc)|\.github\/workflows\/.+\.ya?ml)$/;
+const INSTRUCTION_VALIDATOR = 'scripts/ci/check_instruction_claims.mjs';
 
-/**
- * Run the full Stop-time integrity check.
- * @returns {{ok:boolean, codegen:string[], manifests:string[]}}
- */
-export function runIntegrityCheck() {
-  const codegen = staleCodegen();
-  const manifests = staleManifests();
-  return { ok: codegen.length === 0 && manifests.length === 0, codegen, manifests };
+export function isInstructionFile(path) {
+  return INSTRUCTION_FILE.test(path);
 }
 
 /**
- * Changed .dart sources whose generated partner is missing or older than the
- * source itself. This is the mtime-based counterpart to the git-set heuristic
- * in session_status: it catches an edited annotated file even when the stale
- * generated file was never touched.
- * @returns {string[]}
+ * Run the complete Stop-time integrity check.
+ * The instruction-claim extension is loaded only when the later CI validator exists.
+ * @param {{cwd?:string}} [options]
+ * @returns {Promise<{ok:boolean, codegen:string[], manifests:string[], claims:string[]}>}
  */
-function staleCodegen() {
-  const changed = changedFiles();
-  const stale = [];
-
-  for (const path of changed) {
-    if (!path.endsWith('.dart')) continue;
-    if (path.endsWith('.g.dart') || path.endsWith('.freezed.dart')) continue;
-    if (!existsSync(path)) continue;
-
-    let content;
-    try {
-      content = readFileSync(path, 'utf8');
-    } catch {
-      continue;
-    }
-
-    const base = path.replace(/\.dart$/, '');
-    const srcMtime = statSync(path).mtimeMs;
-
-    if (/@(riverpod|Riverpod)\b/.test(content) && isStalePartner(`${base}.g.dart`, srcMtime)) {
-      stale.push(path);
-      continue;
-    }
-    if (/@(freezed|Freezed)\b/.test(content) && isStalePartner(`${base}.freezed.dart`, srcMtime)) {
-      stale.push(path);
-    }
-  }
-  return stale;
+export async function runIntegrityCheck({ cwd = process.cwd() } = {}) {
+  const changed = changedFiles({ cwd });
+  const codegen = pendingCodegen(changed, { cwd });
+  const manifests = staleManifests(changed, { cwd });
+  const claims = await unresolvedClaims(changed, { cwd });
+  return {
+    ok: codegen.length === 0 && manifests.length === 0 && claims.length === 0,
+    codegen,
+    manifests,
+    claims,
+  };
 }
 
-// A partner is stale if it does not exist, or the source was modified more than
-// TOLERANCE_MS after the partner was last generated.
-function isStalePartner(partner, srcMtime) {
-  if (!existsSync(partner)) return true;
+/**
+ * Validate changed instruction files when the optional CI implementation exists.
+ * Absence, import failure, or validator failure is fail-open for editor hooks.
+ * @param {Iterable<string>} [changed]
+ * @param {{cwd?:string}} [options]
+ */
+export async function unresolvedClaims(changed, { cwd = process.cwd() } = {}) {
+  const validatorPath = join(cwd, INSTRUCTION_VALIDATOR);
+  if (!existsSync(validatorPath)) return [];
+
+  const documents = [...(changed ?? changedFiles({ cwd }))]
+    .filter(path => isInstructionFile(path) && existsSync(join(cwd, path)));
+  if (documents.length === 0) return [];
+
   try {
-    return srcMtime - statSync(partner).mtimeMs > TOLERANCE_MS;
+    const validator = await import(pathToFileURL(validatorPath).href);
+    if (
+      typeof validator.buildIndex !== 'function' ||
+      typeof validator.checkDocument !== 'function'
+    ) {
+      return [];
+    }
+    const index = validator.buildIndex(cwd);
+    return documents
+      .flatMap(path =>
+        validator.checkDocument({
+          path,
+          text: readFileSync(join(cwd, path), 'utf8'),
+          index,
+        }),
+      )
+      .map(violation => `${violation.path}:${violation.line} ${violation.message}`);
   } catch {
-    return true;
+    return [];
   }
-}
-
-function changedFiles() {
-  const status = git('status --porcelain');
-  if (!status) return [];
-  const out = new Set();
-  for (const line of status.split('\n')) {
-    const p = line.slice(3).trim();
-    if (p) out.add(p.replace(/^"|"$/g, ''));
-  }
-  return [...out];
 }
 
 /**
  * Human-readable pass/fail summary.
- * @param {{ok:boolean, codegen:string[], manifests:string[]}} result
+ * @param {{ok:boolean, codegen:string[], manifests:string[], claims?:string[]}} result
  * @returns {string}
  */
 export function formatIntegritySummary(result) {
-  if (result.ok) return 'Integrity check: PASS — codegen and manifests are up to date.';
+  if (result.ok) {
+    return 'Integrity check: PASS — codegen, manifests, and instruction claims are current.';
+  }
 
   const lines = ['Integrity check: ACTION NEEDED'];
   if (result.codegen.length > 0) {
     lines.push(
       `- ${result.codegen.length} source(s) changed since last build_runner — run: ` +
-        'dart run build_runner build -d',
+        BUILD_RUNNER_COMMAND,
     );
     for (const f of result.codegen.slice(0, 8)) lines.push(`    · ${f}`);
   }
   if (result.manifests.length > 0) {
     lines.push(
       `- ${result.manifests.length} manifest(s) may be stale — run: ` +
-        'dart run scripts/generate_feature_manifests.dart',
+        MANIFEST_COMMAND,
     );
     lines.push(`    · ${result.manifests.join(', ')}`);
+  }
+  if (result.claims?.length > 0) {
+    lines.push(
+      `- ${result.claims.length} instruction claim(s) do not resolve against source — run: ` +
+        `node ${INSTRUCTION_VALIDATOR}`,
+    );
+    for (const claim of result.claims.slice(0, 8)) lines.push(`    · ${claim}`);
   }
   return lines.join('\n');
 }
 
 /**
  * Persist the result as JSON for later inspection / tooling.
- * @param {string} file  Target path, e.g. `.cursor/last-session-status.json`.
- * @param {{ok:boolean, codegen:string[], manifests:string[]}} result
+ * @param {string} file Target path, e.g. `.cursor/last-session-status.json`.
+ * @param {{ok:boolean, codegen:string[], manifests:string[], claims?:string[]}} result
  */
 export function writeStatus(file, result) {
   try {
@@ -149,16 +144,4 @@ export function readStdin() {
     process.stdin.on('end', () => resolve(data));
     setTimeout(() => resolve(data), 2000);
   });
-}
-
-function git(args) {
-  try {
-    return execSync(`git ${args}`, {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-      timeout: 1500,
-    }).trim();
-  } catch {
-    return '';
-  }
 }

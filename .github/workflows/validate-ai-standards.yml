@@ -2,16 +2,32 @@ name: Validate AI-Forward Standards
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, edited]
     paths:
-      - 'lib/presentation/**'
-      - 'lib/data/repositories/**'
-      - 'lib/models/**'
-      - 'lib/core/**'
-      - 'scripts/generate_feature_manifests.dart'
-      - 'lib/manifests/**'
+      - 'AGENTS.md'
+      - 'CLAUDE.md'
+      - 'ARCHITECTURE.md'
+      - 'README.md'
+      - 'docs/**'
+      - '.claude/**'
+      - '.cursor/**'
+      - '.github/workflows/**'
+      - 'lib/**'
+      - 'scripts/**'
       - 'test/**'
       - 'ios/**'
       - 'android/**'
+      - 'linux/**'
+      - 'macos/**'
+      - 'web/**'
+      - 'windows/**'
+      - '.env.example'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - 'analysis_options.yaml'
+
+permissions:
+  contents: read
 
 concurrency:
   group: ai-standards-${{ github.head_ref || github.ref }}
@@ -48,13 +64,139 @@ jobs:
             echo ""
             echo "Please fix failing tests before merging."
             echo "If you modified:"
-            echo "  - Models: Update tests in test/models/"
+            echo "  - Models: Update tests in test/domain/"
             echo "  - Repositories: Update tests in test/repositories/"
             echo "  - Controllers: Update tests in test/presentation/"
             echo "  - Views/Widgets: Update tests in test/presentation/ (e.g. *_view_test.dart, *_widget_test.dart)"
             exit 1
           fi
           echo "✅ All unit and widget tests passed"
+
+  instruction-standards:
+    name: Instruction Standards
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Reject tool attribution
+        id: attribution
+        if: always()
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          patterns="$RUNNER_TEMP/attribution-patterns.txt"
+          text="$RUNNER_TEMP/pr-attribution-text.txt"
+          sed -n '/^```attribution-pattern$/,/^```$/p' .claude/rules/no-tool-attribution.md | sed '1d;$d' > "$patterns"
+          test -s "$patterns" || { echo "::error::Attribution pattern block is missing"; exit 1; }
+          printf '%s\n' "$PR_TITLE" "$PR_BODY" > "$text"
+          git log "$BASE_SHA..$HEAD_SHA" --format=%B >> "$text"
+          if grep -Eni -f "$patterns" "$text"; then
+            echo "::error::Remove the tool attribution matched above from the PR or its commits"
+            exit 1
+          else
+            result=$?
+            test "$result" -eq 1 || exit "$result"
+          fi
+
+      - name: Test and run instruction validation
+        id: instruction-claims
+        if: always()
+        run: |
+          node --test scripts/ai/session_status.test.mjs scripts/ci/check_instruction_claims.test.mjs scripts/ci/check_flutter_analyze_baseline.test.mjs
+          node scripts/ci/check_instruction_claims.mjs
+
+      - name: Instruction standards gate
+        if: always()
+        run: |
+          FAILED=""
+          [ "${{ steps.setup-node.outcome }}" != "success" ] && FAILED="${FAILED} node-setup"
+          [ "${{ steps.attribution.outcome }}" = "failure" ] && FAILED="${FAILED} attribution"
+          [ "${{ steps.instruction-claims.outcome }}" = "failure" ] && FAILED="${FAILED} instruction-claims"
+
+          if [ -n "$FAILED" ]; then
+            echo "❌ Instruction standards failed:${FAILED}"
+            exit 1
+          fi
+          echo "✅ Instruction standards passed"
+
+  flutter-analysis:
+    name: Flutter Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        id: flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        id: dependencies
+        if: always()
+        run: flutter pub get
+
+      - name: Create .env file
+        id: environment
+        if: always()
+        run: cp .env.example .env
+
+      - name: Run Flutter analyzer
+        id: flutter-analyze
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          flutter analyze --no-pub
+          status=$?
+          set -e
+          echo "exit-code=$status" >> "$GITHUB_OUTPUT"
+          if [ "$status" -gt 1 ]; then
+            exit "$status"
+          fi
+
+      - name: Enforce analyzer baseline
+        id: analyze-baseline
+        if: always()
+        run: >-
+          node scripts/ci/check_flutter_analyze_baseline.mjs
+          --run
+          --flutter-exit-code=${{ steps.flutter-analyze.outputs.exit-code }}
+
+      - name: Flutter analysis gate
+        if: always()
+        run: |
+          FAILED=""
+          [ "${{ steps.flutter.outcome }}" != "success" ] && FAILED="${FAILED} flutter-setup"
+          [ "${{ steps.dependencies.outcome }}" != "success" ] && FAILED="${FAILED} dependencies"
+          [ "${{ steps.environment.outcome }}" != "success" ] && FAILED="${FAILED} environment"
+          [ "${{ steps.flutter-analyze.outcome }}" = "failure" ] && FAILED="${FAILED} flutter-analyze"
+          [ "${{ steps.analyze-baseline.outcome }}" = "failure" ] && FAILED="${FAILED} analyzer-baseline"
+
+          if [ -n "$FAILED" ]; then
+            echo "❌ Flutter analysis failed:${FAILED}"
+            exit 1
+          fi
+          echo "✅ Flutter analysis passed"
 
   manifest-freshness:
     name: Manifest Freshness Check
@@ -446,19 +588,28 @@ jobs:
   validation-summary:
     name: Validation Summary
     runs-on: ubuntu-latest
-    needs: [ unit-and-widget-tests, manifest-freshness, static-checks ]
+    needs:
+      - unit-and-widget-tests
+      - instruction-standards
+      - flutter-analysis
+      - manifest-freshness
+      - static-checks
     if: always()
 
     steps:
       - name: Check validation results
         run: |
           if [ "${{ needs.unit-and-widget-tests.result }}" != "success" ] || \
+             [ "${{ needs.instruction-standards.result }}" != "success" ] || \
+             [ "${{ needs.flutter-analysis.result }}" != "success" ] || \
              [ "${{ needs.manifest-freshness.result }}" != "success" ] || \
              [ "${{ needs.static-checks.result }}" != "success" ]; then
             echo "❌ Some validation checks failed. Please review the errors above."
             echo ""
             echo "Results:"
             echo "  - Unit & Widget Tests: ${{ needs.unit-and-widget-tests.result }}"
+            echo "  - Instruction Standards: ${{ needs.instruction-standards.result }}"
+            echo "  - Flutter Analysis: ${{ needs.flutter-analysis.result }}"
             echo "  - Manifest Freshness: ${{ needs.manifest-freshness.result }}"
             echo "  - Static Checks: ${{ needs.static-checks.result }}"
             exit 1

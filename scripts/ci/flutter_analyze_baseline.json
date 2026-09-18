@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "total": 24,
+  "diagnostics": [
+    {
+      "severity": "INFO",
+      "code": "CONSTANT_IDENTIFIER_NAMES",
+      "path": "lib/core/constants/state_errors.dart",
+      "count": 3
+    },
+    {
+      "severity": "INFO",
+      "code": "DEPEND_ON_REFERENCED_PACKAGES",
+      "path": "lib/core/services/local_notifications_service/local_notifications_service.dart",
+      "count": 1
+    },
+    {
+      "severity": "INFO",
+      "code": "IMPLEMENTATION_IMPORTS",
+      "path": "lib/core/services/local_notifications_service/local_notifications_service.dart",
+      "count": 1
+    },
+    {
+      "severity": "INFO",
+      "code": "UNNECESSARY_IMPORT",
+      "path": "lib/core/services/local_notifications_service/local_notifications_service_provider.dart",
+      "count": 1
+    },
+    {
+      "severity": "INFO",
+      "code": "UNNECESSARY_IMPORT",
+      "path": "lib/core/services/network_service/network_service_providers.dart",
+      "count": 1
+    },
+    {
+      "severity": "INFO",
+      "code": "DEPRECATED_MEMBER_USE",
+      "path": "lib/core/theme/theme.dart",
+      "count": 8
+    },
+    {
+      "severity": "INFO",
+      "code": "UNNECESSARY_IMPORT",
+      "path": "lib/core/utils/shared_prefs/shared_prefs_provider.dart",
+      "count": 1
+    },
+    {
+      "severity": "INFO",
+      "code": "UNNECESSARY_IMPORT",
+      "path": "lib/data/firebase/firebase_api_providers.dart",
+      "count": 1
+    },
+    {
+      "severity": "INFO",
+      "code": "AVOID_PRINT",
+      "path": "test/domain/user_test.dart",
+      "count": 1
+    },
+    {
+      "severity": "INFO",
+      "code": "DEPEND_ON_REFERENCED_PACKAGES",
+      "path": "test/presentation/bottom_navigation/bottom_navigation_controller_test.dart",
+      "count": 1
+    },
+    {
+      "severity": "INFO",
+      "code": "DEPEND_ON_REFERENCED_PACKAGES",
+      "path": "test/presentation/login/login_controller_test.dart",
+      "count": 1
+    },
+    {
+      "severity": "WARNING",
+      "code": "UNUSED_IMPORT",
+      "path": "test/presentation/splash/mocks/mock_local_notifications_service.dart",
+      "count": 1
+    },
+    {
+      "severity": "INFO",
+      "code": "DEPEND_ON_REFERENCED_PACKAGES",
+      "path": "test/presentation/splash/splash_controller_test.dart",
+      "count": 1
+    },
+    {
+      "severity": "WARNING",
+      "code": "UNUSED_IMPORT",
+      "path": "test/presentation/splash/splash_controller_test.dart",
+      "count": 2
+    }
+  ]
+}

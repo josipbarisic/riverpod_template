@@ -46,5 +46,7 @@ app.*.map.json
 # Coverage reports
 coverage/
 
-# Cursor AI runtime artifacts (written by the stop hook each session)
+# Local hook runtime artifacts
 .cursor/last-session-status.json
+.cursor/usage/
+.claude/last-session-status.json

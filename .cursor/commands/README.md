@@ -1,165 +1,38 @@
-# Cursor Commands (Riverpod Template)
+# Cursor Commands
 
-This directory contains Cursor IDE slash commands for standardized AI workflows.
+These ten slash commands are thin entry points into the repository workflow.
+Root `AGENTS.md` owns complexity, FVM discovery, generation, testing, and Git
+safety. Canonical conventions live in `.claude/rules/*.md`.
 
-**Focused command set** for clarity and reduced maintenance. Committing is handled
-by the `git-commit` skill (routed automatically from natural-language commit
-intent by `.cursor/rules/commit-intent-routing.mdc`), not a slash command.
+## Current commands
 
-## Available Commands
+1. `/fix` — diagnose and implement a scoped issue or bug fix
+2. `/add-feature` — plan and implement a feature using the live architecture
+3. `/refine-feature` — improve an existing feature without scope drift
+4. `/analyse` — read-only feature analysis grounded in source and its manifest
+5. `/test` — add focused unit, widget, or integration coverage
+6. `/remove` — remove a file or feature after reference and impact analysis
+7. `/review-pr-v2` — read-only branch review using canonical reviewer agents
+8. `/enhance-prompt` — ground a raw task prompt in verified repository context
+9. `/review-learnings` — read-only review of `docs/LEARNING_LOG.md`
+10. `/start-new-project` — gather requirements and plan a template-derived app
 
-### Core Commands (Daily Use)
+Natural-language commit intent is routed by
+`.claude/rules/commit-intent-routing.md` to
+`.claude/skills/git-commit/SKILL.md`.
 
-1. **`/fix`** — Fix any issue: GitHub issue (by number/URL), user-reported bug, or other
-   - Smart input detection: GitHub issue → fetches via `gh`; text description → direct
-   - Unified discovery → tier → plan → implement → verify flow
-   - Merged from: `/fix-gh-issue`, `/fix-bug`, `/mobile-issue`
+## Shared command model
 
-2. **`/add-feature`** — Add a new feature/screen
-   - Asks complexity (Tier 1/2/3); Tier 3 requires approval
-   - Asks development approach (TDD / Implementation First / Only)
-   - Follows layer-based architecture patterns
-   - Creates views, controllers, states, routes
+- Read root `AGENTS.md` first and use its supplied or requested complexity tier.
+- For feature work, follow `lib/AGENTS.md`, regenerate, and read the flat
+  `lib/manifests/<feature>.manifest.generated.json`.
+- Treat live `lib/` and `test/` source as authoritative.
+- Use `lib/models/` for application models.
+- Update route paths in `lib/core/routing/app_route.dart` and registrations in
+  `lib/core/routing/router.dart`.
+- Use Riverpod annotation code generation only.
+- Run bare Dart and Flutter commands from the repository root after the FVM
+  discovery defined by `AGENTS.md`.
 
-3. **`/refine-feature`** — Iteratively refine an existing feature
-   - Fix violations, add integrations, improve code quality
-   - Asks complexity (Tier 1/2/3); Tier 3 requires approval
-
-4. **`/analyse`** — Analyse a feature with manifest-based discovery
-   - Structured report: purpose, architecture, controllers, API, UI/UX, strengths, gaps
-   - Reads AGENTS.md and feature manifest; checks staleness
-
-### Specialized Commands (Periodic Use)
-
-5. **`/test`** — Create tests (unit, widget, or integration)
-   - Standard mode: write tests for existing code
-   - TDD mode: Red-Green-Refactor cycle
-   - Merged from: `/test` + `/tdd`
-
-6. **`/remove`** — Remove a feature, widget, or file and all references
-   - Impact analysis with safety warnings
-   - Requires explicit confirmation when removal affects other features
-
-7. **`/review-pr-v2`** — Review the current branch by dispatching specialised reviewers
-   - Detects changed file kinds and runs matching auditor skills
-   - Aggregates findings into one severity-grouped report (read-only)
-
-### Meta / Learning Commands
-
-8. **`/enhance-prompt`** — Enhance and optimize any prompt for AI effectiveness
-   - Classifies intent, gathers codebase context, structures with requirements and constraints
-
-9. **`/review-learnings`** — Review accumulated learning notes
-   - Category heatmap, recurring themes, blind spots, focus areas
-
-### Template-Only
-
-10. **`/start-new-project`** — Initialize a new project from this template
-    - Requirements gathering, project specification, implementation plan
-
-## Usage Tracking
-
-Every command logs its invocation to `.cursor/usage/command-log.jsonl` as Step 0.
-
-**Format:** One JSON line per invocation:
-
-```json
-{"command":"/fix","timestamp":"2026-03-02T14:30:00","input":"#45"}
-{"command":"/review-pr-v2","timestamp":"2026-03-02T16:00:00"}
-```
-
-**Location:** `.cursor/usage/command-log.jsonl`
-
-Use this to review which commands you use, how often, and to spot workflow patterns.
-
-## Removed Commands
-
-The following commands were removed during consolidation. Their functionality is merged into the commands above or covered by rules in `.cursor/rules/`.
-
-| Removed | Absorbed By |
-|---------|-------------|
-| `/fix-gh-issue` | `/fix` (merged) |
-| `/fix-bug` | `/fix` (merged) |
-| `/mobile-issue` | `/fix` (merged) |
-| `/commit` | `git-commit` skill + `commit-intent-routing` rule |
-| `/review` | `git-commit` skill (pre-commit review) / `/review-pr-v2` (branch review) |
-| `/tdd` | `/test` (TDD mode option) |
-| `/regenerate-manifests` | Inline step in `/fix`, `/add-feature`, `/refine-feature` |
-| `/branch` | Removed — use git directly |
-| `/pr` | Removed — use `gh pr create` or ask AI for description |
-| `/update-route` | Covered by `/add-feature` (route steps) |
-| `/grind` | Removed — describe batch operations ad-hoc |
-
-## Usage
-
-1. In Cursor Chat, type `/` to see available commands
-2. Select a command from the dropdown
-3. Command content loads — you can edit before submitting
-4. AI follows the command step-by-step
-
-## GitHub Integration
-
-- **GitHub CLI (`gh`)** — required for `/fix` when using a GitHub issue number or URL
-- **Authentication:** `gh auth login`
-- From project root, `gh issue view {number}` uses the current repository
-
-## Command Patterns
-
-All commands follow these patterns:
-
-### 1. Usage Tracking (Step 0)
-
-Every command logs to `.cursor/usage/command-log.jsonl` as its first step.
-
-### 2. Mandatory Reads (ZERO-DRIFT)
-
-- Read `ARCHITECTURE.md` (or `lib/AGENTS.md`)
-- Generate/read manifests when relevant
-- Read relevant feature manifests: `lib/manifests/{feature}.manifest.generated.json`
-
-### 3. Complexity Scale (User-Assigned)
-
-- **Tier 1 – Quick:** Single file, small change → Minimal discovery → Execute
-- **Tier 2 – Moderate:** A few files, clear scope → Short discovery + plan → Execute
-- **Tier 3 – Large:** New feature or big change → Full discovery + spec + plan → **Wait for approval** → Execute
-
-Full definition: `.cursor/docs/COMPLEXITY_AND_DISCOVERY.md`
-
-### 4. Anti-Drift Checklist
-
-- Prevents scope creep
-- Ensures only requested changes
-
-### 5. Verification
-
-- Run `flutter analyze && flutter test`
-- Self-correction protocol for failures
-
-## Architecture
-
-Commands are adapted for **layer-based architecture**:
-
-- **Direct imports:** `package:riverpod_template/...`
-- **Layer paths:** `lib/presentation/`, `lib/data/`, `lib/models/`, `lib/core/`
-- **AppRoute** pattern: `lib/core/routing/app_route.dart`, `lib/core/routing/router.dart`
-- **Manifests:** `lib/manifests/{feature}.manifest.generated.json`
-
-## Skills
-
-Deeper workflows in `.cursor/skills/` (see `.cursor/skills/README.md` for the full index):
-
-- **git-commit** — secure, atomic commits (canonical commit path)
-- **pr-no-cursor-references** — no-tool-attribution validation for PR/commit text
-- **feature-planning** — phased, planning-only feature design
-- **flutter-code-review** / **flutter-ui-refinement** — code + UI review
-- **flutter-ios-transition-freeze** — iOS freeze / phantom-tap debugging
-- **riverpod-pattern-auditor** / **route-integrity-auditor** / **widget-placement-auditor** / **manifest-freshness-checker** — read-only PR auditors dispatched by `/review-pr-v2`
-- **post-task-learning** — persist learning notes to `LEARNING_LOG.md`
-
-## Related Documentation
-
-- **AI Agent Guide:** `lib/AGENTS.md`
-- **Complexity & Discovery:** `.cursor/docs/COMPLEXITY_AND_DISCOVERY.md`
-- **Learning Log:** `.cursor/docs/LEARNING_LOG.md`
-- **Feature READMEs:** `lib/presentation/{feature}/README.md`
-- **Cursor Rules:** `.cursor/rules/`
+Reusable workflows live in `.claude/skills/`. Read-only advisory reviewers live
+in `.claude/agents/` and never act as CI gates.

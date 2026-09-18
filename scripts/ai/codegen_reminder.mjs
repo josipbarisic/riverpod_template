@@ -1,8 +1,7 @@
 // Shared codegen-reminder policy for the post-tool-use hook.
 //
-// Imported by the Cursor postToolUse hook (.cursor/hooks/). This module owns
-// annotation detection and the per-session debounce; the hook only adapts the
-// result to its own JSON contract.
+// Imported by both post-tool-use adapters. This module owns annotation
+// detection and the per-session debounce; adapters only translate payloads.
 //
 // Rationale: editing a file that carries @riverpod / @freezed (or another
 // build_runner) annotation without regenerating produces confusing runtime

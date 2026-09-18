@@ -1,0 +1,7 @@
+---
+description: Riverpod code generation, ref semantics, lifecycle, and state classes
+globs: lib/**/*controller*.dart,lib/**/*provider*.dart,lib/**/*state*.dart,lib/core/utils/user_handler/*.dart
+alwaysApply: false
+---
+
+Read `.claude/rules/dart-state.md` — the only copy of this rule.

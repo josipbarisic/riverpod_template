@@ -1,52 +1,22 @@
-# Cursor Rules (Riverpod Template)
+# Cursor Rule Pointers
 
-Rules are the **source of truth** for how the agent writes code in this repo.
-Commands and skills are workflows that *apply* these rules — when they diverge,
-the rule wins.
+`AGENTS.md` is the primary all-agent instruction source. Canonical path-scoped rules live only in
+`.claude/rules/*.md`.
 
-## How Rules Apply
+`riverpod-template.mdc` is the sole always-applied Cursor entry point. Every other `.mdc` file is a
+scoped pointer whose `globs:` correspond to the canonical rule's `paths:`. Do not copy rule text
+into this directory.
 
-- **Always-applied** rules (`alwaysApply: true`) are injected into every request.
-- **Glob-scoped** rules (front-matter `globs:`) apply only to matching files.
-- Rules are `.mdc` files with YAML front-matter (`description`, and either
-  `alwaysApply: true` or `globs:`).
-
-## Rule Index
-
-| Rule | Scope | Owns |
+| Cursor pointer | Canonical owner | Scope |
 |---|---|---|
-| `project-context.mdc` | always | Template structure, architecture, environments, build commands. |
-| `discovery-first.mdc` | always | Tier 1/2/3 complexity model. Tier 3 = wait for approval. |
-| `pre-edit-checklist.mdc` | always | Critical constraints: separate widget files, absolute imports, strict layers, no `dynamic`. |
-| `ai-workflow.mdc` | always | When to read manifests, codegen commands, reference docs. |
-| `commit-intent-routing.mdc` | always | Routes natural-language commit intent to the `git-commit` skill. |
-| `no-tool-attribution.mdc` | always | Repo-wide: no Cursor/AI attribution in PRs, commits, code, or docs. |
-| `post-task-learning.mdc` | always | Append a Supervisor's Briefing after every task; persist via the skill. |
-| `dart-riverpod.mdc` | `**/*.dart` | Riverpod patterns, state classes, codegen, `AsyncValue`, `keepAlive`. |
-| `dart-widget-rules.mdc` | `**/*.dart` | Widget structure, base-class selection, one class per file. |
-| `dart-navigation.mdc` | `**/*.dart` | GoRouter patterns, `AppRoute` constants, navigation extensions. |
-| `dart-imports.mdc` | `**/*.dart` | Absolute package imports; import ordering. |
-| `dart-naming.mdc` | `**/*.dart` | File/class/provider naming. |
-| `dart-expression-bodies.mdc` | `**/*.dart` | Arrow syntax vs block bodies. |
+| `dart-conventions.mdc` | `.claude/rules/dart-conventions.md` | Dart under `lib/` |
+| `dart-state.mdc` | `.claude/rules/dart-state.md` | Controllers, providers, states, user handler |
+| `dart-widgets.mdc` | `.claude/rules/dart-widgets.md` | Presentation Dart |
+| `dart-navigation.mdc` | `.claude/rules/dart-navigation.md` | Routing, deeplinks, presentation navigation |
+| `claims-need-source.mdc` | `.claude/rules/claims-need-source.md` | Source, tests, tooling, platforms, docs |
+| `no-tool-attribution.mdc` | `.claude/rules/no-tool-attribution.md` | Repository artifacts |
+| `commit-intent-routing.mdc` | `.claude/rules/commit-intent-routing.md` | Repository artifacts |
+| `post-task-learning.mdc` | `.claude/rules/post-task-learning.md` | Repository artifacts |
 
-## Enforcement
-
-Several rules are backed by automation so they can't silently drift:
-
-- **Hooks** (`.cursor/hooks.json`) — block hand-edits to generated files, remind
-  to run `build_runner`, and report branch/manifest/codegen status on session start.
-- **CI** (`.github/workflows/validate-ai-standards.yml`) — enforces absolute
-  imports, no `dynamic`, no private `_build` methods, manifest freshness, and
-  config-file integrity.
-
-## Authoring Conventions
-
-- Filenames are kebab-case: `dart-<topic>.mdc`.
-- Keep each rule focused on one concern; cross-reference rather than duplicate.
-- Prefer `globs:` scoping over `alwaysApply` when a rule only affects some files.
-
-## Related
-
-- Skills: `.cursor/skills/README.md`
-- Commands: `.cursor/commands/README.md`
-- Complexity model: `.cursor/docs/COMPLEXITY_AND_DISCOVERY.md`
+When policy changes, edit the canonical Markdown file. Change its pointer only when the canonical
+`paths:` change.

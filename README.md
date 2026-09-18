@@ -1,150 +1,99 @@
 # riverpod_template
 
-A new Flutter project.
+A Flutter application template with Riverpod code generation, Freezed models, GoRouter,
+Firebase integrations, dev/prod flavors, and generated feature manifests.
 
-## Getting Started
+## Run the template
 
-This project is a starting point for a Flutter application.
+```bash
+flutter pub get
+cp .env.example .env
+flutter run --flavor dev -t lib/main_dev.dart
+```
 
-A few resources to get you started if this is your first Flutter project:
+The production entry point is `lib/main_prod.dart`:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```bash
+flutter run --flavor prod -t lib/main_prod.dart
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Commands are documented in bare Flutter/Dart form. `AGENTS.md` defines the FVM discovery policy
+for automated work without making FVM a template dependency.
 
-This template's architecture is based off of the
-following: https://codewithandrea.com/articles/flutter-app-architecture-riverpod-introduction/
+## Architecture
 
-Template relies on Riverpod and is utilising its auto-generation for providers feature. To learn
-more about it, check the following: https://codewithandrea.com/articles/flutter-riverpod-generator/
+```text
+lib/
+├── core/          # Routing, services, theme, configuration, utilities
+├── data/          # Firebase integration and repositories
+├── models/        # Freezed application models
+├── presentation/  # Feature-grouped views, controllers, states, widgets
+└── manifests/     # Generated feature context
+```
 
-There are multiple sources to get you more familiar with both riverpod in general and the
-architecture/structure of this template:
+Read `ARCHITECTURE.md` for layer responsibilities and `lib/AGENTS.md` for the live feature and
+manifest workflow.
 
-- [Structure](https://codewithandrea.com/articles/flutter-project-structure/)
-- [Domain Layer](https://codewithandrea.com/articles/flutter-app-architecture-domain-model/)
-- [Presentation Layer](https://codewithandrea.com/articles/flutter-presentation-layer/)
-- Data Layer
-  - Data Layer encompasses Repositories and Models as mentioned in the Structure section.
-  - [Data utilisation/flow and mutations](https://codewithandrea.com/articles/data-mutations-riverpod/)
-- [Repository Pattern](https://codewithandrea.com/articles/flutter-repository-pattern/)
-- [Application/Service
-  Layer](https://codewithandrea.com/articles/flutter-app-architecture-application-layer/)
+Riverpod providers use annotation-based generation only. Project imports use direct
+`package:riverpod_template/...` paths.
 
-Several other useful resources:
+## Code generation
 
-- [Data Caching and Provider
-  Lifecycle](https://codewithandrea.com/articles/flutter-riverpod-data-caching-providers-lifecycle/)
+After changing Riverpod, Freezed, or JSON-serializable annotations:
 
-This template is not a one-size-fits-all solution. It is a starting point and
-everything in it is subject to change based on the requirements of the project. It is a good idea to
-familiarise yourself with the architecture and structure of the template and adjust it to your
-needs.
+```bash
+dart run build_runner build -d
+```
 
----
+Never hand-edit `*.g.dart` or `*.freezed.dart`.
 
-## AI-First Setup (included in template)
+## Feature manifests
 
-This template ships with an **AI-first development** setup so every project you start from it gets the same workflows and context for AI agents (e.g. Cursor, Claude).
+`scripts/generate_feature_manifests.dart` scans `lib/presentation/`,
+`lib/core/routing/app_route.dart`, `lib/core/routing/router.dart`, repositories, providers, and
+tests. It writes `lib/manifests/<feature>.manifest.generated.json`.
 
-### What’s included
-
-- **`.cursor/rules/`** – Always-on rules: project context, AI workflow, discovery-first, pre-edit checklist, Dart conventions (imports, navigation, Riverpod, widgets).
-- **`.cursor/commands/`** – Slash commands: `/add-feature`, `/fix-bug`, `/review`, `/commit`, `/regenerate-manifests`, `/analyse`, etc. Type `/` in Cursor Chat to see them.
-- **`.cursor/docs/`** – Complexity scale and discovery-first workflow (Tier 1/2/3).
-- **`lib/manifests/`** – Auto-generated feature manifests (JSON per feature: exports, routes, providers, API usage). Keeps AI context in sync with the codebase.
-- **`scripts/generate_feature_manifests.dart`** – Generates manifests from `lib/presentation/`, `lib/routing/router.dart` (RoutePath), and repositories.
-- **`lib/AGENTS.md`** – Quick reference for AI agents (what to read, when to regenerate manifests).
-- **`ARCHITECTURE.md`** – Architecture and conventions.
-- **`CLAUDE.md`** – Claude-specific instructions (ZERO-DRIFT workflow).
-- **`.cursor/skills/`** – Agent skills: flutter-code-review, flutter-ui-refinement, git-commit, feature-planning (for deeper review, UI refinement, commit workflow, and feature planning).
-
-### When starting a new project from this template
-
-1. **Rename the package** (e.g. `riverpod_template` → `my_app`) in `pubspec.yaml` and across the codebase.
-2. **Update AI references** – In `.cursor/rules/`, `.cursor/commands/`, and `lib/AGENTS.md`, replace `riverpod_template` with your package name.
-3. **Regenerate manifests** after changing structure:
-   ```bash
-   dart run scripts/generate_feature_manifests.dart
-   ```
-4. **Use slash commands** – `/add-feature`, `/fix-bug`, `/review`, `/commit`, `/analyse` follow the same patterns as in this template.
-
-### Regenerating manifests
-
-Run after adding or moving views, controllers, routes, or repositories:
+Regenerate after structural feature changes:
 
 ```bash
 dart run scripts/generate_feature_manifests.dart
 ```
 
-Manifests are written to `lib/manifests/*.manifest.generated.json`. Do not edit these files by hand.
+Generated manifests are context, not source. Do not edit them by hand.
 
----
-
-## Testing
-
-This template includes a complete testing setup with patterns for unit, widget, and integration tests.
-
-### Testing Documentation
-
-- **`docs/TESTING_STRATEGY.md`** – Philosophy, pyramid, patterns, and best practices
-- **`lib/AGENTS.md`** – Testing sections for AI agents (workflow, manifest testing, mocking)
-
-### Test Structure
-
-```
-test/
-├── presentation/           # Feature tests
-│   ├── splash/
-│   │   ├── splash_controller_test.dart
-│   │   └── mocks/
-│   │       ├── mock_firebase_api.dart
-│   │       └── mock_local_notifications_service.dart
-│   └── login/
-│       └── mocks/
-│           └── mock_auth_repository.dart
-├── test_data/              # Shared test data factories
-│   └── auth_test_data.dart
-└── helpers/                # Test utilities
-```
-
-### Running Tests
+## Analyze and test
 
 ```bash
-# Run all tests
+flutter analyze
 flutter test
-
-# Run specific feature tests
-flutter test test/presentation/splash/
-
-# Run with coverage
+flutter test test/presentation/login/
 flutter test --coverage
 ```
 
-### Pre-Commit Requirement
+The current suite has tests under `test/domain/`, `test/presentation/`, `test/repositories/`,
+`test/services/`, and `test/utils/`, plus shared helpers and test data. The pull-request workflow
+runs the full unit/widget suite for application, test, and platform changes.
 
-**All tests must pass before every commit.** Never commit with failing tests.
+## Agent instruction model
 
-When modifying a feature:
-1. Check manifest for `testing.hasTests`
-2. Run feature tests before and after changes
-3. Add tests for new functionality
+- `AGENTS.md` is the primary instruction source for every agent.
+- `CLAUDE.md` imports `AGENTS.md` and contains only Claude-specific integration notes.
+- `.claude/rules/*.md` is the canonical home of path-scoped rules.
+- `.claude/skills/*/SKILL.md` contains reusable workflow implementations.
+- `.claude/agents/*.md` contains read-only advisory reviewers.
+- `.cursor/rules/*.mdc` contains one always-applied entry point and scoped pointers to those rules.
+- `.cursor/commands/*.md` contains the ten slash-command entry points.
+- `lib/AGENTS.md` covers feature manifests, layer placement, and test discovery.
+- `docs/LEARNING_LOG.md` stores transferable implementation insights.
 
-Use `/review` command to run the full pre-commit checklist including tests.
+## Starting a project from the template
 
----
+1. Rename `riverpod_template` in `pubspec.yaml`, Dart package imports, bundle/application
+   identifiers, and instruction examples.
+2. Replace template Firebase and environment configuration for the new application.
+3. Run code generation.
+4. Regenerate feature manifests.
+5. Run `flutter analyze` and `flutter test`.
 
-[Important note]: Template has Firebase set up in order to implement widely used features such as
-Push Notifications, Authentication, etc. If you are not planning to use Firebase, make sure to
-remove all the Firebase related code and dependencies. Outside of pubspec.yaml, those are:
-
-- firebase.json
-- firebase_options.dart
-- android/app/google-services.json
-- ios/Runner/GoogleService-Info.plist
-- android/app/src/main/AndroidManifest.xml notification icon meta-data=
-- Google services plugin in android/build.gradle and settings.gradle, and GoogleService-Info
-  mentions in project.pbxproj
+This repository is a starting point. Keep the layers and generated workflows only where they fit
+the resulting application.

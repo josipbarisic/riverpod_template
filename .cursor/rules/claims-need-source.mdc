@@ -1,0 +1,7 @@
+---
+description: Resolve inherited claims against live target source
+globs: "lib/**", "test/**", "scripts/**", "android/**", "ios/**", "linux/**", "macos/**", "web/**", "windows/**", "docs/**", ".github/**", ".claude/**", ".cursor/**", "*.md", "*.yaml", "*.yml", "pubspec.lock"
+alwaysApply: false
+---
+
+Read `.claude/rules/claims-need-source.md` — the only copy of this rule.

@@ -1,0 +1,64 @@
+{
+  "generatedAt": "2026-09-18T10:49:37.794831Z",
+  "feature": "profile",
+  "views": [],
+  "controllers": [
+    "lib/presentation/profile/profile_controller.dart"
+  ],
+  "widgets": [],
+  "models": [
+    "lib/models/user"
+  ],
+  "repositories": [],
+  "providers": [
+    {
+      "name": "profileControllerProvider",
+      "type": "Notifier",
+      "returnType": "ProfileController",
+      "file": "lib/presentation/profile/profile_controller.dart"
+    }
+  ],
+  "stateClasses": [],
+  "routes": [],
+  "apiEndpoints": [],
+  "coreServices": [],
+  "thirdPartyDependencies": [],
+  "controllerMethods": {
+    "ProfileController": [
+      {
+        "name": "refreshProfile",
+        "returnType": "Future<void>",
+        "params": "(int userId)",
+        "parameters": [
+          {
+            "name": "userId",
+            "type": "int",
+            "isRequired": true
+          }
+        ],
+        "file": "lib/presentation/profile/profile_controller.dart",
+        "line": 28
+      },
+      {
+        "name": "updateProfile",
+        "returnType": "Future<bool>",
+        "params": "({required Map<String, dynamic> formData})",
+        "parameters": [
+          {
+            "name": "dynamic",
+            "type": "Map<String,",
+            "isRequired": true
+          }
+        ],
+        "file": "lib/presentation/profile/profile_controller.dart",
+        "line": 46
+      }
+    ]
+  },
+  "testing": {
+    "testFiles": [],
+    "testDataFiles": [],
+    "runCommand": "flutter test test/presentation/profile/",
+    "hasTests": false
+  }
+}

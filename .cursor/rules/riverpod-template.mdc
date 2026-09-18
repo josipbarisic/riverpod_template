@@ -1,0 +1,12 @@
+---
+description: Entry point for the Riverpod template instruction set
+alwaysApply: true
+---
+
+Read `AGENTS.md` at the repository root, then `lib/AGENTS.md` for feature work.
+
+Canonical coding rules live in `.claude/rules/*.md` and that is their only copy. Read the files
+whose `paths:` match files you are about to touch.
+
+The sibling files in this directory are pointers, not rules. Each carries `globs:` corresponding
+to its canonical rule's `paths:` so Cursor attaches the right pointer without duplicating policy.

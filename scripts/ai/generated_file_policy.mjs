@@ -1,17 +1,16 @@
 // Shared policy for pre-tool-use file guards.
 //
-// Imported by the Cursor preToolUse hook (.cursor/hooks/). This module contains
-// no tool-specific I/O — the hook adapts the verdict to its own JSON contract.
+// Imported by both pre-tool-use adapters. This module contains no editor output
+// contract; each adapter translates the verdict to its own JSON shape.
 //
 // Verdicts:
 //   block  -> generated/derived file that must never be hand-edited
-//   warn   -> editable, but the author must take a follow-up action
 //   allow  -> no policy applies
 
 /**
  * Classify a target file path.
  * @param {string|null|undefined} rawPath
- * @returns {{action:'block'|'warn'|'allow', title?:string, detail?:string, source?:string}}
+ * @returns {{action:'block'|'allow', title?:string, detail?:string, source?:string}}
  */
 export function classifyFile(rawPath) {
   if (!rawPath || typeof rawPath !== 'string') return { action: 'allow' };

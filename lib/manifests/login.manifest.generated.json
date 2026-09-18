@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-23T17:03:53.413716Z",
+  "generatedAt": "2026-09-18T10:49:37.786676Z",
   "feature": "login",
   "views": [
     "lib/presentation/login/login_view.dart"

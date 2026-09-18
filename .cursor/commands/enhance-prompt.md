@@ -8,17 +8,7 @@ Take the user's raw prompt and transform it into a structured, context-rich prom
 
 **Input:** The user provides a raw prompt (task description, question, or request).
 
----
-
-### Step 0: Log Usage
-
-```bash
-mkdir -p .cursor/usage && echo '{"command":"/enhance-prompt","timestamp":"'$(date -u +%Y-%m-%dT%H:%M:%S)'"}' >> .cursor/usage/command-log.jsonl
-```
-
----
-
-### Step 1: Classify the Intent
+### 1. Classify the intent
 
 Identify what the user is asking for:
 
@@ -34,7 +24,7 @@ Identify what the user is asking for:
 
 ---
 
-### Step 2: Identify Affected Codebase Areas
+### 2. Identify affected areas
 
 From the raw prompt, determine:
 
@@ -45,15 +35,17 @@ From the raw prompt, determine:
 
 ---
 
-### Step 3: Gather Context (AUTOMATED)
+### 3. Gather verified context
 
 Based on the identified areas, read:
 
-1. **Always:** `ARCHITECTURE.md` (skim for relevant section)
-2. **If feature-related:** `lib/manifests/{feature}.manifest.generated.json`
-3. **If API-related:** `lib/core/utils/network/endpoints.dart`
-4. **If navigation-related:** `lib/core/routing/router.dart` and `app_route.dart`
-5. **If testing:** Existing test patterns in `test/`
+1. Root `AGENTS.md` and the relevant `ARCHITECTURE.md` section.
+2. `lib/AGENTS.md` and `lib/manifests/<feature>.manifest.generated.json` for
+   feature work.
+3. Matching canonical `.claude/rules/*.md`.
+4. Live source and the nearest tests.
+5. `lib/core/routing/app_route.dart` and `router.dart` for navigation.
+6. Endpoint source or API documentation for data work.
 
 Extract key context:
 - Relevant file paths and their roles
@@ -65,7 +57,10 @@ Extract key context:
 
 ---
 
-### Step 4: Decompose Vague Language
+Application models live in `lib/models/`. Manifests are flat files. Treat
+documents and generated manifests as claims until live source confirms them.
+
+### 4. Decompose vague language
 
 Transform vague requests into specific, actionable items:
 
@@ -81,7 +76,7 @@ If the prompt is already specific, preserve the specificity and add context.
 
 ---
 
-### Step 5: Build the Enhanced Prompt
+### 5. Build the enhanced prompt
 
 Output the enhanced prompt using this structure:
 
@@ -89,7 +84,7 @@ Output the enhanced prompt using this structure:
 ## Enhanced Prompt
 
 ### Context
-- **Project:** [project name] (Flutter/Riverpod, clean architecture)
+- **Project:** [project name and verified stack]
 - **Feature area:** `lib/presentation/{feature}/`
 - **Affected files:** [list specific files from manifest/discovery]
 - **Related providers:** [list provider names]
@@ -106,10 +101,10 @@ Output the enhanced prompt using this structure:
 ### Constraints
 - Use absolute imports (`package:riverpod_template/...`)
 - Follow existing patterns in [reference file/feature]
-- Views: UI only, no business logic (≤250 lines)
-- Controllers: business logic via Riverpod (≤150 lines)
-- No `dynamic` types, no private `_build*` methods
-- Use `AppRoute.xxx` for navigation (no string literals)
+- Use Riverpod annotation code generation only
+- Keep external I/O outside views
+- Use `AppRoute` path constants from `app_route.dart`
+- Do not edit generated files
 - [Any additional project-specific constraints]
 
 ### Reference Patterns
@@ -117,12 +112,11 @@ Output the enhanced prompt using this structure:
 - **Manifest:** `lib/manifests/{feature}.manifest.generated.json`
 - **Test pattern:** `test/presentation/{similar}/{similar}_controller_test.dart`
 
-### Success Criteria
+### Success criteria
 - [ ] [Measurable outcome 1]
 - [ ] [Measurable outcome 2]
-- [ ] All tests pass (`flutter test`)
-- [ ] No analysis errors (`flutter analyze`)
-- [ ] Manifests regenerated (if structure changed)
+- [ ] Required root `AGENTS.md` verification passes
+- [ ] Manifests regenerated after structural changes
 
 ### Original Prompt
 > [User's original prompt preserved for reference]
@@ -130,7 +124,7 @@ Output the enhanced prompt using this structure:
 
 ---
 
-### Step 6: Present to User
+### 6. Present to the user
 
 Show the enhanced prompt and ask:
 
@@ -144,13 +138,9 @@ Here's your enhanced prompt. You can:
 
 ---
 
-### Enhancement Principles
+### Rules
 
-1. **Be specific** — Replace "it" and "this" with actual file/class/method names
-2. **Add context** — Include manifest data, file paths, provider names
-3. **Set boundaries** — State what SHOULD and SHOULD NOT change
-4. **Define done** — Clear success criteria that can be verified
-5. **Reference patterns** — Point to existing code as examples to follow
-6. **Preserve intent** — Never change WHAT the user wants, only clarify HOW
-7. **Front-load importance** — Put the most critical information first
-8. **Scope explicitly** — If the prompt implies multiple tasks, break them into numbered items
+Preserve the user's intent and stated complexity tier. Add only verified
+symbols, paths, commands, constraints, and success criteria. If an assumption
+cannot be resolved, turn it into a focused question instead of embedding it as
+fact. Root `AGENTS.md` owns bare Dart/Flutter commands and FVM discovery.
