@@ -1,0 +1,37 @@
+name: Spike
+description: Time-boxed investigation
+labels:
+  - type:spike
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: >-
+        The question to answer.
+    validations:
+      required: true
+  - type: textarea
+    id: method
+    attributes:
+      label: Method
+      description: >-
+        How it will be investigated, and the time box.
+    validations:
+      required: true
+  - type: textarea
+    id: decision-output
+    attributes:
+      label: Decision output
+      description: >-
+        What decision or artifact the spike produces.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: >-
+        Why the question matters now.
+    validations:
+      required: false

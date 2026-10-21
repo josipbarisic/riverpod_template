@@ -1,0 +1,49 @@
+name: Project Release
+
+# A published release marks the issues it ships as Done. Logic lives in
+# scripts/project/project.mjs (release); AGENTS.md § Work tracking owns the rule.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Mark released issues Done
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check project token
+        id: token
+        env:
+          PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+        run: |
+          if [ -z "$PROJECT_TOKEN" ]; then
+            echo "::notice::PROJECT_TOKEN is not set; released issues were not marked Done."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout code
+        if: steps.token.outputs.present == 'true'
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github
+            scripts/project
+
+      - name: Setup Node
+        if: steps.token.outputs.present == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Mark released issues Done
+        if: steps.token.outputs.present == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: node scripts/project/project.mjs release --tag="$RELEASE_TAG"

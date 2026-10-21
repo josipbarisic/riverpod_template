@@ -70,3 +70,20 @@ Before any Dart or Flutter command, discover FVM from the repository root with
 `command -v fvm`; prefix the bare commands only when found.
 
 Wait for implementation-plan approval before changing the application.
+
+## 4. Work tracking
+
+The new repository inherits the template's `.github/project.json`, which still names the
+template's project. Give the repository its own project before filing work:
+
+```bash
+node scripts/project/project.mjs bootstrap
+node scripts/project/project.mjs bootstrap --apply
+```
+
+Show the dry run and apply only after the user agrees. Then hand the user the two steps the
+command prints, which are theirs: enabling auto-add and pointing "Item closed" at `Done` and
+"Pull request merged" at `Merged` in the project's workflow settings, and setting the
+`PROJECT_TOKEN` secret. Commit the
+rewritten `.github/project.json`. After the implementation plan is approved, file its phases with
+`plan-issues` instead of tracking them only in `docs/IMPLEMENTATION_PLAN.md`.

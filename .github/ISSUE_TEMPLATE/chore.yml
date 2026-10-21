@@ -1,0 +1,37 @@
+name: Chore
+description: Maintenance with no behavior change
+labels:
+  - type:chore
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: >-
+        What and why.
+    validations:
+      required: true
+  - type: textarea
+    id: approach
+    attributes:
+      label: Approach
+      description: >-
+        How.
+    validations:
+      required: false
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: >-
+        Why now.
+    validations:
+      required: false
+  - type: textarea
+    id: qa
+    attributes:
+      label: QA
+      description: >-
+        How to confirm nothing changed for users.
+    validations:
+      required: true
