@@ -5,8 +5,9 @@
 //                           one type label, its form's headings present (exit 1 if not)
 //   ready [--limit=N]       executable Ready issues, highest Priority first
 //   status <n> <Status>     add issue #n to the project and set its Status
-//   sync                    Actions entry: PR opened → In review, PR merged → Merged,
-//                           issue closed → Merged or Done, last sub-issue closed → parent closed
+//   sync                    Actions entry: PR opened → In review, PR merged → Merged, PR closed
+//                           unmerged → back to In progress, issue closed → Merged or Done,
+//                           last sub-issue closed → parent closed
 //   release --tag=<tag>     Actions entry: issues closed by PRs since the previous release
 //                           move Merged → Done with a "Released in <tag>" comment
 //   bootstrap [--apply]     copy the source project for this repository, link it, create
@@ -163,7 +164,7 @@ export function assessIssue(issue) {
 
 export function statusForPullRequest(event) {
   const pr = event.pull_request;
-  if (event.action === 'closed') return pr.merged ? 'Merged' : null;
+  if (event.action === 'closed') return pr.merged ? 'Merged' : 'In progress';
   if (['opened', 'reopened', 'ready_for_review'].includes(event.action) && !pr.draft) {
     return 'In review';
   }
@@ -318,10 +319,7 @@ export function commandReady(gh, { cwd, limit, log }) {
   const config = requireConfig(cwd);
   const repository = currentRepository(gh);
   const candidates = listProjectItems(gh, config).filter(
-    item =>
-      item.content?.type === 'Issue' &&
-      item.content.repository === repository &&
-      item.status === 'Ready',
+    item => item.content.repository === repository && item.status === 'Ready',
   );
   const ready = rankReady(
     candidates.map(item => ({ number: item.content.number, priority: item.priority, title: item.title })),
@@ -359,8 +357,11 @@ export function commandSync(gh, { eventName, event, cwd, log }) {
     if (!status) return 0;
     for (const number of fetchClosingIssues(gh, repository, event.pull_request.number)) {
       const issue = fetchIssue(gh, repository, number);
+      const current = projectStatus(issue, config);
       // A reopened or re-readied pull request never pulls a finished issue back.
-      if (status === 'In review' && ['Merged', 'Done'].includes(projectStatus(issue, config))) continue;
+      if (status === 'In review' && ['Merged', 'Done'].includes(current)) continue;
+      // An abandoned pull request returns only issues it had put In review.
+      if (status === 'In progress' && current !== 'In review') continue;
       setStatus(gh, config, issue, status);
       log(`#${number} → ${status} (pull request #${event.pull_request.number})`);
     }
@@ -395,10 +396,11 @@ function releasedIssueNumbers(gh, repository, config, tag) {
   const previous = previousReleaseTag(releases, tag);
   if (!previous) {
     return listProjectItems(gh, config)
-      .filter(item => item.content?.type === 'Issue' && item.content.repository === repository && item.status === 'Merged')
+      .filter(item => item.content.repository === repository && item.status === 'Merged')
       .map(item => item.content.number);
   }
-  const shas = gh(['api', `repos/${repository}/compare/${previous}...${tag}`, '--jq', '.commits[].sha'])
+  // The compare API returns 250 commits per response unless paginated.
+  const shas = gh(['api', '--paginate', `repos/${repository}/compare/${previous}...${tag}?per_page=100`, '--jq', '.commits[].sha'])
     .split('\n')
     .filter(Boolean);
   const pulls = new Set();
@@ -421,11 +423,12 @@ export function commandRelease(gh, { tag, cwd, log }) {
   for (const number of releasedIssueNumbers(gh, repository, config, tag)) {
     const issue = fetchIssue(gh, repository, number);
     if (projectStatus(issue, config) !== 'Merged') continue;
-    setStatus(gh, config, issue, 'Done');
+    // Comment before Done: a rerun skips Done issues, so a comment left for later would never post.
     const comments = gh(['issue', 'view', String(number), '--repo', repository, '--json', 'comments', '--jq', '.comments[].body']);
     if (!comments.includes(marker)) {
       gh(['issue', 'comment', String(number), '--repo', repository, '--body', `Released in ${tag}.\n\n${marker}`]);
     }
+    setStatus(gh, config, issue, 'Done');
     log(`#${number} → Done (${tag})`);
     if (issue.parent) parents.add(issue.parent.number);
   }

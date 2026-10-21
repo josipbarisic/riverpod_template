@@ -87,7 +87,7 @@ function fakeGh({ issues = {}, closing = {}, items = [], releases = [], compare 
       return JSON.stringify({ data: { repository: { issue: issues[number] ?? null } } });
     }
     if (joined.startsWith('release list')) return JSON.stringify(releases);
-    if (args[0] === 'api' && args[1].includes('/compare/')) return compare.join('\n');
+    if (args[0] === 'api' && args.some(arg => arg.includes('/compare/'))) return compare.join('\n');
     if (args[0] === 'api' && args[1].includes('/commits/')) {
       const sha = args[1].split('/commits/')[1].split('/')[0];
       return (commitPulls[sha] ?? []).join('\n');
@@ -161,12 +161,12 @@ test('headings match form (###) and hand-written (##) bodies, whole line only', 
   assert.deepEqual(missingHeadings('Summary in prose\n### Summaryish', ['Summary']), ['Summary']);
 });
 
-test('pull request events map to In review and Merged; drafts and unmerged closes do nothing', () => {
+test('pull request events map to In review, Merged, and back to In progress; drafts do nothing', () => {
   assert.equal(statusForPullRequest({ action: 'opened', pull_request: { draft: false } }), 'In review');
   assert.equal(statusForPullRequest({ action: 'opened', pull_request: { draft: true } }), null);
   assert.equal(statusForPullRequest({ action: 'ready_for_review', pull_request: { draft: false } }), 'In review');
   assert.equal(statusForPullRequest({ action: 'closed', pull_request: { merged: true } }), 'Merged');
-  assert.equal(statusForPullRequest({ action: 'closed', pull_request: { merged: false } }), null);
+  assert.equal(statusForPullRequest({ action: 'closed', pull_request: { merged: false } }), 'In progress');
 });
 
 test('a closed issue is Merged only when a merged pull request closed it', () => {
@@ -271,7 +271,7 @@ test('sync on a closed sub-issue sets its Status and closes the finished parent'
   });
 });
 
-test('release moves the range\'s Merged issues to Done once, with one comment', () => {
+test('release pages through the range and moves its Merged issues to Done with one comment', () => {
   const releases = [
     { tagName: 'v1.1.0', isDraft: false, publishedAt: '2026-02-01T00:00:00Z' },
     { tagName: 'v1.0.0', isDraft: false, publishedAt: '2026-01-01T00:00:00Z' },
@@ -283,15 +283,48 @@ test('release moves the range\'s Merged issues to Done once, with one comment', 
     closing: { 10: [1], 11: [2] },
     issues: { 1: issue(1, { state: 'CLOSED', ...onProject('Merged') }), 2: issue(2, { state: 'CLOSED', ...onProject('Done') }) },
   };
+  const commentCount = fake => fake.calls.filter(args => args[0] === 'issue' && args[1] === 'comment').length;
   withRepository(CONFIG, root => {
     const fake = fakeGh(base);
     run(['release', '--tag=v1.1.0'], fake, root);
+    const compare = fake.calls.find(args => args.some(arg => arg.includes('/compare/')));
+    assert.ok(compare.includes('--paginate'), 'the compare API caps one response at 250 commits');
+    assert.ok(compare.some(arg => arg.endsWith('?per_page=100')));
     assert.deepEqual(fake.statuses(), ['1:Done']);
-    assert.equal(fake.calls.filter(args => args[0] === 'issue' && args[1] === 'comment').length, 1);
+    assert.equal(commentCount(fake), 1);
 
-    const rerun = fakeGh({ ...base, comments: { 1: ['Released in v1.1.0.\n\n<!-- released-in: v1.1.0 -->'] } });
+    // A rerun after success finds the issue Done and leaves it alone.
+    const rerun = fakeGh({ ...base, issues: { ...base.issues, 1: issue(1, { state: 'CLOSED', ...onProject('Done') }) } });
     run(['release', '--tag=v1.1.0'], rerun, root);
-    assert.equal(rerun.calls.filter(args => args[0] === 'issue' && args[1] === 'comment').length, 0);
+    assert.deepEqual(rerun.statuses(), []);
+    assert.equal(commentCount(rerun), 0);
+
+    // A rerun after the status write failed finds the comment and only finishes the status.
+    const retry = fakeGh({ ...base, comments: { 1: ['Released in v1.1.0.\n\n<!-- released-in: v1.1.0 -->'] } });
+    run(['release', '--tag=v1.1.0'], retry, root);
+    assert.deepEqual(retry.statuses(), ['1:Done']);
+    assert.equal(commentCount(retry), 0);
+    // A failed comment leaves the issue Merged, so the next run posts it.
+    const failing = fakeGh(base);
+    const throwOnComment = args => {
+      if (args[0] === 'issue' && args[1] === 'comment') throw new Error('comment failed');
+      return failing.gh(args);
+    };
+    assert.throws(() => main(['release', '--tag=v1.1.0'], { gh: throwOnComment, cwd: root, log: () => {} }), /comment failed/);
+    assert.deepEqual(failing.statuses(), []);
+  });
+});
+
+test('a pull request closed unmerged returns only its In review issues to In progress', () => {
+  const fake = fakeGh({
+    closing: { 10: [1, 2, 3] },
+    issues: { 1: issue(1, onProject('In review')), 2: issue(2, onProject('Merged')), 3: issue(3, onProject('Ready')) },
+  });
+  withRepository(CONFIG, root => {
+    const eventPath = join(root, 'event.json');
+    writeFileSync(eventPath, JSON.stringify({ action: 'closed', pull_request: { number: 10, merged: false } }));
+    run(['sync', '--event-name=pull_request', `--event-path=${eventPath}`], fake, root);
+    assert.deepEqual(fake.statuses(), ['1:In progress']);
   });
 });
 
