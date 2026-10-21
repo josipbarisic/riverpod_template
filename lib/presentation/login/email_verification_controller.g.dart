@@ -18,7 +18,7 @@ part of 'email_verification_controller.dart';
 /// - `AsyncError` — failed with user-friendly message
 
 @ProviderFor(EmailVerificationController)
-const emailVerificationControllerProvider =
+final emailVerificationControllerProvider =
     EmailVerificationControllerProvider._();
 
 /// Controls the email verification flow.
@@ -39,7 +39,7 @@ final class EmailVerificationControllerProvider
   /// - `AsyncData('verified')` — email verified
   /// - `AsyncLoading` — in progress
   /// - `AsyncError` — failed with user-friendly message
-  const EmailVerificationControllerProvider._()
+  EmailVerificationControllerProvider._()
     : super(
         from: null,
         argument: null,
@@ -74,8 +74,7 @@ abstract class _$EmailVerificationController extends $AsyncNotifier<String?> {
   FutureOr<String?> build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<String?>, String?>;
     final element =
         ref.element
@@ -85,6 +84,6 @@ abstract class _$EmailVerificationController extends $AsyncNotifier<String?> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }

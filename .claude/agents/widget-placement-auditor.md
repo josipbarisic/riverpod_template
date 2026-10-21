@@ -35,6 +35,8 @@ Confirm route-level widgets against `lib/core/routing/router.dart`.
 ### Placement
 
 - A route-level widget does not end in `View` or is buried under `widgets/`.
+  Only route-level widgets need the suffix; a section widget named `…Section`,
+  `…Card` or `…Header` is valid.
 - A feature-only widget sits in the shared widget directory.
 - A widget belongs to one feature but was added under a different feature.
 

@@ -48,7 +48,9 @@ Shared infrastructure and cross-feature concerns:
 - theme colors and text styles
 - reusable extensions, mixins, formatters, and helpers
 
-Core code stays feature-agnostic. Feature-specific behavior belongs with the feature.
+Core code stays feature-agnostic. A service belongs in `lib/core/services/` when two or more
+features use it or it provides infrastructure (network, storage, notifications); a service only one
+feature uses stays with that feature.
 
 ### Data — `lib/data/`
 
@@ -76,8 +78,10 @@ UI is grouped by feature:
 - Feature-local widgets belong under that feature; widgets shared by multiple features currently
   live in `lib/presentation/widgets/`.
 
-Views may own local UI state, hooks, navigation, and event wiring. They do not perform repository,
-network, or Firebase work directly.
+Views may own local UI state (form keys, animation and scroll controllers, hooks), navigation, event
+wiring, and conditional composition. They do not perform repository, network, or Firebase work, and
+they do not hold business logic: calculations, data transformations, and multi-step state changes
+belong in the controller.
 
 ## Riverpod
 
@@ -99,8 +103,8 @@ Use `@riverpod` for default auto-disposal and `@Riverpod(keepAlive: true)` only 
 no-listener persistence. Function providers receive Riverpod 3's `Ref` type. Controllers obtain
 dependencies through generated providers so tests can override them with `ProviderContainer`.
 
-Small explicit states may use Equatable; generated immutable models and larger state shapes may use
-Freezed. `.claude/rules/dart-state.md` owns ref access and lifecycle details.
+New state classes use Freezed; the existing Equatable states stay until their files change.
+`.claude/rules/dart-state.md` owns the state-class rule, ref access, and lifecycle details.
 
 ## Navigation
 
@@ -155,4 +159,3 @@ implementation details. Root `AGENTS.md` owns local and pre-commit test commands
 - `.claude/rules/*.md`: path-scoped coding constraints
 - `.claude/skills/*/SKILL.md`: reusable workflow implementations
 - `.claude/agents/*.md`: read-only advisory reviewers
-- `.cursor/rules/*.mdc`: Cursor attachment pointers only

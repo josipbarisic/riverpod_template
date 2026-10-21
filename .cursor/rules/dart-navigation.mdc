@@ -1,7 +1,0 @@
----
-description: AppRoute paths, GoRouter registrations, and navigation calls
-globs: lib/core/routing/**/*.dart,lib/core/utils/helpers/deeplink_helper.dart,lib/presentation/**/*.dart
-alwaysApply: false
----
-
-Read `.claude/rules/dart-navigation.md` — the only copy of this rule.

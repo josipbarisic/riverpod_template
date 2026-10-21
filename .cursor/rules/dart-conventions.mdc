@@ -1,7 +1,0 @@
----
-description: Imports, naming, expression bodies, removal completeness, and scope
-globs: lib/**/*.dart
-alwaysApply: false
----
-
-Read `.claude/rules/dart-conventions.md` — the only copy of this rule.

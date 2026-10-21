@@ -1,7 +1,7 @@
 // Shared codegen-reminder policy for the post-tool-use hook.
 //
-// Imported by both post-tool-use adapters. This module owns annotation
-// detection and the per-session debounce; adapters only translate payloads.
+// Imported by the Claude Code post-tool-use hook. This module owns annotation
+// detection and the per-session debounce; the hook only translates payloads.
 //
 // Rationale: editing a file that carries @riverpod / @freezed (or another
 // build_runner) annotation without regenerating produces confusing runtime

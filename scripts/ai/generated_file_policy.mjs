@@ -1,7 +1,7 @@
 // Shared policy for pre-tool-use file guards.
 //
-// Imported by both pre-tool-use adapters. This module contains no editor output
-// contract; each adapter translates the verdict to its own JSON shape.
+// Imported by the Claude Code pre-tool-use hook. This module contains no hook output
+// contract; the hook translates the verdict to its own JSON shape.
 //
 // Verdicts:
 //   block  -> generated/derived file that must never be hand-edited
@@ -51,15 +51,14 @@ export function classifyFile(rawPath) {
 
 /**
  * Best-effort extraction of a target file path from a hook payload's tool_input.
- * Field names differ slightly across tool schemas, so we check the known variants.
+ * Edit, Write and MultiEdit send `file_path`; NotebookEdit sends `notebook_path`.
  * @param {unknown} toolInput
  * @returns {string|null}
  */
 export function extractFilePath(toolInput) {
   if (!toolInput || typeof toolInput !== 'object') return null;
   const ti = /** @type {Record<string, unknown>} */ (toolInput);
-  const candidate =
-    ti.file_path ?? ti.path ?? ti.target_file ?? ti.target_notebook ?? null;
+  const candidate = ti.file_path ?? ti.notebook_path ?? null;
   return typeof candidate === 'string' ? candidate : null;
 }
 

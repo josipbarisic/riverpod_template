@@ -28,11 +28,20 @@ The project extension for clearing the stack is defined on `GoRouter`:
 GoRouter.of(context).pushAndRemoveUntil(AppRoute.login);
 ```
 
+Close a dialog or sheet with `Navigator.of(ctx).pop(result)`, where `ctx` is the `builder:`
+context, never the page's (`lib/core/mixins/dialog_mixin.dart` does this). `context.pop()` ignores
+its context and pops the router's current navigator; under a nested `Navigator` GoRouter does not
+manage, a dialog's `context.pop()` pops the page underneath.
+
+Inside `PopScope.onPopInvokedWithResult` the navigator is mid-transaction, so defer a pop there with
+`Future.microtask`; a synchronous pop asserts `_debugLocked`.
+
 When adding, renaming, or removing a route:
 
 1. Update the path constant in `app_route.dart`.
 2. Update its `GoRoute` in `router.dart`.
-3. Update navigation and deeplink call sites.
+3. Update navigation and deeplink call sites. A renamed path keeps the old one as an alias in
+   `DeeplinkHelper.parseDeeplink`: links already sent in emails and notifications live for months.
 4. Regenerate feature manifests.
 5. Add or update navigation tests when behavior changes.
 

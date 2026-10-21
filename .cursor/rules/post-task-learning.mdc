@@ -1,7 +1,0 @@
----
-description: Supervisor's Briefing and learning-log persistence
-globs: "lib/**", "test/**", "scripts/**", "android/**", "ios/**", "linux/**", "macos/**", "web/**", "windows/**", "docs/**", ".github/**", ".claude/**", ".cursor/**", "*.md", "*.yaml", "*.yml", "pubspec.lock"
-alwaysApply: false
----
-
-Read `.claude/rules/post-task-learning.md` — the only copy of this rule.

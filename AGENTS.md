@@ -10,8 +10,19 @@ Firebase integrations, and generated feature manifests.
 3. For feature work, read `lib/AGENTS.md`, regenerate manifests, then read
    `lib/manifests/<feature>.manifest.generated.json`.
 4. Read every `.claude/rules/*.md` file whose `paths:` match files you may touch. Those files are
-   the canonical coding rules; `.cursor/rules/*.mdc` only attach pointers to them.
-5. Inspect the live source and tests before citing a symbol, path, command, or behavior.
+   the only copy of the coding rules. Claude Code attaches them by itself only in a session started
+   in this repository; a session started elsewhere must read them.
+   - `dart-state.md` — Riverpod codegen, state classes, `ref` access, `AsyncValue`
+   - `dart-widgets.md` — base classes, one widget per file, keys on dynamic lists, overlay insets
+   - `dart-conventions.md` — imports, naming, server-owned enums, logging, removal completeness
+   - `dart-navigation.md` — path-based `AppRoute`, dialog pops, deeplink aliases
+   - `claims-need-source.md` — repo-wide: resolve every claim against source
+   - `no-tool-attribution.md` — repo-wide: no editor or assistant attribution
+   - `commit-intent-routing.md` — repo-wide: commit intent runs the `commit` skill; message format
+   - `post-task-learning.md` — repo-wide: the briefing and the traps-only learning log
+5. Before editing a file, search `docs/LEARNING_LOG.md` for its path and feature directory
+   (`rg -n '<path>' docs/LEARNING_LOG.md`); never read the whole log.
+6. Inspect the live source and tests before citing a symbol, path, command, or behavior.
 
 Use the complexity tier supplied by the user. If none was supplied, ask before editing:
 
@@ -21,7 +32,8 @@ Use the complexity tier supplied by the user. If none was supplied, ask before e
 - **Tier 3 — Large:** broad, ambiguous, architectural, or cross-cutting work. Complete discovery,
   write the specification and implementation plan, and wait for explicit approval before editing.
 
-Approval applies to the stated target and scope. Re-plan and ask again if implementation would
+A plan the user already approved counts as approval for the work it covers; ask for a tier only for
+ad-hoc requests. Approval applies to the stated target and scope. Re-plan and ask again if implementation would
 materially exceed it.
 
 ## Build, test, and lint
@@ -44,7 +56,7 @@ Before running Flutter or Dart, discover FVM without executing it:
 command -v fvm
 ```
 
-If discovery succeeds, an agent may prefix the commands with `fvm`. If it does not, use the bare
+On Windows PowerShell, use `Get-Command fvm -ErrorAction SilentlyContinue`. If discovery succeeds, an agent may prefix the commands with `fvm`. If it does not, use the bare
 commands. Never probe with `fvm spawn --help`, and never add, initialize, or change FVM as a
 side-effect of another task.
 
@@ -56,17 +68,17 @@ instruction-only changes do not require Flutter tests.
 Update tests when behavior changes in controllers, repositories, services, models, or widgets.
 Tests mirror the current `test/` tree; do not invent a test directory from an architectural label.
 
-## Local editor hooks
+## Claude Code hooks
 
-`.claude/settings.json` and `.cursor/hooks.json` register thin editor adapters. Shared policy lives
-under `scripts/ai/`: SessionStart reports branch/base, changed-source manifest freshness, and
+`.claude/settings.json` registers thin adapters in `.claude/hooks/`. Shared policy lives under
+`scripts/ai/`: SessionStart reports branch/base, changed-source manifest freshness, and
 pending codegen; PreToolUse blocks manual edits to generated Dart and manifest files; PostToolUse
 emits one debounced build-runner reminder; Stop runs the same integrity policy without blocking.
-Stop results are local ignored files at `.claude/last-session-status.json` and
-`.cursor/last-session-status.json`.
+Stop results go to the local ignored file `.claude/last-session-status.json`.
 
-`node scripts/ai/check_manifest_freshness.mjs` is the read-only local manifest gate. It reports
-changed generator inputs without regenerating or rewriting manifests.
+`node scripts/ai/check_manifest_freshness.mjs` is the local manifest gate. It runs the generator,
+compares each manifest with the checked-out copy ignoring `generatedAt`, restores every manifest,
+and fails when one is out of date, including sources committed without their manifests.
 
 `node scripts/ci/check_instruction_claims.mjs` validates repository paths, cited `App*` members,
 layer names, and claimed CI command parity across canonical instructions. The Stop hook applies it
@@ -77,6 +89,9 @@ CI keeps `flutter analyze` blocking through
 `scripts/ci/check_flutter_analyze_baseline.mjs`. The checker compares machine diagnostics with
 `scripts/ci/flutter_analyze_baseline.json` by severity, lint code, repository-relative path, and
 count. Existing diagnostics may be removed; a new diagnostic or an excess count fails.
+`scripts/ci/check_riverpod_lint.sh` proves the `riverpod_lint` analyzer plugin from
+`analysis_options.yaml` actually loaded (a temporary canary must report `missing_provider_scope`),
+then applies the same baseline to the plugin's diagnostics.
 
 ## Generated files and manifests
 
@@ -92,7 +107,9 @@ controllers, routes, repositories, or providers, run
 `dart run scripts/generate_feature_manifests.dart`.
 
 Before feature implementation, regenerate manifests and inspect the relevant generated JSON.
-Treat the live Dart source as authoritative if generated context disagrees. Preserve unrelated
+Treat the live Dart source as authoritative if generated context disagrees. Revert a manifest diff
+that only changes `generatedAt`. A staleness warning right after a branch switch can be an mtime
+artefact; regenerate and compare before acting on it. Preserve unrelated
 generated changes already present in the worktree, and ask before staging a new untracked
 manifest.
 
@@ -125,14 +142,11 @@ Path-scoped `.claude/rules/*.md` own code conventions.
 - `ARCHITECTURE.md`: stable layers, data flow, and placement.
 - `lib/AGENTS.md`: feature map, manifests, and feature-test discovery.
 - `.claude/rules/*.md`: the only canonical copy of path-scoped rules.
-- `.cursor/rules/*.mdc`: attachment pointers only; they never duplicate rule text.
 - `.claude/skills/*/SKILL.md`: workflow implementations only. They defer to `AGENTS.md` and
-  canonical rules.
+  canonical rules, and each skill's frontmatter owns when it runs.
 - `.claude/agents/*.md`: read-only advisory reviewers. They report findings and never act as CI
   gates.
-- `.cursor/commands/*.md`: the ten slash-command entry points; `.cursor/commands/README.md` is
-  their index.
-- `.claude/skills/git-commit/SKILL.md`: the local commit workflow, reached through
+- `.claude/skills/commit/SKILL.md`: the local commit workflow, reached through
   `commit-intent-routing.md`.
 - `.claude/rules/post-task-learning.md`: the Supervisor's Briefing contract.
 - `.claude/skills/post-task-learning/SKILL.md`: the only allowed writer for the designated

@@ -10,12 +10,12 @@ part of 'firebase_api_providers.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(firebaseApi)
-const firebaseApiProvider = FirebaseApiProvider._();
+final firebaseApiProvider = FirebaseApiProvider._();
 
 final class FirebaseApiProvider
     extends $FunctionalProvider<FirebaseApi, FirebaseApi, FirebaseApi>
     with $Provider<FirebaseApi> {
-  const FirebaseApiProvider._()
+  FirebaseApiProvider._()
     : super(
         from: null,
         argument: null,
@@ -51,17 +51,17 @@ final class FirebaseApiProvider
 String _$firebaseApiHash() => r'2ba41767e5415a6f2ec7fb16d0c7a66d0669d16d';
 
 @ProviderFor(HasRemoteMessage)
-const hasRemoteMessageProvider = HasRemoteMessageProvider._();
+final hasRemoteMessageProvider = HasRemoteMessageProvider._();
 
 final class HasRemoteMessageProvider
     extends $NotifierProvider<HasRemoteMessage, bool> {
-  const HasRemoteMessageProvider._()
+  HasRemoteMessageProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'hasRemoteMessageProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -82,14 +82,13 @@ final class HasRemoteMessageProvider
   }
 }
 
-String _$hasRemoteMessageHash() => r'9393da66eebfa139ba542a5958cde19f455ffa6e';
+String _$hasRemoteMessageHash() => r'e25ad7c8a90f280f76406931d67eba5630ef62a8';
 
 abstract class _$HasRemoteMessage extends $Notifier<bool> {
   bool build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<bool, bool>;
     final element =
         ref.element
@@ -99,6 +98,6 @@ abstract class _$HasRemoteMessage extends $Notifier<bool> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }

@@ -52,7 +52,9 @@ is authoritative.
 - A route-level view in the router does not match the imported view.
 
 Path parameters and a view reused by multiple routes are valid. Report only
-confirmed inconsistencies.
+confirmed inconsistencies. A navigation call's `AppRoute.x` argument often
+wraps to the next line, so search call sites across lines before calling a
+constant unused. Report a dead constant only when the diff touches it.
 
 ## Output
 

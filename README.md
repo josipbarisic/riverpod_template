@@ -81,12 +81,13 @@ runs the full unit/widget suite for application, test, and platform changes.
 - `.claude/rules/*.md` is the canonical home of path-scoped rules.
 - `.claude/skills/*/SKILL.md` contains reusable workflow implementations.
 - `.claude/agents/*.md` contains read-only advisory reviewers.
-- `.cursor/rules/*.mdc` contains one always-applied entry point and scoped pointers to those rules.
-- `.cursor/commands/*.md` contains the ten slash-command entry points.
 - `lib/AGENTS.md` covers feature manifests, layer placement, and test discovery.
-- `docs/LEARNING_LOG.md` stores transferable implementation insights.
+- `docs/LEARNING_LOG.md` stores traps: failure mechanisms nothing else guards.
 
 ## Starting a project from the template
+
+In Claude Code, `/start-new-project` runs the discovery, specification, and plan workflow below with
+approval gates. By hand:
 
 1. Rename `riverpod_template` in `pubspec.yaml`, Dart package imports, bundle/application
    identifiers, and instruction examples.

@@ -68,7 +68,7 @@ dependencies:
   google_sign_in:
 
   # https://pub.dev/packages/json_annotation
-  json_annotation:
+  json_annotation: ^4.12.0
 
   # https://pub.dev/packages/mocktail
   mocktail:
@@ -89,7 +89,7 @@ dependencies:
   flutter_local_notifications: ^19.5.0
 
   # https://pub.dev/packages/flutter_riverpod
-  flutter_riverpod:
+  flutter_riverpod: ^3.4.3
 
   # https://pub.dev/packages/flutter_timezone
   flutter_timezone: ^5.0.1
@@ -98,13 +98,13 @@ dependencies:
   go_router:
 
   # https://pub.dev/packages/hooks_riverpod
-  hooks_riverpod:
+  hooks_riverpod: ^3.4.3
 
   # https://pub.dev/packages/permission_handler
   permission_handler:
 
   # https://pub.dev/packages/riverpod_annotation
-  riverpod_annotation:
+  riverpod_annotation: ^4.0.7
 
   # https://pub.dev/packages/shared_preferences
   shared_preferences:
@@ -125,7 +125,6 @@ dev_dependencies:
 
   # Run "dart run build_runner build -d" to start code generation
   # https://pub.dev/packages/build_runner
-  # Note: Keeping at 2.7.1 due to analyzer conflict with riverpod_lint
   build_runner: ^2.7.1
 
   # https://pub.dev/packages/http_mock_adapter
@@ -157,10 +156,7 @@ dev_dependencies:
   mockito:
 
   # https://pub.dev/packages/riverpod_generator
-  riverpod_generator:
-
-  # https://pub.dev/packages/riverpod_lint
-  riverpod_lint:
+  riverpod_generator: ^4.0.9
 
 # After change run "dart run flutter_launcher_icons"
 flutter_launcher_icons:

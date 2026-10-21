@@ -1,5 +1,5 @@
-// Shared Stop-time policy for both editor adapters. It is advisory and local:
-// adapters may surface or persist the result, but never force another turn.
+// Shared Stop-time policy behind the Claude Code Stop hook. It is advisory and local:
+// the hook may surface or persist the result, but never forces another turn.
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -13,7 +13,7 @@ import {
 } from './session_status.mjs';
 
 const INSTRUCTION_FILE =
-  /^(?:AGENTS\.md|CLAUDE\.md|ARCHITECTURE\.md|README\.md|lib\/AGENTS\.md|docs\/.+\.md|\.claude\/(?:rules|skills|agents)\/.+\.md|\.cursor\/(?:rules|commands)\/.+\.(?:md|mdc)|\.github\/workflows\/.+\.ya?ml)$/;
+  /^(?:AGENTS\.md|CLAUDE\.md|ARCHITECTURE\.md|README\.md|lib\/AGENTS\.md|docs\/.+\.md|\.claude\/(?:rules|skills|agents)\/.+\.md|\.github\/workflows\/.+\.ya?ml)$/;
 const INSTRUCTION_VALIDATOR = 'scripts/ci/check_instruction_claims.mjs';
 
 export function isInstructionFile(path) {
@@ -41,7 +41,7 @@ export async function runIntegrityCheck({ cwd = process.cwd() } = {}) {
 
 /**
  * Validate changed instruction files when the optional CI implementation exists.
- * Absence, import failure, or validator failure is fail-open for editor hooks.
+ * Absence, import failure, or validator failure is fail-open for the Claude Code hooks.
  * @param {Iterable<string>} [changed]
  * @param {{cwd?:string}} [options]
  */
@@ -113,7 +113,7 @@ export function formatIntegritySummary(result) {
 
 /**
  * Persist the result as JSON for later inspection / tooling.
- * @param {string} file Target path, e.g. `.cursor/last-session-status.json`.
+ * @param {string} file Target path, e.g. `.claude/last-session-status.json`.
  * @param {{ok:boolean, codegen:string[], manifests:string[], claims?:string[]}} result
  */
 export function writeStatus(file, result) {

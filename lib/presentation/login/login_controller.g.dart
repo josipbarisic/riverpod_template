@@ -23,7 +23,7 @@ part of 'login_controller.dart';
 /// ```
 
 @ProviderFor(LoginController)
-const loginControllerProvider = LoginControllerProvider._();
+final loginControllerProvider = LoginControllerProvider._();
 
 /// Controls the login flow for all supported providers.
 ///
@@ -53,7 +53,7 @@ final class LoginControllerProvider
   ///   password: passwordController.text,
   /// );
   /// ```
-  const LoginControllerProvider._()
+  LoginControllerProvider._()
     : super(
         from: null,
         argument: null,
@@ -92,8 +92,7 @@ abstract class _$LoginController extends $AsyncNotifier<LoginState> {
   FutureOr<LoginState> build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<LoginState>, LoginState>;
     final element =
         ref.element
@@ -103,6 +102,6 @@ abstract class _$LoginController extends $AsyncNotifier<LoginState> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }

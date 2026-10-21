@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'cart.dart';
@@ -9,6 +9,7 @@ part of 'cart.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -28,16 +29,21 @@ $CartCopyWith<Cart> get copyWith => _$CartCopyWithImpl<Cart>(this as Cart, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Cart&&const DeepCollectionEquality().equals(other.items, items)&&(identical(other.total, total) || other.total == total));
+  final _this = this as Cart;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Cart&&const DeepCollectionEquality().equals(other.items, _this.items)&&(identical(other.total, _this.total) || other.total == _this.total));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(items),total);
+int get hashCode {
+  final _this = this as Cart;
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.items),_this.total);
+}
 
 @override
 String toString() {
-  return 'Cart(items: $items, total: $total)';
+  final _this = this as Cart;
+  return 'Cart(items: ${_this.items}, total: ${_this.total})';
 }
 
 
@@ -66,7 +72,7 @@ class _$CartCopyWithImpl<$Res>
 /// Create a copy of Cart
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? items = null,Object? total = null,}) {
-  return _then(_self.copyWith(
+  return _then(Cart(
 items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
 as List<Item>,total: null == total ? _self.total : total // ignore: cast_nullable_to_non_nullable
 as double,
@@ -210,7 +216,7 @@ return $default(_that.items,_that.total);case _:
 @JsonSerializable()
 
 class _Cart implements Cart {
-  const _Cart({required final  List<Item> items, required this.total}): _items = items;
+  const _Cart({required  List<Item> items, required this.total}): _items = items;
   factory _Cart.fromJson(Map<String, dynamic> json) => _$CartFromJson(json);
 
  final  List<Item> _items;
@@ -235,16 +241,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Cart&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.total, total) || other.total == total));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Cart&&const DeepCollectionEquality().equals(other.items, _items)&&(identical(other.total, total) || other.total == total));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_items),total);
+int get hashCode {
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_items),total);
+}
 
 @override
 String toString() {
-  return 'Cart(items: $items, total: $total)';
+    return 'Cart(items: $items, total: $total)';
 }
 
 

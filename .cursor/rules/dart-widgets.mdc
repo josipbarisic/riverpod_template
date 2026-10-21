@@ -1,7 +1,0 @@
----
-description: Widget base classes, extraction, layer boundaries, and project presentation APIs
-globs: lib/presentation/**/*.dart
-alwaysApply: false
----
-
-Read `.claude/rules/dart-widgets.md` — the only copy of this rule.

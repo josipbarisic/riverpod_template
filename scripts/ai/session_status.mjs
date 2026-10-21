@@ -1,8 +1,8 @@
-// Shared, local session diagnostics for the Cursor and Claude hook adapters.
+// Shared, local session diagnostics for the Claude Code hooks and the manifest gate.
 // Git state is authoritative: checkout mtimes never create false stale results.
 
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, join, relative } from 'node:path';
 
 export const BASE_CANDIDATES = ['develop', 'main', 'master'];
@@ -125,12 +125,23 @@ export function changedFiles({ cwd = process.cwd() } = {}) {
 }
 
 /**
- * Find flat feature manifests affected by changed generator inputs.
- * A changed manifest is treated as regenerated; content comparison belongs to CI.
+ * Find flat feature manifests that may be stale.
+ *
+ * Without `regenerate` this is the fast session-hook hint: a manifest's generator
+ * inputs changed in the worktree while the manifest did not. A changed manifest is
+ * treated as regenerated. It cannot see work that is already committed.
+ *
+ * With `regenerate` it is CI's manifest freshness comparison run locally: run the
+ * generator, compare each manifest with the checked-out copy (HEAD on a clean
+ * branch) ignoring `generatedAt`, then restore every manifest exactly, so the
+ * worktree is left as it was found. A manifest the generator newly creates is
+ * removed and ignored, as CI ignores an untracked one.
  * @param {Iterable<string>} [changed]
- * @param {{cwd?:string}} [options]
+ * @param {{cwd?:string, regenerate?:() => void}} [options]
  */
-export function staleManifests(changed, { cwd = process.cwd() } = {}) {
+export function staleManifests(changed, { cwd = process.cwd(), regenerate } = {}) {
+  if (regenerate) return regeneratedManifestDrift(regenerate, cwd);
+
   const changedPaths = new Set(
     [...(changed ?? changedFiles({ cwd }))].map(normalizeRepoPath).filter(Boolean),
   );
@@ -193,19 +204,61 @@ export function pendingCodegen(changed, { cwd = process.cwd() } = {}) {
   return pending.sort();
 }
 
-function readFlatManifests(cwd) {
-  const directory = join(cwd, MANIFEST_DIR);
-  let entries;
+function regeneratedManifestDrift(regenerate, cwd) {
+  const before = new Map(
+    listFlatManifests(cwd).map(path => [path, readFileSync(path, 'utf8')]),
+  );
+
+  const stale = [];
   try {
-    entries = readdirSync(directory, { withFileTypes: true });
+    regenerate();
+    for (const path of listFlatManifests(cwd)) {
+      const checkedOut = before.get(path);
+      if (checkedOut === undefined) continue;
+      const regenerated = readFileSync(path, 'utf8');
+      if (withoutGeneratedAt(regenerated) !== withoutGeneratedAt(checkedOut)) {
+        stale.push(featureOf(checkedOut, path));
+      }
+    }
+  } finally {
+    for (const path of listFlatManifests(cwd)) if (!before.has(path)) rmSync(path);
+    for (const [path, content] of before) writeFileSync(path, content);
+  }
+  return stale.sort();
+}
+
+function withoutGeneratedAt(json) {
+  try {
+    const { generatedAt: _ignored, ...rest } = JSON.parse(json);
+    return JSON.stringify(rest);
+  } catch {
+    return json;
+  }
+}
+
+function featureOf(json, path) {
+  try {
+    return manifestFeature(JSON.parse(json), path);
+  } catch {
+    return basename(path, MANIFEST_SUFFIX);
+  }
+}
+
+function listFlatManifests(cwd) {
+  const directory = join(cwd, MANIFEST_DIR);
+  try {
+    return readdirSync(directory, { withFileTypes: true })
+      .filter(entry => entry.isFile() && entry.name.endsWith(MANIFEST_SUFFIX))
+      .map(entry => join(directory, entry.name))
+      .sort();
   } catch {
     return [];
   }
+}
 
+function readFlatManifests(cwd) {
   const manifests = [];
-  for (const entry of entries) {
-    if (!entry.isFile() || !entry.name.endsWith(MANIFEST_SUFFIX)) continue;
-    const absolutePath = join(directory, entry.name);
+  for (const absolutePath of listFlatManifests(cwd)) {
     try {
       manifests.push({
         data: JSON.parse(readFileSync(absolutePath, 'utf8')),

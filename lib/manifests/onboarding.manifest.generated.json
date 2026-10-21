@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-18T10:49:37.776922Z",
+  "generatedAt": "2026-10-21T09:19:32.398264Z",
   "feature": "onboarding",
   "views": [
     "lib/presentation/onboarding/onboarding_view.dart"
@@ -10,7 +10,18 @@
   "repositories": [],
   "providers": [],
   "stateClasses": [],
-  "routes": [],
+  "routes": [
+    {
+      "appRoute": "AppRoute.onboarding",
+      "path": "/onboarding",
+      "view": "OnboardingView"
+    },
+    {
+      "appRoute": "AppRoute.signUp",
+      "path": "/signUp",
+      "view": "SignUpView"
+    }
+  ],
   "apiEndpoints": [],
   "coreServices": [],
   "thirdPartyDependencies": [

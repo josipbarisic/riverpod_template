@@ -22,7 +22,8 @@ There are no nested per-feature manifest directories.
 
 ## Method
 
-1. Derive changed files with read-only Git commands.
+1. Start from the SessionStart line `Manifests: N may be stale` when the session
+   has one, then derive changed files with read-only Git commands.
 2. Map `lib/presentation/<feature>/...` to
    `lib/manifests/<feature>.manifest.generated.json`.
 3. Treat these as structural freshness triggers:
@@ -47,7 +48,9 @@ files:
 dart run scripts/generate_feature_manifests.dart
 ```
 
-Root `AGENTS.md` owns FVM discovery before that bare command.
+Root `AGENTS.md` owns FVM discovery before that bare command. For proof rather
+than candidates, recommend `node scripts/ai/check_manifest_freshness.mjs`; it
+regenerates and restores, so it is the user's to run, not yours.
 
 ## Output
 

@@ -12,7 +12,6 @@ paths:
   - "docs/**"
   - ".github/**"
   - ".claude/**"
-  - ".cursor/**"
   - "*.md"
   - "*.yaml"
   - "*.yml"

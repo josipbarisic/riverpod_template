@@ -260,26 +260,36 @@ final endpointsFile = File('lib/core/utils/network/endpoints.dart');
 // PARSING UTILITIES
 // ═══════════════════════════════════════════════════════════════════════════
 
-String readFileSafe(String filePath) {
-  try {
-    return File(filePath).readAsStringSync();
-  } catch (e) {
-    return '';
-  }
-}
+// One generation reads a stable source snapshot; the next generation discovers it afresh.
+final _fileContents = <String, String>{};
+final _dartFiles = <String, List<String>>{};
+
+String readFileSafe(String filePath) =>
+    _fileContents.putIfAbsent(File(filePath).absolute.path, () {
+      try {
+        return File(filePath).readAsStringSync();
+      } catch (e) {
+        return '';
+      }
+    });
 
 List<String> listDartFilesRecursive(Directory dir) {
   if (!dir.existsSync()) return [];
 
-  return dir
-      .listSync(recursive: true)
-      .whereType<File>()
-      .where((f) => f.path.endsWith('.dart'))
-      .where((f) => !f.path.contains('.g.dart'))
-      .where((f) => !f.path.contains('.freezed.dart'))
-      .map((f) => f.path.replaceAll('\\', '/'))
-      .toList()
-    ..sort();
+  return List<String>.of(
+    _dartFiles.putIfAbsent(
+      dir.absolute.path,
+      () => dir
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((f) => f.path.endsWith('.dart'))
+          .where((f) => !f.path.contains('.g.dart'))
+          .where((f) => !f.path.contains('.freezed.dart'))
+          .map((f) => f.path.replaceAll('\\', '/'))
+          .toList()
+        ..sort(),
+    ),
+  );
 }
 
 String getRelativePath(String absolutePath) {
@@ -500,6 +510,14 @@ List<RouteDefinition> extractRoutesForFeature(
     );
     final builderMatch = builderViewRegex.firstMatch(restOfRouter);
 
+    // Try a block-body builder: { ... return (const)? XxxView(
+    final returnViewRegex = RegExp(
+      r'return\s+(?:const\s+)?(\w+View)\s*\(',
+      multiLine: true,
+      dotAll: true,
+    );
+    final returnMatch = returnViewRegex.firstMatch(restOfRouter);
+
     // Try child: (const)? XxxView(
     final childViewRegex = RegExp(
       r'child:\s*(?:const\s+)?(\w+View)\s*\(',
@@ -508,9 +526,10 @@ List<RouteDefinition> extractRoutesForFeature(
     );
     final childMatch = childViewRegex.firstMatch(restOfRouter);
 
-    final view = (builderMatch != null && childMatch != null)
-        ? (builderMatch.start <= childMatch.start ? builderMatch.group(1) : childMatch.group(1))
-        : (builderMatch?.group(1) ?? childMatch?.group(1));
+    // Prefer the view that appears first in the route block.
+    final viewMatches = [builderMatch, returnMatch, childMatch].whereType<RegExpMatch>().toList()
+      ..sort((a, b) => a.start.compareTo(b.start));
+    final view = viewMatches.isEmpty ? null : viewMatches.first.group(1);
 
     if (view != null) {
       routes.add(RouteDefinition(appRouteConstant: routeConstantName, view: view));
@@ -619,7 +638,8 @@ List<ControllerMethod> extractControllerMethods(String content, String fileName)
       }
 
       final methodStartRegex = RegExp(
-        r'^\s*(Future<[^>]+>|FutureOr<[^>]+>|void|bool|int|String|List<[^>]+>|Map<[^>]+>|\w+)\s+(\w+)\s*\(',
+        // (?:[^<>]+|<[^>]*>)* keeps one level of nested generics, e.g. Future<List<Item>>.
+        r'^\s*(Future<(?:[^<>]+|<[^>]*>)*>|FutureOr<(?:[^<>]+|<[^>]*>)*>|void|bool|int|String|List<(?:[^<>]+|<[^>]*>)*>|Map<(?:[^<>]+|<[^>]*>)*>|\w+)\s+(\w+)\s*\(',
       );
 
       final match = methodStartRegex.firstMatch(trimmed);
@@ -894,7 +914,8 @@ List<String> findRepositoryMethodUsages(
   final seenFiles = <String>{};
   for (final filePath in allLibFiles) {
     final content = readFileSafe(filePath);
-    if (content.isEmpty) continue;
+    // Every usage pattern contains the literal method name; skip the regex scans otherwise.
+    if (content.isEmpty || !content.contains(repositoryMethodName)) continue;
 
     final relativePath = getRelativePath(filePath);
     if (relativePath == repositoryRelativePath) continue;
@@ -902,13 +923,9 @@ List<String> findRepositoryMethodUsages(
     if (seenFiles.contains(relativePath)) continue;
     if (declarationPattern.hasMatch(content)) continue;
 
-    bool foundUsage = false;
-    for (final pattern in usagePatterns) {
-      if (pattern.hasMatch(content)) {
-        foundUsage = true;
-        break;
-      }
-    }
+    final foundUsage = usagePatterns.any(
+      (pattern) => pattern.allMatches(content).any((match) => _isCodeCall(content, match)),
+    );
 
     if (foundUsage) {
       usages.add(relativePath);
@@ -917,6 +934,29 @@ List<String> findRepositoryMethodUsages(
   }
 
   return usages..sort();
+}
+
+// A call whose only argument is a string literal, such as an enum value
+// declared as loadItems('loadItems').
+final _onlyStringArgument = RegExp(r'''\s*(['"])(?:\\.|(?!\1).)*\1\s*\)''');
+
+/// Whether [match] is code: not inside a string literal on its line, and not a
+/// call whose only argument is a string literal.
+bool _isCodeCall(String content, Match match) {
+  final lineStart = content.lastIndexOf('\n', match.start) + 1;
+  String? quote;
+  for (var i = lineStart; i < match.start; i++) {
+    final char = content[i];
+    if (char != "'" && char != '"') continue;
+    if (i > 0 && content[i - 1] == r'\') continue;
+    if (quote == null) {
+      quote = char;
+    } else if (char == quote) {
+      quote = null;
+    }
+  }
+  if (quote != null) return false;
+  return _onlyStringArgument.matchAsPrefix(content, match.end) == null;
 }
 
 /// Extract method parameters from method signature
@@ -1338,6 +1378,8 @@ FeatureManifest generateManifestForFeature(String featureName, String featurePat
 // ═══════════════════════════════════════════════════════════════════════════
 
 void generateAllManifests() {
+  _fileContents.clear();
+  _dartFiles.clear();
   print('Generating feature manifests...\n');
 
   final outputDir = Directory('lib/manifests');
