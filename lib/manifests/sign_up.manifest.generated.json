@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-18T10:49:37.793290Z",
+  "generatedAt": "2026-10-21T09:19:32.410485Z",
   "feature": "sign_up",
   "views": [
     "lib/presentation/sign_up/sign_up_view.dart"
@@ -22,7 +22,13 @@
     }
   ],
   "stateClasses": [],
-  "routes": [],
+  "routes": [
+    {
+      "appRoute": "AppRoute.signUp",
+      "path": "/signUp",
+      "view": "SignUpView"
+    }
+  ],
   "apiEndpoints": [],
   "coreServices": [],
   "thirdPartyDependencies": [

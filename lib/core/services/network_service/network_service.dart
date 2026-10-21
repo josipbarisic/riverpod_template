@@ -98,7 +98,7 @@ class NetworkService {
         data: response.data?['data'],
         errorCode: response.data?['code'],
       );
-    } on DioException catch (dioError, _) {
+    } on DioException catch (dioError) {
       return NetworkErrorResponse(
         httpStatusCode: dioError.response?.statusCode,
         message: dioError.response?.data?['message'] ??
@@ -142,7 +142,7 @@ class NetworkService {
         data: response.data?['data'],
         errorCode: response.data?['code'],
       );
-    } on DioException catch (dioError, _) {
+    } on DioException catch (dioError) {
       return NetworkErrorResponse(
         httpStatusCode: dioError.response?.statusCode,
         message: dioError.response?.data?['message'] ??
@@ -186,7 +186,7 @@ class NetworkService {
         data: response.data?['data'],
         errorCode: response.data?['code'],
       );
-    } on DioException catch (dioError, _) {
+    } on DioException catch (dioError) {
       return NetworkErrorResponse(
         httpStatusCode: dioError.response?.statusCode,
         message: dioError.response?.data?['message'] ??
@@ -230,7 +230,7 @@ class NetworkService {
         data: response.data?['data'],
         errorCode: response.data?['code'],
       );
-    } on DioException catch (dioError, _) {
+    } on DioException catch (dioError) {
       return NetworkErrorResponse(
         httpStatusCode: dioError.response?.statusCode,
         message: dioError.response?.data?['message'] ??

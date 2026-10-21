@@ -10,7 +10,7 @@ part of 'local_notifications_service_provider.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(localNotificationsService)
-const localNotificationsServiceProvider = LocalNotificationsServiceProvider._();
+final localNotificationsServiceProvider = LocalNotificationsServiceProvider._();
 
 final class LocalNotificationsServiceProvider
     extends
@@ -20,7 +20,7 @@ final class LocalNotificationsServiceProvider
           LocalNotificationsService
         >
     with $Provider<LocalNotificationsService> {
-  const LocalNotificationsServiceProvider._()
+  LocalNotificationsServiceProvider._()
     : super(
         from: null,
         argument: null,

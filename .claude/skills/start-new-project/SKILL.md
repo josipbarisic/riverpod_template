@@ -1,3 +1,9 @@
+---
+name: start-new-project
+description: Initialize a new app from this template — discovery, docs/PROJECT_SPEC.md, docs/IMPLEMENTATION_PLAN.md, with approval gates before any product edit. Use when the user types /start-new-project or asks to turn the template into a new project.
+disable-model-invocation: true
+---
+
 # Start New Project
 
 Initialize a Flutter project from this template. This is Tier 3: gather

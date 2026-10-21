@@ -10,7 +10,6 @@ on:
       - 'README.md'
       - 'docs/**'
       - '.claude/**'
-      - '.cursor/**'
       - '.github/workflows/**'
       - 'lib/**'
       - 'scripts/**'
@@ -182,6 +181,12 @@ jobs:
           --run
           --flutter-exit-code=${{ steps.flutter-analyze.outputs.exit-code }}
 
+      - name: Run riverpod_lint
+        id: riverpod-lint
+        if: always()
+        timeout-minutes: 8
+        run: bash scripts/ci/check_riverpod_lint.sh
+
       - name: Flutter analysis gate
         if: always()
         run: |
@@ -191,6 +196,7 @@ jobs:
           [ "${{ steps.environment.outcome }}" != "success" ] && FAILED="${FAILED} environment"
           [ "${{ steps.flutter-analyze.outcome }}" = "failure" ] && FAILED="${FAILED} flutter-analyze"
           [ "${{ steps.analyze-baseline.outcome }}" = "failure" ] && FAILED="${FAILED} analyzer-baseline"
+          [ "${{ steps.riverpod-lint.outcome }}" = "failure" ] && FAILED="${FAILED} riverpod-lint"
 
           if [ -n "$FAILED" ]; then
             echo "❌ Flutter analysis failed:${FAILED}"
@@ -218,17 +224,32 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Check manifest validation tool
+        run: |
+          if ! command -v jq >/dev/null; then
+            sudo apt-get update && sudo apt-get install -y jq
+          fi
+          jq --version
+
       - name: Configure git
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
+      - name: Test manifest generator
+        run: |
+          if ! dart run scripts/ci/generate_feature_manifests_test.dart; then
+            echo "❌ Manifest generator fixture failed"
+            echo "Local repro: dart run scripts/ci/generate_feature_manifests_test.dart"
+            exit 1
+          fi
+
       - name: Generate manifests
         run: |
           echo "Generating feature manifests..."
-          dart run scripts/generate_feature_manifests.dart
-          if [ $? -ne 0 ]; then
+          if ! dart run scripts/generate_feature_manifests.dart; then
             echo "❌ Failed to generate manifests"
+            echo "Local repro: dart run scripts/generate_feature_manifests.dart"
             exit 1
           fi
           echo "✅ Manifest generation completed"
@@ -239,11 +260,9 @@ jobs:
           # Ensure manifests directory exists
           if [ ! -d "lib/manifests" ]; then
             echo "❌ lib/manifests directory does not exist"
+            echo "Local repro: dart run scripts/generate_feature_manifests.dart"
             exit 1
           fi
-          
-          # Install jq for JSON manipulation (to ignore timestamp differences)
-          sudo apt-get update && sudo apt-get install -y jq
           
           # After generating manifests, check if any manifest files differ from what's committed in the PR
           # We compare the generated files against HEAD, ignoring the 'generatedAt' timestamp field
@@ -297,6 +316,7 @@ jobs:
             echo ""
             echo "Please run: dart run scripts/generate_feature_manifests.dart"
             echo "Then commit the updated manifests."
+            echo "Local repro: node scripts/ai/check_manifest_freshness.mjs"
             exit 1
           else
             echo "✅ All manifests are up to date"

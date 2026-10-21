@@ -49,11 +49,40 @@ Widget build(BuildContext context) => const SizedBox.shrink();
 Use a block when the body has multiple statements, local variables, control flow, or needs
 comments that explain the mechanism.
 
-## Removal completeness
+## Server-owned enums
 
-When removing a rendered element or capability, remove state fields, providers, helpers, imports,
-tests, and routes that existed only for it. Check references first; do not delete shared code
-because it was used by the removed call site.
+An enum decoded from the server falls back instead of throwing on a value the app does not know:
+`@JsonKey(unknownEnumValue: …)` on a generated field, or an `unknown` member with
+`values.firstWhere(…, orElse: () => unknown)` in a hand-written parser. Keep null for "the payload
+has no value" and `unknown` for "a value the app does not understand"; they drive different UI.
+
+## Watched values and callback parameters
+
+Never name a callback parameter the same as a watched provider value in the enclosing scope:
+
+```dart
+final page = ref.watch(bottomNavigationControllerProvider.select((s) => s.page));
+onTap: (index) {
+  final tapped = SelectedBottomNavigationPage.values[index];
+  final isReTap = page == tapped; // a parameter named `page` would shadow the watched value
+```
+
+## Logging
+
+Never log tokens, credentials, or user personal data, not even in an error message: log that the
+step failed, not the value. A token never goes in a URL query (`?access_token=`): proxies and logs
+keep URLs. A Dio `LogInterceptor` must not print auth headers or bodies that carry credentials.
+
+## Removing a rendered element
+
+When a rendered element or capability is deleted, delete in the same change everything that existed
+only to serve it: state fields only it read, controllers or providers left without a consumer,
+strings, helpers, mixins and extensions only it called, routes, tests, and any `useMemoized`
+dependency that referenced them. Check references first; do not delete shared code because the
+removed call site used it.
+
+`flutter analyze` does not catch an unread state field, so nothing fails: the widget goes and the
+field it fed survives in the constructor, `copyWith` and equality indefinitely.
 
 ## Scope
 

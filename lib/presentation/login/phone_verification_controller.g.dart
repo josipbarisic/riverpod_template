@@ -17,7 +17,7 @@ part of 'phone_verification_controller.dart';
 /// - `AsyncError` — failed with user-friendly message
 
 @ProviderFor(PhoneVerificationController)
-const phoneVerificationControllerProvider =
+final phoneVerificationControllerProvider =
     PhoneVerificationControllerProvider._();
 
 /// Controls the phone number verification flow.
@@ -36,7 +36,7 @@ final class PhoneVerificationControllerProvider
   /// - `AsyncData(verificationId)` — SMS code sent, pass this ID to verify
   /// - `AsyncLoading` — sending or verifying
   /// - `AsyncError` — failed with user-friendly message
-  const PhoneVerificationControllerProvider._()
+  PhoneVerificationControllerProvider._()
     : super(
         from: null,
         argument: null,
@@ -70,8 +70,7 @@ abstract class _$PhoneVerificationController extends $AsyncNotifier<String?> {
   FutureOr<String?> build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<String?>, String?>;
     final element =
         ref.element
@@ -81,6 +80,6 @@ abstract class _$PhoneVerificationController extends $AsyncNotifier<String?> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }

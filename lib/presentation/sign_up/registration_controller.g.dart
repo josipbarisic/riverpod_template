@@ -19,7 +19,7 @@ part of 'registration_controller.dart';
 /// - `AsyncError` — failed with user-friendly message
 
 @ProviderFor(RegistrationController)
-const registrationControllerProvider = RegistrationControllerProvider._();
+final registrationControllerProvider = RegistrationControllerProvider._();
 
 /// Controls the registration/sign-up flow.
 ///
@@ -41,7 +41,7 @@ final class RegistrationControllerProvider
   /// - `AsyncData(step)` — current registration step
   /// - `AsyncLoading` — processing
   /// - `AsyncError` — failed with user-friendly message
-  const RegistrationControllerProvider._()
+  RegistrationControllerProvider._()
     : super(
         from: null,
         argument: null,
@@ -78,8 +78,7 @@ abstract class _$RegistrationController
   FutureOr<RegistrationStep> build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref =
         this.ref as $Ref<AsyncValue<RegistrationStep>, RegistrationStep>;
     final element =
@@ -90,6 +89,6 @@ abstract class _$RegistrationController
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }

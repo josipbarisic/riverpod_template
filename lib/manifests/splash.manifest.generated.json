@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-18T10:49:37.770772Z",
+  "generatedAt": "2026-10-21T09:19:32.392510Z",
   "feature": "splash",
   "views": [
     "lib/presentation/splash/splash_view.dart"
@@ -19,7 +19,18 @@
     }
   ],
   "stateClasses": [],
-  "routes": [],
+  "routes": [
+    {
+      "appRoute": "AppRoute.onboarding",
+      "path": "/onboarding",
+      "view": "OnboardingView"
+    },
+    {
+      "appRoute": "AppRoute.splash",
+      "path": "/splash",
+      "view": "SplashView"
+    }
+  ],
   "apiEndpoints": [],
   "coreServices": [
     {

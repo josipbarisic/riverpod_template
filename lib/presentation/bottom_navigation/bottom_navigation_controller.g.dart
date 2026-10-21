@@ -10,13 +10,13 @@ part of 'bottom_navigation_controller.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(BottomNavigationController)
-const bottomNavigationControllerProvider =
+final bottomNavigationControllerProvider =
     BottomNavigationControllerProvider._();
 
 final class BottomNavigationControllerProvider
     extends
         $NotifierProvider<BottomNavigationController, BottomNavigationState> {
-  const BottomNavigationControllerProvider._()
+  BottomNavigationControllerProvider._()
     : super(
         from: null,
         argument: null,
@@ -51,8 +51,7 @@ abstract class _$BottomNavigationController
   BottomNavigationState build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<BottomNavigationState, BottomNavigationState>;
     final element =
         ref.element
@@ -62,6 +61,6 @@ abstract class _$BottomNavigationController
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }

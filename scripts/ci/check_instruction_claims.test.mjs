@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 import {
   mkdirSync,
   mkdtempSync,
+  readFileSync,
   rmSync,
   writeFileSync,
 } from 'node:fs';
@@ -49,7 +50,7 @@ const pathExists = pathResolver({
     'test/domain/user_test.dart',
     '.claude/rules/dart-navigation.md',
   ]),
-  isIgnored: target => target === '.env' || target === '.cursor/last-session-status.json',
+  isIgnored: target => target === '.env' || target === '.claude/last-session-status.json',
 });
 
 const analyzeShape = commandShape('flutter analyze');
@@ -77,7 +78,7 @@ test('path resolution accepts Git-visible files, directories, and ignored local 
   assert.ok(pathExists('lib/core/routing'));
   assert.ok(pathExists('lib/core/routing/'));
   assert.ok(pathExists('.env'));
-  assert.ok(pathExists('.cursor/last-session-status.json'));
+  assert.ok(pathExists('.claude/last-session-status.json'));
   assert.ok(!pathExists('lib/core/routing/missing.dart'));
 });
 
@@ -216,7 +217,7 @@ test('learning logs are excluded from point-in-time instruction validation', () 
   );
 });
 
-test('instruction inventory covers roots, nested guides, skills, agents, commands, and workflows', () => {
+test('instruction inventory covers roots, nested guides, rules, skills, agents, and workflows', () => {
   const root = mkdtempSync(join(tmpdir(), 'instruction-files-'));
   try {
     for (const path of [
@@ -230,8 +231,6 @@ test('instruction inventory covers roots, nested guides, skills, agents, command
       '.claude/rules/example.md',
       '.claude/skills/example/SKILL.md',
       '.claude/agents/example.md',
-      '.cursor/rules/example.mdc',
-      '.cursor/commands/example.md',
       '.github/workflows/checks.yml',
     ]) {
       write(root, path, 'fixture\n');
@@ -241,9 +240,29 @@ test('instruction inventory covers roots, nested guides, skills, agents, command
     assert.ok(files.includes('lib/AGENTS.md'));
     assert.ok(files.includes('.claude/skills/example/SKILL.md'));
     assert.ok(files.includes('.claude/agents/example.md'));
-    assert.ok(files.includes('.cursor/commands/example.md'));
+    assert.ok(files.includes('.claude/rules/example.md'));
     assert.ok(files.includes('.github/workflows/checks.yml'));
     assert.ok(!files.includes('docs/LEARNING_LOG.md'));
+  } finally {
+    removeRepository(root);
+  }
+});
+
+test('discovered documents keep archive exemptions and live checks across platforms', () => {
+  const root = mkdtempSync(join(tmpdir(), 'instruction-claims[fixture]-'));
+  try {
+    const text = 'See `lib/removed.dart`.';
+    write(root, 'docs/LEARNING_LOG.md', text);
+    write(root, 'docs/CURRENT.md', text);
+
+    const paths = instructionFiles(root);
+    assert.deepEqual(paths, ['docs/CURRENT.md']);
+    const violations = paths.flatMap(path =>
+      checkDocument({ path, text: readFileSync(join(root, path), 'utf8'), index }),
+    );
+    assert.equal(violations.length, 1);
+    assert.equal(violations[0].path, 'docs/CURRENT.md');
+    assert.match(violations[0].message, /lib\/removed\.dart/);
   } finally {
     removeRepository(root);
   }

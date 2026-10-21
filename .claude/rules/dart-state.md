@@ -4,6 +4,7 @@ paths:
   - "lib/**/*provider*.dart"
   - "lib/**/*state*.dart"
   - "lib/core/utils/user_handler/*.dart"
+  - "lib/presentation/**/*.dart"
 ---
 
 # Riverpod State
@@ -31,6 +32,10 @@ Use `@riverpod` for default auto-disposal. Use `@Riverpod(keepAlive: true)` only
 must retain state with no listeners, such as an app-lifetime service or session owner. A provider
 recomputation still disposes its previous state; register owned-resource cleanup with
 `ref.onDispose`.
+
+A keepAlive provider that holds one user's data watches `userHandlerProvider` in `build()` and
+returns an empty value when the user is null. Otherwise it outlives sign-out and shows the previous
+account's data after the next sign-in.
 
 Riverpod 3 function providers receive the unified `Ref` type:
 
@@ -60,12 +65,37 @@ work with `AsyncLoading`, success with `AsyncData`, and failures with `AsyncErro
 real stack trace. Guard async mutations so an older request cannot overwrite newer state when the
 feature permits concurrent calls.
 
+Reading it:
+
+- There is no `valueOrNull` in Riverpod 3; `.value` is the nullable accessor.
+- `AsyncLoading` keeps the previous error, so a retry in flight is `isLoading && hasError`. Gate
+  failure UI on `hasError && !isLoading`, and read `value` or `requireValue` only after both checks;
+  `requireValue` on an `AsyncError` throws and swallows the error UI.
+- On a reload (a watched dependency changed, or the notifier set `AsyncLoading` itself), `when`
+  shows `loading` even while an error is held; `ref.refresh` and `ref.invalidate` skip loading by
+  default. Pass `skipLoadingOnReload: true` when the error or retry surface must stay up.
+
 ## State classes
 
-The live source uses both Equatable state classes and Freezed models. Use Equatable for small
-explicit states and Freezed when generated copy/serialization or a larger immutable shape is
-useful. A dedicated state class is optional when `AsyncValue<T>` already expresses the complete
-state.
+Pick the smallest shape that holds the state:
+
+1. **No state class** when `build()` can return the value itself (`FutureOr<List<T>>`,
+   `FutureOr<bool>`) and the UI reads it as `AsyncValue<T>`.
+2. **`@freezed`** for every new state class. It generates `copyWith`, `==` and `hashCode`, so a new
+   field cannot be left out of equality the way it can from a hand-written `props` list.
+
+```dart
+@freezed
+abstract class ExampleState with _$ExampleState {
+  const factory ExampleState({
+    @Default([]) List<String> items,
+    @Default(false) bool isLoadingMore,
+  }) = _ExampleState;
+}
+```
+
+`LoginState` and `BottomNavigationState` are Equatable and stay until their files change for another
+reason. Do not copy that shape into new code.
 
 After changing Riverpod, Freezed, or JSON-serializable annotations, follow root `AGENTS.md` for
 code generation. Never edit generated Dart files.

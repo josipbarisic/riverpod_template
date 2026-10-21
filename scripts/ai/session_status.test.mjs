@@ -64,14 +64,53 @@ test('Stop integrity matches every CI-scanned instruction surface', () => {
     '.claude/rules/dart-state.md',
     '.claude/skills/example/SKILL.md',
     '.claude/agents/reviewer.md',
-    '.cursor/rules/dart-state.mdc',
-    '.cursor/commands/test.md',
     '.github/workflows/validate-ai-standards.yml',
   ]) {
     assert.ok(isInstructionFile(path), path);
   }
   assert.ok(!isInstructionFile('lib/presentation/home/home_view.dart'));
   assert.ok(!isInstructionFile('docs/LEARNING_LOG.json'));
+});
+
+test('a committed branch whose sources changed without their manifests is stale', () => {
+  const view = 'lib/presentation/home/home_view.dart';
+  const widget = 'lib/presentation/home/widgets/home_banner.dart';
+  const manifest = 'lib/manifests/home.manifest.generated.json';
+  const manifestJson = (content, generatedAt) =>
+    `${JSON.stringify({ feature: 'home', ...content, generatedAt }, null, 2)}\n`;
+  const root = createRepository({
+    [view]: 'class HomeView {}\n',
+    [manifest]: manifestJson({ views: [view] }, 'base'),
+  });
+
+  try {
+    git(root, 'checkout', '-b', 'feature/home-banner');
+    // The branch adds a widget and commits it without running the generator.
+    write(root, widget, 'class HomeBanner {}\n');
+    git(root, 'add', '.');
+    git(root, 'commit', '-m', 'Add: Home banner');
+    const committedManifest = readFileSync(join(root, manifest), 'utf8');
+
+    // What the real generator would now write, including a manifest it newly creates.
+    const regenerate = () => {
+      write(root, manifest, manifestJson({ views: [view], widgets: [widget] }, 'now'));
+      write(root, 'lib/manifests/extra.manifest.generated.json', '{}\n');
+    };
+
+    assert.equal(git(root, 'status', '--porcelain'), '');
+    assert.deepEqual(staleManifests(undefined, { cwd: root }), []);
+    assert.deepEqual(staleManifests(undefined, { cwd: root, regenerate }), ['home']);
+    assert.equal(readFileSync(join(root, manifest), 'utf8'), committedManifest);
+    assert.equal(git(root, 'status', '--porcelain'), '');
+
+    // Regenerated and committed: only generatedAt differs on the next run.
+    write(root, manifest, manifestJson({ views: [view], widgets: [widget] }, 'then'));
+    git(root, 'commit', '-am', 'Chore: Regenerate manifests');
+    assert.deepEqual(staleManifests(undefined, { cwd: root, regenerate }), []);
+    assert.equal(git(root, 'status', '--porcelain'), '');
+  } finally {
+    removeRepository(root);
+  }
 });
 
 test('Stop integrity loads the source-backed checker for changed skills', async () => {

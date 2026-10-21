@@ -15,6 +15,15 @@ Before modifying a feature:
 Never edit a manifest directly. If a manifest disagrees with source after regeneration, source is
 authoritative; fix the generator only when generator behavior is inside the task.
 
+### When the manifest looks wrong
+
+- **Wrong view for a route:** routes using `builder:` or `pageBuilder:` with a `XxxView(...)` child
+  are supported. If the view is still wrong after regenerating, fix `extractRoutesForFeature` in
+  `scripts/generate_feature_manifests.dart`.
+- **Wrong or missing endpoint:** endpoints come only from uncommented
+  `networkService.getHttp/postHttp/putHttp/deleteHttp(...)` calls in repositories.
+- **A diff that only changes `generatedAt`** is not a change; revert it.
+
 ## Feature manifests
 
 Each `lib/manifests/<feature>.manifest.generated.json` may contain:
@@ -71,8 +80,8 @@ Use Riverpod code generation only. Providers use `@riverpod` or
 `@Riverpod(keepAlive: true)`, include the matching `part` file, and access dependencies through
 `Ref`. Do not add manually constructed provider objects.
 
-The current source uses Equatable for small explicit presentation states and Freezed/JSON
-generation for models. Use `AsyncValue<T>` directly when it fully represents controller state.
+Models use Freezed/JSON generation. New state classes use Freezed; `.claude/rules/dart-state.md`
+owns the state-class rule. Use `AsyncValue<T>` directly when it fully represents controller state.
 
 ## Navigation
 
@@ -93,6 +102,14 @@ Current test locations are:
 - models: `test/domain/`
 - utilities: `test/utils/`
 - fixtures and helpers: `test/test_data/`, `test/helpers/`
+
+| If you modified | Update the test in |
+|---|---|
+| `lib/models/**` | `test/domain/` |
+| `lib/data/repositories/**` | `test/repositories/` |
+| `lib/presentation/<feature>/*_controller.dart` | `test/presentation/<feature>/` |
+| `lib/core/services/**` | `test/services/` |
+| `lib/core/utils/**` | `test/utils/` |
 
 Controller tests use `ProviderContainer` overrides. Mock repositories or external services rather
 than controllers. Add tests for changed behavior; root `AGENTS.md` owns focused and full-suite

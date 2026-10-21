@@ -10,12 +10,12 @@ part of 'network_service_providers.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(networkService)
-const networkServiceProvider = NetworkServiceProvider._();
+final networkServiceProvider = NetworkServiceProvider._();
 
 final class NetworkServiceProvider
     extends $FunctionalProvider<NetworkService, NetworkService, NetworkService>
     with $Provider<NetworkService> {
-  const NetworkServiceProvider._()
+  NetworkServiceProvider._()
     : super(
         from: null,
         argument: null,

@@ -17,7 +17,7 @@ part of 'forgot_password_controller.dart';
 /// - `AsyncError` — failed with a user-friendly message
 
 @ProviderFor(ForgotPasswordController)
-const forgotPasswordControllerProvider = ForgotPasswordControllerProvider._();
+final forgotPasswordControllerProvider = ForgotPasswordControllerProvider._();
 
 /// Controls the forgot-password flow.
 ///
@@ -35,7 +35,7 @@ final class ForgotPasswordControllerProvider
   /// - `AsyncData(false)` — initial / idle
   /// - `AsyncLoading` — sending email
   /// - `AsyncError` — failed with a user-friendly message
-  const ForgotPasswordControllerProvider._()
+  ForgotPasswordControllerProvider._()
     : super(
         from: null,
         argument: null,
@@ -69,8 +69,7 @@ abstract class _$ForgotPasswordController extends $AsyncNotifier<bool> {
   FutureOr<bool> build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<bool>, bool>;
     final element =
         ref.element
@@ -80,6 +79,6 @@ abstract class _$ForgotPasswordController extends $AsyncNotifier<bool> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }

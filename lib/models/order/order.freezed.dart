@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'order.dart';
@@ -9,6 +9,7 @@ part of 'order.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -28,16 +29,21 @@ $OrderCopyWith<Order> get copyWith => _$OrderCopyWithImpl<Order>(this as Order, 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Order&&(identical(other.id, id) || other.id == id)&&(identical(other.userID, userID) || other.userID == userID)&&const DeepCollectionEquality().equals(other.items, items)&&(identical(other.status, status) || other.status == status)&&(identical(other.date, date) || other.date == date)&&(identical(other.total, total) || other.total == total));
+  final _this = this as Order;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Order&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.userID, _this.userID) || other.userID == _this.userID)&&const DeepCollectionEquality().equals(other.items, _this.items)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.date, _this.date) || other.date == _this.date)&&(identical(other.total, _this.total) || other.total == _this.total));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,userID,const DeepCollectionEquality().hash(items),status,date,total);
+int get hashCode {
+  final _this = this as Order;
+  return Object.hash(runtimeType,_this.id,_this.userID,const DeepCollectionEquality().hash(_this.items),_this.status,_this.date,_this.total);
+}
 
 @override
 String toString() {
-  return 'Order(id: $id, userID: $userID, items: $items, status: $status, date: $date, total: $total)';
+  final _this = this as Order;
+  return 'Order(id: ${_this.id}, userID: ${_this.userID}, items: ${_this.items}, status: ${_this.status}, date: ${_this.date}, total: ${_this.total})';
 }
 
 
@@ -66,7 +72,7 @@ class _$OrderCopyWithImpl<$Res>
 /// Create a copy of Order
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userID = null,Object? items = null,Object? status = null,Object? date = null,Object? total = null,}) {
-  return _then(_self.copyWith(
+  return _then(Order(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,userID: null == userID ? _self.userID : userID // ignore: cast_nullable_to_non_nullable
 as String,items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
@@ -214,7 +220,7 @@ return $default(_that.id,_that.userID,_that.items,_that.status,_that.date,_that.
 @JsonSerializable()
 
 class _Order implements Order {
-  const _Order({required this.id, required this.userID, required final  List<Item> items, required this.status, required this.date, required this.total}): _items = items;
+  const _Order({required this.id, required this.userID, required  List<Item> items, required this.status, required this.date, required this.total}): _items = items;
   factory _Order.fromJson(Map<String, dynamic> json) => _$OrderFromJson(json);
 
 @override final  String id;
@@ -243,16 +249,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Order&&(identical(other.id, id) || other.id == id)&&(identical(other.userID, userID) || other.userID == userID)&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.status, status) || other.status == status)&&(identical(other.date, date) || other.date == date)&&(identical(other.total, total) || other.total == total));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Order&&(identical(other.id, id) || other.id == id)&&(identical(other.userID, userID) || other.userID == userID)&&const DeepCollectionEquality().equals(other.items, _items)&&(identical(other.status, status) || other.status == status)&&(identical(other.date, date) || other.date == date)&&(identical(other.total, total) || other.total == total));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,userID,const DeepCollectionEquality().hash(_items),status,date,total);
+int get hashCode {
+    return Object.hash(runtimeType,id,userID,const DeepCollectionEquality().hash(_items),status,date,total);
+}
 
 @override
 String toString() {
-  return 'Order(id: $id, userID: $userID, items: $items, status: $status, date: $date, total: $total)';
+    return 'Order(id: $id, userID: $userID, items: $items, status: $status, date: $date, total: $total)';
 }
 
 

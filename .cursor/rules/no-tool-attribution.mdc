@@ -1,7 +1,0 @@
----
-description: No tool attribution in repository artifacts
-globs: "lib/**", "test/**", "scripts/**", "android/**", "ios/**", "linux/**", "macos/**", "web/**", "windows/**", "docs/**", ".github/**", ".claude/**", ".cursor/**", "*.md", "*.yaml", "*.yml", "pubspec.lock"
-alwaysApply: false
----
-
-Read `.claude/rules/no-tool-attribution.md` — the only copy of this rule.

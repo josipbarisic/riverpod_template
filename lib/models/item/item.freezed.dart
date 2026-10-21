@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'item.dart';
@@ -9,6 +9,7 @@ part of 'item.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -28,16 +29,21 @@ $ItemCopyWith<Item> get copyWith => _$ItemCopyWithImpl<Item>(this as Item, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Item&&(identical(other.productID, productID) || other.productID == productID)&&(identical(other.quantity, quantity) || other.quantity == quantity));
+  final _this = this as Item;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Item&&(identical(other.productID, _this.productID) || other.productID == _this.productID)&&(identical(other.quantity, _this.quantity) || other.quantity == _this.quantity));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,productID,quantity);
+int get hashCode {
+  final _this = this as Item;
+  return Object.hash(runtimeType,_this.productID,_this.quantity);
+}
 
 @override
 String toString() {
-  return 'Item(productID: $productID, quantity: $quantity)';
+  final _this = this as Item;
+  return 'Item(productID: ${_this.productID}, quantity: ${_this.quantity})';
 }
 
 
@@ -66,7 +72,7 @@ class _$ItemCopyWithImpl<$Res>
 /// Create a copy of Item
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? productID = null,Object? quantity = null,}) {
-  return _then(_self.copyWith(
+  return _then(Item(
 productID: null == productID ? _self.productID : productID // ignore: cast_nullable_to_non_nullable
 as String,quantity: null == quantity ? _self.quantity : quantity // ignore: cast_nullable_to_non_nullable
 as int,
@@ -229,16 +235,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Item&&(identical(other.productID, productID) || other.productID == productID)&&(identical(other.quantity, quantity) || other.quantity == quantity));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Item&&(identical(other.productID, productID) || other.productID == productID)&&(identical(other.quantity, quantity) || other.quantity == quantity));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,productID,quantity);
+int get hashCode {
+    return Object.hash(runtimeType,productID,quantity);
+}
 
 @override
 String toString() {
-  return 'Item(productID: $productID, quantity: $quantity)';
+    return 'Item(productID: $productID, quantity: $quantity)';
 }
 
 

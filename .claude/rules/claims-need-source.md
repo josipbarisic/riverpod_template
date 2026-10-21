@@ -12,7 +12,6 @@ paths:
   - "docs/**"
   - ".github/**"
   - ".claude/**"
-  - ".cursor/**"
   - "*.md"
   - "*.yaml"
   - "*.yml"
@@ -36,6 +35,8 @@ When source contradicts a claim:
 1. State the claim and the source that disproves it.
 2. Correct it when it is inside the approved task.
 3. Otherwise leave it unchanged and report the exact follow-up.
+4. When the claim came from an issue or a comment, correct that text too; it is what the next person
+   copies from.
 
 Do not hide a contradiction because fixing it would be out of scope. Scope limits edits, not
 reporting.
@@ -47,8 +48,10 @@ Instruction files require absolute verification because they shape future work:
 - root `AGENTS.md`, `CLAUDE.md`, `ARCHITECTURE.md`, and `README.md`
 - `lib/AGENTS.md` and Markdown under `docs/**`
 - `.claude/{rules,skills,agents}/**`
-- `.cursor/{rules,commands}/**`
 - workflow definitions under `.github/workflows/**`
+
+A wrong rule is worse than a wrong line of code: the code fails a test, and the rule silently
+teaches the next twenty changes.
 
 For source comments and delivery text, verify every cited symbol and behavioral claim. A path
 existing is not proof that the described behavior is still true; inspect the implementation or
@@ -69,8 +72,10 @@ Flutter's stable analyze command has no machine-format option. The committed
 severity/code/repository-path key: removed diagnostics pass, while a new key or excess count
 fails.
 
-The checker cannot prove behavioral prose. Review claims about lifecycle, control flow, runtime
-effects, and ownership against their implementation even when the mechanical check passes.
+The checker cannot prove behavioral prose. A rule that says a request "fails closed" when the code
+degrades to a default passes every check, because each symbol resolves. Review claims about
+lifecycle, control flow, runtime effects, and ownership against their implementation even when the
+mechanical check passes.
 
 Run the same Node checks as CI:
 

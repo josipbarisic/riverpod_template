@@ -23,7 +23,6 @@ const REPOSITORY_ROOTS = [
   'windows/',
   '.github/',
   '.claude/',
-  '.cursor/',
 ];
 
 const ROOT_FILES = new Set([
@@ -39,7 +38,6 @@ const ROOT_FILES = new Set([
 
 const ARCHIVE_FILES = new Set([
   'docs/LEARNING_LOG.md',
-  '.cursor/docs/LEARNING_LOG.md',
 ]);
 
 const PLACEHOLDER_MEMBERS = new Set([
@@ -361,9 +359,7 @@ function walk(directory, out = []) {
 }
 
 function isArchived(path) {
-  return ARCHIVE_FILES.has(path) ||
-    path.startsWith('.claude/runtime/') ||
-    path.startsWith('.cursor/runtime/');
+  return ARCHIVE_FILES.has(path) || path.startsWith('.claude/runtime/');
 }
 
 export function checkDocument({ path, text, index }) {
@@ -523,14 +519,12 @@ export function instructionFiles(root = '.') {
     '.claude/rules',
     '.claude/skills',
     '.claude/agents',
-    '.cursor/rules',
-    '.cursor/commands',
     '.github/workflows',
   ];
   const scanned = directories.flatMap(directory =>
     walk(join(repositoryRoot, directory))
-      .filter(file => /\.(?:md|mdc|ya?ml)$/.test(file))
-      .map(file => relative(repositoryRoot, file)),
+      .filter(file => /\.(?:md|ya?ml)$/.test(file))
+      .map(file => relative(repositoryRoot, file).replaceAll('\\', '/')),
   );
 
   return [...new Set([...explicit, ...scanned])]

@@ -77,3 +77,19 @@ Include:
 
 Do not estimate lines or prescribe optional files as mandatory. For Tier 3,
 finish with an explicit approval checkpoint and make no implementation edits.
+
+## 6. Implement after approval
+
+Follow the approved plan and canonical rules. Do not invent a feature README,
+repository, state class, or model the behavior does not need, and do not edit
+generated Dart or manifest files. After root `AGENTS.md` FVM discovery, run:
+
+```bash
+dart run build_runner build -d
+dart run scripts/generate_feature_manifests.dart
+flutter analyze
+flutter test <focused-test-path>
+```
+
+Report created, updated, and generated paths, integration points, tests, and
+verification results. Remove any work outside the approved scope.

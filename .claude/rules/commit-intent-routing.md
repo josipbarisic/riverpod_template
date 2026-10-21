@@ -12,7 +12,6 @@ paths:
   - "docs/**"
   - ".github/**"
   - ".claude/**"
-  - ".cursor/**"
   - "*.md"
   - "*.yaml"
   - "*.yml"
@@ -23,7 +22,8 @@ paths:
 
 When the user says `commit`, `commit this`, `commit and push`, `push this`, `save changes`,
 `save this`, `finalize changes`, or otherwise asks to record the work in Git, run the local
-`.claude/skills/git-commit/SKILL.md` workflow. Do not replace it with a shortened direct commit.
+`.claude/skills/commit/SKILL.md` workflow. It is named `commit` so a personal `git-commit` skill
+cannot shadow it. Do not replace it with a shortened direct commit.
 
 The skill owns status inspection, untracked-file confirmation, secret scanning, verification,
 staging, commit execution, and optional push. `AGENTS.md` and canonical rules remain authoritative

@@ -19,7 +19,7 @@ part of 'profile_controller.dart';
 /// - `AsyncError` — failed with message
 
 @ProviderFor(ProfileController)
-const profileControllerProvider = ProfileControllerProvider._();
+final profileControllerProvider = ProfileControllerProvider._();
 
 /// Controls user profile viewing and editing.
 ///
@@ -41,7 +41,7 @@ final class ProfileControllerProvider
   /// - `AsyncData(user)` — user profile loaded
   /// - `AsyncLoading` — fetching or updating
   /// - `AsyncError` — failed with message
-  const ProfileControllerProvider._()
+  ProfileControllerProvider._()
     : super(
         from: null,
         argument: null,
@@ -76,8 +76,7 @@ abstract class _$ProfileController extends $AsyncNotifier<User?> {
   FutureOr<User?> build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<AsyncValue<User?>, User?>;
     final element =
         ref.element
@@ -87,6 +86,6 @@ abstract class _$ProfileController extends $AsyncNotifier<User?> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-18T10:49:37.786676Z",
+  "generatedAt": "2026-10-21T09:19:32.406433Z",
   "feature": "login",
   "views": [
     "lib/presentation/login/login_view.dart"
@@ -52,7 +52,13 @@
       "file": "lib/presentation/login/login_state.dart"
     }
   ],
-  "routes": [],
+  "routes": [
+    {
+      "appRoute": "AppRoute.login",
+      "path": "/login",
+      "view": "LoginView"
+    }
+  ],
   "apiEndpoints": [],
   "coreServices": [],
   "thirdPartyDependencies": [

@@ -1,7 +1,0 @@
----
-description: Local commit workflow and generic commit message format
-globs: "lib/**", "test/**", "scripts/**", "android/**", "ios/**", "linux/**", "macos/**", "web/**", "windows/**", "docs/**", ".github/**", ".claude/**", ".cursor/**", "*.md", "*.yaml", "*.yml", "pubspec.lock"
-alwaysApply: false
----
-
-Read `.claude/rules/commit-intent-routing.md` — the only copy of this rule.

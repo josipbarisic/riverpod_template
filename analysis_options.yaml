@@ -9,6 +9,19 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+# riverpod_lint runs as an analyzer plugin: the analysis server resolves this pinned version itself,
+# so it is not a pubspec dependency. scripts/ci/check_riverpod_lint.sh proves it loads in CI.
+# 3.1.9 needs Dart 3.13; move this pin together with the Flutter SDK.
+plugins:
+  riverpod_lint:
+    version: 3.1.9
+
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`

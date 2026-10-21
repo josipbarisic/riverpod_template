@@ -12,14 +12,14 @@ part of 'user_handler.dart';
 /// the entire app lifecycle so any feature can check auth state.
 
 @ProviderFor(UserHandler)
-const userHandlerProvider = UserHandlerProvider._();
+final userHandlerProvider = UserHandlerProvider._();
 
 /// Global user state provider. Keeps the current user alive across
 /// the entire app lifecycle so any feature can check auth state.
 final class UserHandlerProvider extends $NotifierProvider<UserHandler, User?> {
   /// Global user state provider. Keeps the current user alive across
   /// the entire app lifecycle so any feature can check auth state.
-  const UserHandlerProvider._()
+  UserHandlerProvider._()
     : super(
         from: null,
         argument: null,
@@ -55,8 +55,7 @@ abstract class _$UserHandler extends $Notifier<User?> {
   User? build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
+  WhenComplete runBuild() {
     final ref = this.ref as $Ref<User?, User?>;
     final element =
         ref.element
@@ -66,6 +65,6 @@ abstract class _$UserHandler extends $Notifier<User?> {
               Object?,
               Object?
             >;
-    element.handleValue(ref, created);
+    return element.handleCreate(ref, build);
   }
 }

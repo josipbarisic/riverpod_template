@@ -10,12 +10,12 @@ part of 'user_repository_providers.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(userRepository)
-const userRepositoryProvider = UserRepositoryProvider._();
+final userRepositoryProvider = UserRepositoryProvider._();
 
 final class UserRepositoryProvider
     extends $FunctionalProvider<UserRepository, UserRepository, UserRepository>
     with $Provider<UserRepository> {
-  const UserRepositoryProvider._()
+  UserRepositoryProvider._()
     : super(
         from: null,
         argument: null,
@@ -51,12 +51,12 @@ final class UserRepositoryProvider
 String _$userRepositoryHash() => r'bdf4310c5be00dffe1708c7743d45725b690456c';
 
 @ProviderFor(userData)
-const userDataProvider = UserDataFamily._();
+final userDataProvider = UserDataFamily._();
 
 final class UserDataProvider
     extends $FunctionalProvider<AsyncValue<User>, User, FutureOr<User>>
     with $FutureModifier<User>, $FutureProvider<User> {
-  const UserDataProvider._({
+  UserDataProvider._({
     required UserDataFamily super.from,
     required int super.argument,
   }) : super(
@@ -103,7 +103,7 @@ String _$userDataHash() => r'c42ac378c1544801e22c49b3f677188840750a13';
 
 final class UserDataFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<User>, int> {
-  const UserDataFamily._()
+  UserDataFamily._()
     : super(
         retry: null,
         name: r'userDataProvider',
@@ -119,7 +119,7 @@ final class UserDataFamily extends $Family
 }
 
 @ProviderFor(someUsers)
-const someUsersProvider = SomeUsersProvider._();
+final someUsersProvider = SomeUsersProvider._();
 
 final class SomeUsersProvider
     extends
@@ -129,7 +129,7 @@ final class SomeUsersProvider
           FutureOr<List<User>>
         >
     with $FutureModifier<List<User>>, $FutureProvider<List<User>> {
-  const SomeUsersProvider._()
+  SomeUsersProvider._()
     : super(
         from: null,
         argument: null,

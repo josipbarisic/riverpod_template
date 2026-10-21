@@ -13,7 +13,8 @@ FirebaseApi firebaseApi(Ref ref) => FirebaseApi(
       hasRemoteMessage: ref.read(hasRemoteMessageProvider.notifier),
     );
 
-@riverpod
+// Kept alive because the app-lifetime firebaseApi provider holds this notifier.
+@Riverpod(keepAlive: true)
 class HasRemoteMessage extends _$HasRemoteMessage {
   @override
   bool build() => false;

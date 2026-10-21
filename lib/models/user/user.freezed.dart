@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'user.dart';
@@ -9,15 +9,14 @@ part of 'user.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$User {
 
- String get id; String get email; String get firstName; String get lastName;// Remove if Firebase is not used
- String get firebaseUserId; DateTime? get createdAt; DateTime? get updatedAt; DateTime? get dob; String? get phoneNumber; String? get gender; bool? get verified;// --- Extended profile fields ---
- String? get bio; String? get companyName; String? get title; String? get profileImageUrl; String? get primaryAddressCity; String? get primaryAddressState; String? get primaryAddressCountry; String? get primaryAddressStreetOne; String? get primaryAddressStreetTwo; String? get primaryAddressZipCode; bool? get newsletter;
+ String get id; String get email; String get firstName; String get lastName; String get firebaseUserId; DateTime? get createdAt; DateTime? get updatedAt; DateTime? get dob; String? get phoneNumber; String? get gender; bool? get verified; String? get bio; String? get companyName; String? get title; String? get profileImageUrl; String? get primaryAddressCity; String? get primaryAddressState; String? get primaryAddressCountry; String? get primaryAddressStreetOne; String? get primaryAddressStreetTwo; String? get primaryAddressZipCode; bool? get newsletter;
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,16 +29,21 @@ $UserCopyWith<User> get copyWith => _$UserCopyWithImpl<User>(this as User, _$ide
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.firebaseUserId, firebaseUserId) || other.firebaseUserId == firebaseUserId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.dob, dob) || other.dob == dob)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.gender, gender) || other.gender == gender)&&(identical(other.verified, verified) || other.verified == verified)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.companyName, companyName) || other.companyName == companyName)&&(identical(other.title, title) || other.title == title)&&(identical(other.profileImageUrl, profileImageUrl) || other.profileImageUrl == profileImageUrl)&&(identical(other.primaryAddressCity, primaryAddressCity) || other.primaryAddressCity == primaryAddressCity)&&(identical(other.primaryAddressState, primaryAddressState) || other.primaryAddressState == primaryAddressState)&&(identical(other.primaryAddressCountry, primaryAddressCountry) || other.primaryAddressCountry == primaryAddressCountry)&&(identical(other.primaryAddressStreetOne, primaryAddressStreetOne) || other.primaryAddressStreetOne == primaryAddressStreetOne)&&(identical(other.primaryAddressStreetTwo, primaryAddressStreetTwo) || other.primaryAddressStreetTwo == primaryAddressStreetTwo)&&(identical(other.primaryAddressZipCode, primaryAddressZipCode) || other.primaryAddressZipCode == primaryAddressZipCode)&&(identical(other.newsletter, newsletter) || other.newsletter == newsletter));
+  final _this = this as User;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.email, _this.email) || other.email == _this.email)&&(identical(other.firstName, _this.firstName) || other.firstName == _this.firstName)&&(identical(other.lastName, _this.lastName) || other.lastName == _this.lastName)&&(identical(other.firebaseUserId, _this.firebaseUserId) || other.firebaseUserId == _this.firebaseUserId)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.updatedAt, _this.updatedAt) || other.updatedAt == _this.updatedAt)&&(identical(other.dob, _this.dob) || other.dob == _this.dob)&&(identical(other.phoneNumber, _this.phoneNumber) || other.phoneNumber == _this.phoneNumber)&&(identical(other.gender, _this.gender) || other.gender == _this.gender)&&(identical(other.verified, _this.verified) || other.verified == _this.verified)&&(identical(other.bio, _this.bio) || other.bio == _this.bio)&&(identical(other.companyName, _this.companyName) || other.companyName == _this.companyName)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.profileImageUrl, _this.profileImageUrl) || other.profileImageUrl == _this.profileImageUrl)&&(identical(other.primaryAddressCity, _this.primaryAddressCity) || other.primaryAddressCity == _this.primaryAddressCity)&&(identical(other.primaryAddressState, _this.primaryAddressState) || other.primaryAddressState == _this.primaryAddressState)&&(identical(other.primaryAddressCountry, _this.primaryAddressCountry) || other.primaryAddressCountry == _this.primaryAddressCountry)&&(identical(other.primaryAddressStreetOne, _this.primaryAddressStreetOne) || other.primaryAddressStreetOne == _this.primaryAddressStreetOne)&&(identical(other.primaryAddressStreetTwo, _this.primaryAddressStreetTwo) || other.primaryAddressStreetTwo == _this.primaryAddressStreetTwo)&&(identical(other.primaryAddressZipCode, _this.primaryAddressZipCode) || other.primaryAddressZipCode == _this.primaryAddressZipCode)&&(identical(other.newsletter, _this.newsletter) || other.newsletter == _this.newsletter));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,email,firstName,lastName,firebaseUserId,createdAt,updatedAt,dob,phoneNumber,gender,verified,bio,companyName,title,profileImageUrl,primaryAddressCity,primaryAddressState,primaryAddressCountry,primaryAddressStreetOne,primaryAddressStreetTwo,primaryAddressZipCode,newsletter]);
+int get hashCode {
+  final _this = this as User;
+  return Object.hashAll([runtimeType,_this.id,_this.email,_this.firstName,_this.lastName,_this.firebaseUserId,_this.createdAt,_this.updatedAt,_this.dob,_this.phoneNumber,_this.gender,_this.verified,_this.bio,_this.companyName,_this.title,_this.profileImageUrl,_this.primaryAddressCity,_this.primaryAddressState,_this.primaryAddressCountry,_this.primaryAddressStreetOne,_this.primaryAddressStreetTwo,_this.primaryAddressZipCode,_this.newsletter]);
+}
 
 @override
 String toString() {
-  return 'User(id: $id, email: $email, firstName: $firstName, lastName: $lastName, firebaseUserId: $firebaseUserId, createdAt: $createdAt, updatedAt: $updatedAt, dob: $dob, phoneNumber: $phoneNumber, gender: $gender, verified: $verified, bio: $bio, companyName: $companyName, title: $title, profileImageUrl: $profileImageUrl, primaryAddressCity: $primaryAddressCity, primaryAddressState: $primaryAddressState, primaryAddressCountry: $primaryAddressCountry, primaryAddressStreetOne: $primaryAddressStreetOne, primaryAddressStreetTwo: $primaryAddressStreetTwo, primaryAddressZipCode: $primaryAddressZipCode, newsletter: $newsletter)';
+  final _this = this as User;
+  return 'User(id: ${_this.id}, email: ${_this.email}, firstName: ${_this.firstName}, lastName: ${_this.lastName}, firebaseUserId: ${_this.firebaseUserId}, createdAt: ${_this.createdAt}, updatedAt: ${_this.updatedAt}, dob: ${_this.dob}, phoneNumber: ${_this.phoneNumber}, gender: ${_this.gender}, verified: ${_this.verified}, bio: ${_this.bio}, companyName: ${_this.companyName}, title: ${_this.title}, profileImageUrl: ${_this.profileImageUrl}, primaryAddressCity: ${_this.primaryAddressCity}, primaryAddressState: ${_this.primaryAddressState}, primaryAddressCountry: ${_this.primaryAddressCountry}, primaryAddressStreetOne: ${_this.primaryAddressStreetOne}, primaryAddressStreetTwo: ${_this.primaryAddressStreetTwo}, primaryAddressZipCode: ${_this.primaryAddressZipCode}, newsletter: ${_this.newsletter})';
 }
 
 
@@ -68,7 +72,7 @@ class _$UserCopyWithImpl<$Res>
 /// Create a copy of User
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? firstName = null,Object? lastName = null,Object? firebaseUserId = null,Object? createdAt = freezed,Object? updatedAt = freezed,Object? dob = freezed,Object? phoneNumber = freezed,Object? gender = freezed,Object? verified = freezed,Object? bio = freezed,Object? companyName = freezed,Object? title = freezed,Object? profileImageUrl = freezed,Object? primaryAddressCity = freezed,Object? primaryAddressState = freezed,Object? primaryAddressCountry = freezed,Object? primaryAddressStreetOne = freezed,Object? primaryAddressStreetTwo = freezed,Object? primaryAddressZipCode = freezed,Object? newsletter = freezed,}) {
-  return _then(_self.copyWith(
+  return _then(User(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
@@ -239,7 +243,6 @@ class _User extends User {
 @override final  String email;
 @override final  String firstName;
 @override final  String lastName;
-// Remove if Firebase is not used
 @override final  String firebaseUserId;
 @override final  DateTime? createdAt;
 @override final  DateTime? updatedAt;
@@ -247,7 +250,6 @@ class _User extends User {
 @override final  String? phoneNumber;
 @override final  String? gender;
 @override final  bool? verified;
-// --- Extended profile fields ---
 @override final  String? bio;
 @override final  String? companyName;
 @override final  String? title;
@@ -273,16 +275,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _User&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.firebaseUserId, firebaseUserId) || other.firebaseUserId == firebaseUserId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.dob, dob) || other.dob == dob)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.gender, gender) || other.gender == gender)&&(identical(other.verified, verified) || other.verified == verified)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.companyName, companyName) || other.companyName == companyName)&&(identical(other.title, title) || other.title == title)&&(identical(other.profileImageUrl, profileImageUrl) || other.profileImageUrl == profileImageUrl)&&(identical(other.primaryAddressCity, primaryAddressCity) || other.primaryAddressCity == primaryAddressCity)&&(identical(other.primaryAddressState, primaryAddressState) || other.primaryAddressState == primaryAddressState)&&(identical(other.primaryAddressCountry, primaryAddressCountry) || other.primaryAddressCountry == primaryAddressCountry)&&(identical(other.primaryAddressStreetOne, primaryAddressStreetOne) || other.primaryAddressStreetOne == primaryAddressStreetOne)&&(identical(other.primaryAddressStreetTwo, primaryAddressStreetTwo) || other.primaryAddressStreetTwo == primaryAddressStreetTwo)&&(identical(other.primaryAddressZipCode, primaryAddressZipCode) || other.primaryAddressZipCode == primaryAddressZipCode)&&(identical(other.newsletter, newsletter) || other.newsletter == newsletter));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _User&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.firebaseUserId, firebaseUserId) || other.firebaseUserId == firebaseUserId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.dob, dob) || other.dob == dob)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.gender, gender) || other.gender == gender)&&(identical(other.verified, verified) || other.verified == verified)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.companyName, companyName) || other.companyName == companyName)&&(identical(other.title, title) || other.title == title)&&(identical(other.profileImageUrl, profileImageUrl) || other.profileImageUrl == profileImageUrl)&&(identical(other.primaryAddressCity, primaryAddressCity) || other.primaryAddressCity == primaryAddressCity)&&(identical(other.primaryAddressState, primaryAddressState) || other.primaryAddressState == primaryAddressState)&&(identical(other.primaryAddressCountry, primaryAddressCountry) || other.primaryAddressCountry == primaryAddressCountry)&&(identical(other.primaryAddressStreetOne, primaryAddressStreetOne) || other.primaryAddressStreetOne == primaryAddressStreetOne)&&(identical(other.primaryAddressStreetTwo, primaryAddressStreetTwo) || other.primaryAddressStreetTwo == primaryAddressStreetTwo)&&(identical(other.primaryAddressZipCode, primaryAddressZipCode) || other.primaryAddressZipCode == primaryAddressZipCode)&&(identical(other.newsletter, newsletter) || other.newsletter == newsletter));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,email,firstName,lastName,firebaseUserId,createdAt,updatedAt,dob,phoneNumber,gender,verified,bio,companyName,title,profileImageUrl,primaryAddressCity,primaryAddressState,primaryAddressCountry,primaryAddressStreetOne,primaryAddressStreetTwo,primaryAddressZipCode,newsletter]);
+int get hashCode {
+    return Object.hashAll([runtimeType,id,email,firstName,lastName,firebaseUserId,createdAt,updatedAt,dob,phoneNumber,gender,verified,bio,companyName,title,profileImageUrl,primaryAddressCity,primaryAddressState,primaryAddressCountry,primaryAddressStreetOne,primaryAddressStreetTwo,primaryAddressZipCode,newsletter]);
+}
 
 @override
 String toString() {
-  return 'User(id: $id, email: $email, firstName: $firstName, lastName: $lastName, firebaseUserId: $firebaseUserId, createdAt: $createdAt, updatedAt: $updatedAt, dob: $dob, phoneNumber: $phoneNumber, gender: $gender, verified: $verified, bio: $bio, companyName: $companyName, title: $title, profileImageUrl: $profileImageUrl, primaryAddressCity: $primaryAddressCity, primaryAddressState: $primaryAddressState, primaryAddressCountry: $primaryAddressCountry, primaryAddressStreetOne: $primaryAddressStreetOne, primaryAddressStreetTwo: $primaryAddressStreetTwo, primaryAddressZipCode: $primaryAddressZipCode, newsletter: $newsletter)';
+    return 'User(id: $id, email: $email, firstName: $firstName, lastName: $lastName, firebaseUserId: $firebaseUserId, createdAt: $createdAt, updatedAt: $updatedAt, dob: $dob, phoneNumber: $phoneNumber, gender: $gender, verified: $verified, bio: $bio, companyName: $companyName, title: $title, profileImageUrl: $profileImageUrl, primaryAddressCity: $primaryAddressCity, primaryAddressState: $primaryAddressState, primaryAddressCountry: $primaryAddressCountry, primaryAddressStreetOne: $primaryAddressStreetOne, primaryAddressStreetTwo: $primaryAddressStreetTwo, primaryAddressZipCode: $primaryAddressZipCode, newsletter: $newsletter)';
 }
 
 

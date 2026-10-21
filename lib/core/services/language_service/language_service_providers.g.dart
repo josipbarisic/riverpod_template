@@ -10,13 +10,13 @@ part of 'language_service_providers.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(languageService)
-const languageServiceProvider = LanguageServiceProvider._();
+final languageServiceProvider = LanguageServiceProvider._();
 
 final class LanguageServiceProvider
     extends
         $FunctionalProvider<LanguageService, LanguageService, LanguageService>
     with $Provider<LanguageService> {
-  const LanguageServiceProvider._()
+  LanguageServiceProvider._()
     : super(
         from: null,
         argument: null,

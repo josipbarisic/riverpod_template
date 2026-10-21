@@ -1,9 +1,9 @@
 ---
-name: git-commit
+name: commit
 description: Commit the current work safely with untracked-file confirmation, secret scanning, repository checks, and the project's generic prefix message format. Use when the user asks to commit, save, finalize, or push changes.
 ---
 
-# Git Commit
+# Commit
 
 Use this workflow only after explicit commit intent. Root `AGENTS.md`, the
 canonical `.claude/rules/*.md`, and the user's scope remain authoritative.

@@ -19,6 +19,26 @@ Choose the narrowest base class the widget needs:
 
 Do not add hooks or Riverpod access only to justify a broader base class.
 
+## Build order
+
+```dart
+class FeatureView extends HookConsumerWidget {
+  const FeatureView({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 1. Hooks
+    final scrollController = useScrollController();
+    // 2. Providers
+    final state = ref.watch(featureControllerProvider);
+    // 3. Listeners
+    ref.listen(featureControllerProvider, (previous, next) {/* side effects */});
+    // 4. Widget tree; complex sections live in their own files
+    return Scaffold(body: FeatureContent(controller: scrollController, state: state));
+  }
+}
+```
+
 ## One widget class per file
 
 Each widget class lives in its own Dart file. Extract a coherent section when a view approaches
@@ -44,8 +64,26 @@ Reuse `lib/core/theme/` colors and text styles instead of introducing one-off pa
 existing token fits. Use `SnackbarMixin` for application snackbars rather than duplicating
 message-display plumbing.
 
-Stateful or hook-bearing children rendered from a mutable collection need stable keys on the
-widgets the parent matches by index.
+## Keys on dynamic lists
+
+A stateful child (`HookWidget`, `StatefulWidget`, anything holding a notifier) built from a mutable
+collection carries a stable key on the widget the parent actually matches, which may be a wrapping
+`Padding`. Namespace the key when two id spaces share one list (`ValueKey('order-${o.id}')`,
+`ValueKey('draft-${d.id}')`). Unkeyed same-type siblings are matched by slot, so hook state stays
+with the slot when an item is removed and lands on whatever takes its place.
+
+A keyed `ListView.builder` over a mutable list also sets `findChildIndexCallback` (key → new index);
+without it the builder cannot find a moved child, and a row loses its state when a row above it is
+removed. Never gate a state reset behind `context.mounted` of a subtree a key change can tear down;
+reset on the notifier you own.
+
+## Clearing a fixed overlay
+
+A trailing gap whose job is to clear a fixed overlay (a bottom bar under `extendBody`, a pinned
+footer) derives from that overlay's inset: `SizedBox(height: MediaQuery.paddingOf(context).bottom)`.
+A pinned panel's bottom padding floors the system inset at its own gap,
+`math.max(MediaQuery.paddingOf(context).bottom, gap)`: Android can report a zero bottom inset, which
+puts the last button on the screen edge.
 
 When widget behavior changes, update the relevant test. Root `AGENTS.md` owns which local test
 commands to run.

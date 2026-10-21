@@ -47,6 +47,4 @@ app.*.map.json
 coverage/
 
 # Local hook runtime artifacts
-.cursor/last-session-status.json
-.cursor/usage/
 .claude/last-session-status.json
