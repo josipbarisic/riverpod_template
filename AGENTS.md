@@ -132,7 +132,7 @@ Work is tracked as GitHub issues on this repository's GitHub Project, named in
 |---|---|
 | Backlog | `plan-issues` when it creates an issue, or the project's auto-add |
 | Ready | the user, when the issue is next |
-| In progress | `start-ticket`; or the Project Sync workflow, when a pull request closes unmerged and its issue was In review |
+| In progress | `start-ticket`; or the Project Sync workflow, when a pull request closes unmerged, its issue was In review, and no other open pull request still closes it |
 | In review | the Project Sync workflow, when a ready pull request that closes the issue opens |
 | Merged | the Project Sync workflow, when that pull request merges; a closed parent stays Merged until every sub-issue is Done |
 | Done | the Project Release workflow, when a published GitHub Release ships it; or an issue closed without a merged pull request |

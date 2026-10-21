@@ -86,7 +86,7 @@ const ISSUE_FIELDS = `
   parent { number state }
   subIssues(first: 100) { totalCount nodes { number state } }
   blockedBy(first: 20) { nodes { number state repository { nameWithOwner } } }
-  closedByPullRequestsReferences(first: 10, includeClosedPrs: true) { nodes { number merged } }
+  closedByPullRequestsReferences(first: 10, includeClosedPrs: true) { nodes { number merged state } }
   projectItems(first: 10) {
     nodes {
       project { number owner { ... on User { login } ... on Organization { login } } }
@@ -176,6 +176,13 @@ export function statusForClosedIssue(issue) {
   if (issue.stateReason !== 'COMPLETED') return 'Done';
   const merged = issue.closedByPullRequestsReferences.nodes.some(pr => pr.merged);
   return merged ? 'Merged' : 'Done';
+}
+
+/** Whether a pull request other than `pullNumber` that would close the issue is still open. */
+export function hasOtherOpenPullRequest(issue, pullNumber) {
+  return issue.closedByPullRequestsReferences.nodes.some(
+    pr => pr.number !== pullNumber && pr.state === 'OPEN',
+  );
 }
 
 /** A closed parent is Done once every child is released, Merged until then. */
@@ -360,8 +367,12 @@ export function commandSync(gh, { eventName, event, cwd, log }) {
       const current = projectStatus(issue, config);
       // A reopened or re-readied pull request never pulls a finished issue back.
       if (status === 'In review' && ['Merged', 'Done'].includes(current)) continue;
-      // An abandoned pull request returns only issues it had put In review.
-      if (status === 'In progress' && current !== 'In review') continue;
+      // An abandoned pull request returns only issues it had put In review, and none that a
+      // replacement pull request still has in review.
+      if (status === 'In progress') {
+        if (current !== 'In review') continue;
+        if (hasOtherOpenPullRequest(issue, event.pull_request.number)) continue;
+      }
       setStatus(gh, config, issue, status);
       log(`#${number} → ${status} (pull request #${event.pull_request.number})`);
     }

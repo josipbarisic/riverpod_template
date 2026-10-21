@@ -316,9 +316,15 @@ test('release pages through the range and moves its Merged issues to Done with o
 });
 
 test('a pull request closed unmerged returns only its In review issues to In progress', () => {
+  const replaced = issue(4, {
+    ...onProject('In review'),
+    closedByPullRequestsReferences: {
+      nodes: [{ number: 10, merged: false, state: 'CLOSED' }, { number: 12, merged: false, state: 'OPEN' }],
+    },
+  });
   const fake = fakeGh({
-    closing: { 10: [1, 2, 3] },
-    issues: { 1: issue(1, onProject('In review')), 2: issue(2, onProject('Merged')), 3: issue(3, onProject('Ready')) },
+    closing: { 10: [1, 2, 3, 4] },
+    issues: { 1: issue(1, onProject('In review')), 2: issue(2, onProject('Merged')), 3: issue(3, onProject('Ready')), 4: replaced },
   });
   withRepository(CONFIG, root => {
     const eventPath = join(root, 'event.json');
