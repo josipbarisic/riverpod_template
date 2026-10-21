@@ -108,10 +108,8 @@ controllers, routes, repositories, or providers, run
 
 Before feature implementation, regenerate manifests and inspect the relevant generated JSON.
 Treat the live Dart source as authoritative if generated context disagrees. Revert a manifest diff
-that only changes `generatedAt`. A staleness warning right after a branch switch can be an mtime
-artefact; regenerate and compare before acting on it. Preserve unrelated
-generated changes already present in the worktree, and ask before staging a new untracked
-manifest.
+that only changes `generatedAt`. Preserve unrelated generated changes already present in the
+worktree, and ask before staging a new untracked manifest.
 
 ## Architecture and state
 
