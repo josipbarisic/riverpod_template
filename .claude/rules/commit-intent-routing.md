@@ -38,7 +38,8 @@ Prefix: Short description
 ```
 
 Keep the subject at most 72 characters, capitalize the prefix and description, omit the trailing
-period, and include no tool attribution or assistant trailers.
+period, and include no tool attribution or assistant trailers. A commit for a tracked issue ends
+its subject with `(#<n>)`.
 
 | Prefix | Use |
 |---|---|

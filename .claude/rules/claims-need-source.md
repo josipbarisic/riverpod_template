@@ -80,6 +80,6 @@ mechanical check passes.
 Run the same Node checks as CI:
 
 ```bash
-node --test scripts/ai/session_status.test.mjs scripts/ci/check_instruction_claims.test.mjs scripts/ci/check_flutter_analyze_baseline.test.mjs
+node --test scripts/ai/session_status.test.mjs scripts/ci/check_instruction_claims.test.mjs scripts/ci/check_flutter_analyze_baseline.test.mjs scripts/project/project.test.mjs
 node scripts/ci/check_instruction_claims.mjs
 ```

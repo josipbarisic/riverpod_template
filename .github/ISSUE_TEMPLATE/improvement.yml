@@ -1,0 +1,55 @@
+name: Improvement
+description: Change to existing behavior
+labels:
+  - type:improvement
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: >-
+        What changes for the user and why.
+    validations:
+      required: true
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: Current behavior
+      description: >-
+        What happens today.
+    validations:
+      required: true
+  - type: textarea
+    id: desired-behavior
+    attributes:
+      label: Desired behavior
+      description: >-
+        Checkboxes; they double as the acceptance criteria.
+      value: |
+        - [ ] ...
+    validations:
+      required: true
+  - type: textarea
+    id: approach
+    attributes:
+      label: Approach
+      description: >-
+        Proposed technical approach.
+    validations:
+      required: false
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: >-
+        Why now, links, constraints.
+    validations:
+      required: false
+  - type: textarea
+    id: qa
+    attributes:
+      label: QA
+      description: >-
+        How this will be checked.
+    validations:
+      required: true

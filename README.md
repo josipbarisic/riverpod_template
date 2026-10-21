@@ -83,6 +83,9 @@ runs the full unit/widget suite for application, test, and platform changes.
 - `.claude/agents/*.md` contains read-only advisory reviewers.
 - `lib/AGENTS.md` covers feature manifests, layer placement, and test discovery.
 - `docs/LEARNING_LOG.md` stores traps: failure mechanisms nothing else guards.
+- Work is tracked as GitHub issues on the repository's GitHub Project; root `AGENTS.md` § Work
+  tracking explains the statuses, the `plan-issues`, `start-ticket`, `review-branch` and `board`
+  skills, and the `PROJECT_TOKEN` secret the project workflows need.
 
 ## Starting a project from the template
 

@@ -108,10 +108,8 @@ controllers, routes, repositories, or providers, run
 
 Before feature implementation, regenerate manifests and inspect the relevant generated JSON.
 Treat the live Dart source as authoritative if generated context disagrees. Revert a manifest diff
-that only changes `generatedAt`. A staleness warning right after a branch switch can be an mtime
-artefact; regenerate and compare before acting on it. Preserve unrelated
-generated changes already present in the worktree, and ask before staging a new untracked
-manifest.
+that only changes `generatedAt`. Preserve unrelated generated changes already present in the
+worktree, and ask before staging a new untracked manifest.
 
 ## Architecture and state
 
@@ -123,6 +121,36 @@ manifest.
 
 `ARCHITECTURE.md` owns stable architecture. `lib/AGENTS.md` owns feature and manifest guidance.
 Path-scoped `.claude/rules/*.md` own code conventions.
+
+## Work tracking
+
+Work is tracked as GitHub issues on this repository's GitHub Project, named in
+`.github/project.json`. `scripts/project/project.mjs` holds the rules below; the skills
+`plan-issues`, `start-ticket`, `review-branch` and `board` drive them.
+
+| Status | Set by |
+|---|---|
+| Backlog | `plan-issues` when it creates an issue, or the project's auto-add |
+| Ready | the user, when the issue is next |
+| In progress | `start-ticket`; or the Project Sync workflow, when a pull request closes unmerged, its issue was In review, and no other open pull request still closes it |
+| In review | the Project Sync workflow, when a ready pull request that closes the issue opens |
+| Merged | the Project Sync workflow, when that pull request merges; a closed parent stays Merged until every sub-issue is Done |
+| Done | the Project Release workflow, when a published GitHub Release ships it; or an issue closed without a merged pull request |
+
+The project's built-in "Item closed" rule sets Done the moment an issue closes, and "Pull request
+merged" sets Merged on pull-request items. Project Sync then corrects an issue a merged pull
+request closed back to Merged, so a closed issue reads Done briefly before it settles.
+
+- Only a childless, unblocked issue is executable (`project.mjs check <n>`). A parent issue is a
+  roll-up: it never gets a branch or pull request, and closes when its last sub-issue closes.
+- Each issue has exactly one `type:*` label, and its body carries the headings of that type's form
+  in `.github/ISSUE_TEMPLATE/`.
+- Branch from `develop` with `gh issue develop <n> --name <n>-<slug>`. Pull requests target
+  `develop` and carry one `Fixes #<n>` line per issue they fully complete; partial work uses
+  `Refs #<n>`.
+- Both workflows read the `PROJECT_TOKEN` secret, a classic token with the project and repo
+  scopes; without it they skip, and the built-in rules alone leave closed issues at Done. Agents
+  never create, read or set that token.
 
 ## Git and safety
 
@@ -148,6 +176,8 @@ Path-scoped `.claude/rules/*.md` own code conventions.
   gates.
 - `.claude/skills/commit/SKILL.md`: the local commit workflow, reached through
   `commit-intent-routing.md`.
+- `scripts/project/project.mjs`: the only home of the work-tracking rules; the skills and the
+  `project-*.yml` workflows call it.
 - `.claude/rules/post-task-learning.md`: the Supervisor's Briefing contract.
 - `.claude/skills/post-task-learning/SKILL.md`: the only allowed writer for the designated
   `docs/LEARNING_LOG.md`.
