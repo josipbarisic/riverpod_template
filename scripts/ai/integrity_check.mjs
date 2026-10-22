@@ -1,6 +1,7 @@
 // Shared Stop-time policy behind the Claude Code Stop hook. It is advisory and local:
 // the hook may surface or persist the result, but never forces another turn.
 
+import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -15,6 +16,25 @@ import {
 const INSTRUCTION_FILE =
   /^(?:AGENTS\.md|CLAUDE\.md|ARCHITECTURE\.md|README\.md|lib\/AGENTS\.md|docs\/.+\.md|\.claude\/(?:rules|skills|agents)\/.+\.md|\.github\/workflows\/.+\.ya?ml)$/;
 const INSTRUCTION_VALIDATOR = 'scripts/ci/check_instruction_claims.mjs';
+export const STATUS_FILE = '.claude/last-session-status.json';
+
+/**
+ * The repository's top-level directory, or `cwd` outside a repository. A session started in a
+ * subfolder such as `android/` still checks and records the whole repository from its root.
+ * @param {string} [cwd]
+ */
+export function repositoryRoot(cwd = process.cwd()) {
+  try {
+    return execFileSync('git', ['rev-parse', '--show-toplevel'], {
+      cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+      timeout: 1500,
+    }).trim();
+  } catch {
+    return cwd;
+  }
+}
 
 export function isInstructionFile(path) {
   return INSTRUCTION_FILE.test(path);
@@ -113,7 +133,7 @@ export function formatIntegritySummary(result) {
 
 /**
  * Persist the result as JSON for later inspection / tooling.
- * @param {string} file Target path, e.g. `.claude/last-session-status.json`.
+ * @param {string} file Target path, e.g. `join(repositoryRoot(), STATUS_FILE)`.
  * @param {{ok:boolean, codegen:string[], manifests:string[], claims?:string[]}} result
  */
 export function writeStatus(file, result) {

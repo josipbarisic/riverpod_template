@@ -2,18 +2,23 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import {
   appendFileSync,
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  realpathSync,
   rmSync,
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import {
+  STATUS_FILE,
   isInstructionFile,
+  repositoryRoot,
   runIntegrityCheck,
   unresolvedClaims,
 } from './integrity_check.mjs';
@@ -265,6 +270,35 @@ test('diagnostics fail open outside git and with unreadable manifest data', asyn
       manifests: [],
       claims: [],
     });
+  } finally {
+    removeRepository(root);
+  }
+});
+
+test('repositoryRoot resolves a subfolder to the top level and falls back outside a repository', () => {
+  const root = createRepository({ 'android/app.gradle': 'android\n' });
+  const outside = mkdtempSync(join(tmpdir(), 'riverpod-template-no-git-'));
+  try {
+    assert.equal(realpathSync(repositoryRoot(join(root, 'android'))), realpathSync(root));
+    assert.equal(repositoryRoot(outside), outside);
+  } finally {
+    removeRepository(root);
+    rmSync(outside, { recursive: true, force: true });
+  }
+});
+
+test('the Stop hook started in a subfolder writes its status at the repository root', () => {
+  const root = createRepository({ 'android/app.gradle': 'android\n' });
+  const hook = new URL('../../.claude/hooks/stop.mjs', import.meta.url);
+  try {
+    execFileSync(process.execPath, [fileURLToPath(hook)], {
+      cwd: join(root, 'android'),
+      input: '{}',
+      stdio: ['pipe', 'ignore', 'ignore'],
+    });
+    assert.ok(existsSync(join(root, STATUS_FILE)), 'status written at the root');
+    assert.ok(!existsSync(join(root, 'android', STATUS_FILE)), 'nothing written in the subfolder');
+    assert.equal(JSON.parse(readFileSync(join(root, STATUS_FILE), 'utf8')).ok, true);
   } finally {
     removeRepository(root);
   }
