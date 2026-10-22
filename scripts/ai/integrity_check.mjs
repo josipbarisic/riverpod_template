@@ -29,6 +29,7 @@ export function repositoryRoot(cwd = process.cwd()) {
       cwd,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
+      timeout: 1500,
     }).trim();
   } catch {
     return cwd;

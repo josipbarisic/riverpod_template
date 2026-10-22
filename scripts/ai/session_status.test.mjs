@@ -13,6 +13,7 @@ import {
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import {
   STATUS_FILE,
@@ -290,7 +291,7 @@ test('the Stop hook started in a subfolder writes its status at the repository r
   const root = createRepository({ 'android/app.gradle': 'android\n' });
   const hook = new URL('../../.claude/hooks/stop.mjs', import.meta.url);
   try {
-    execFileSync(process.execPath, [hook.pathname], {
+    execFileSync(process.execPath, [fileURLToPath(hook)], {
       cwd: join(root, 'android'),
       input: '{}',
       stdio: ['pipe', 'ignore', 'ignore'],
